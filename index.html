@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="prefetch" href="/bg.png" as="image">
+  <link rel="icon" href="/icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.youtube.com/iframe_api"></script>
+  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400&family=Noto+Sans+JP&family=Nunito:wght@100;400&display=swap"
+    rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+  <style>
+    div#app {
+      background-repeat: no-repeat;
+      background-size: cover;
+      /*background-image: linear-gradient(var(--theme1), var(--theme2), var(--theme3));*/
+      position: relative;
+      /* Ensure the parent container is positioned */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-align: center;
+      color: var(--grey_1);
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      overflow-x: hidden;
+      /* Ensure the app takes the full height of the viewport */
+    }
+
+    :root {
+      --theme1: #f0a675;
+      --theme2: #ff877d;
+      --theme3: #ffe4c4;
+    }
+  </style>
+  <title>Keycards</title>
+</head>
+
+<body style="min-height: 100vh; margin: 0;" class="_flex _fd-co">
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

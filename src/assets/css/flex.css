@@ -1,0 +1,83 @@
+._flex { display: flex; }
+._c { align-self: center; flex-direction: column; }
+._cc { align-items: center; justify-content: center; }
+
+/* Flex Direction */
+._fd-co { flex-direction: column; }
+._fd-cr { flex-direction: column-reverse; }
+._fd-ro { flex-direction: row; }
+._fd-rr { flex-direction: row-reverse; }
+
+/* Flex Wrap */
+._fw-no { flex-wrap: nowrap; }
+._fw-wr { flex-wrap: wrap; }
+._fr-re { flex-wrap: wrap-reverse; }
+
+/* Justify Content */
+._jc-ce { justify-content: center; }
+._jc-st { justify-content: flex-start; }
+._jc-en { justify-content: flex-end; }
+._jc-be { justify-content: space-between; }
+._jc-ar { justify-content: space-around; }
+._jc-ev { justify-content: space-evenly; }
+
+/* Align Content */
+._ac-ce { align-content: center; }
+._ac-st { align-content: flex-start; }
+._ac-en { align-content: flex-end; }
+._ac-be { align-content: space-between; }
+._ac-ar { align-content: space-around; }
+._ac-ev { align-content: space-evenly; }
+
+/* Align Items */
+._ai-ce { align-items: center; }
+._ai-fs { align-items: flex-start; }
+._ai-fe { align-items: flex-end; }
+._ai-ba { align-items: baseline; }
+._ai-se { align-items: stretch; }
+
+/* Flex Order */
+._or-0 { order: 0; }
+._or-1 { order: 1; }
+._or-2 { order: 2; }
+._or-3 { order: 3; }
+._or-4 { order: 4; }
+._or-5 { order: 5; }
+._or-6 { order: 6; }
+._or-7 { order: 7; }
+._or-8 { order: 8; }
+
+/* Flex Grow */
+._gro-0 { flex-grow: 0; }
+._gro-1 { flex-grow: 1; }
+._gro-2 { flex-grow: 2; }
+._gro-3 { flex-grow: 3; }
+._gro-4 { flex-grow: 4; }
+._gro-5 { flex-grow: 5; }
+._gro-6 { flex-grow: 6; }
+._gro-7 { flex-grow: 7; }
+._gro-8 { flex-grow: 8; }
+
+/* Flex Basis */
+._bas-0 { flex-basis: 5%; }
+._bas-1 { flex-basis: 10%; }
+._bas-2 { flex-basis: 20%; }
+._bas-3 { flex-basis: 30%; }
+._bas-4 { flex-basis: 40%; }
+._bas-5 { flex-basis: 50%; }
+._bas-6 { flex-basis: 60%; }
+._bas-7 { flex-basis: 70%; }
+._bas-8 { flex-basis: 80%; }
+._bas-9 { flex-basis: 90%; }
+._bas-10 { flex-basis: 100%; }
+
+/* Flex Shrink */
+._shr-0 { flex-shrink: 0; }
+._shr-1 { flex-shrink: 1; }
+._shr-2 { flex-shrink: 2; }
+._shr-3 { flex-shrink: 3; }
+._shr-4 { flex-shrink: 4; }
+._shr-5 { flex-shrink: 5; }
+._shr-6 { flex-shrink: 6; }
+._shr-7 { flex-shrink: 7; }
+._shr-8 { flex-shrink: 8; }

@@ -1,0 +1,2113 @@
+:root {
+    /* Info Color */
+    --info_1: rgb(0, 51, 102);
+    --info_2: rgb(0, 77, 153);
+    --info_3: rgb(0, 102, 204);
+    --info_4: rgb(51, 122, 204);
+    --info_5: rgb(102, 153, 204);
+    --info_6: rgb(153, 183, 204);
+    --info_7: rgb(204, 224, 255);
+    --info_8: rgb(204, 234, 255);
+    --info_9: rgb(204, 244, 255);
+    --info_10: rgb(204, 255, 255);
+
+    /* Error Color */
+    --err_1: rgb(102, 0, 0);
+    --err_2: rgb(153, 0, 0);
+    --err_3: rgb(204, 0, 0);
+    --err_4: rgb(204, 51, 51);
+    --err_5: rgb(204, 102, 102);
+    --err_6: rgb(204, 153, 153);
+    --err_7: rgb(255, 204, 204);
+    --err_8: rgb(255, 214, 214);
+    --err_9: rgb(255, 224, 224);
+    --err_10: rgb(255, 234, 234);
+
+    /* Warning Color */
+    --warn_1: rgb(153, 102, 0);
+    --warn_2: rgb(204, 153, 0);
+    --warn_3: rgb(255, 204, 0);
+    --warn_4: rgb(255, 204, 51);
+    --warn_5: rgb(255, 204, 102);
+    --warn_6: rgb(255, 204, 153);
+    --warn_7: rgb(255, 229, 204);
+    --warn_8: rgb(255, 239, 204);
+    --warn_9: rgb(255, 249, 204);
+    --warn_10: rgb(255, 255, 204);
+
+    /* Grey Color */
+    --grey_1: rgb(26, 26, 26);
+    --grey_2: rgb(51, 51, 51);
+    --grey_3: rgb(77, 77, 77);
+    --grey_4: rgb(102, 102, 102);
+    --grey_5: rgb(128, 128, 128);
+    --grey_6: rgb(153, 153, 153);
+    --grey_7: rgb(179, 179, 179);
+    --grey_8: rgb(204, 204, 204);
+    --grey_9: rgb(230, 230, 230);
+    --grey_10: rgb(255, 255, 255);
+
+    /* Black & White */
+    --dark: rgb(26, 26, 26);
+    --lite: rgb(254, 254, 254);
+
+    /* Success Color */
+    --succ_1: rgb(0, 102, 0);
+    --succ_2: rgb(0, 153, 0);
+    --succ_3: rgb(0, 204, 0);
+    --succ_4: rgb(51, 204, 51);
+    --succ_5: rgb(102, 204, 102);
+    --succ_6: rgb(153, 204, 153);
+    --succ_7: rgb(204, 255, 204);
+    --succ_8: rgb(214, 255, 214);
+    --succ_9: rgb(224, 255, 224);
+    --succ_10: rgb(234, 255, 234);
+
+    --font: Roboto;
+    --secfont: Inter;
+
+    --theme1: #d18d8d;
+    --theme2: #FFFFFF;
+    --theme3: #1A1A1A;
+    --theme4: #ad4444;
+    --theme5:#2E2E2E;
+    --theme6: #f5f2f2;
+}
+
+* {
+    font-family: var(--font), var(--secfont), sans-serif;
+}
+
+/* Theme Styles */
+
+/* Background Colour */
+.__bg-1 {
+    background-color: var(--theme1);
+}
+
+.__bg-2 {
+    background-color: var(--theme2);
+}
+
+.__bg-3 {
+    background-color: var(--theme3);
+}
+
+.__bg-4 {
+    background-color: var(--theme4);
+}
+
+.__bg-5 {
+    background-color: var(--theme5);
+}
+
+.__bg-6 {
+    background-color: var(--theme6);
+}
+
+/* Text Colour */
+
+.__txt-1 {
+    color: var(--theme1);
+}
+
+.__txt-2 {
+    color: var(--theme2);
+}
+
+.__txt-3 {
+    color: var(--theme3);
+}
+
+.__txt-4 {
+    color: var(--theme4);
+}
+
+.__txt-5 {
+    color: var(--theme5);
+}
+
+.__txt-6 {
+    color: var(--theme6);
+}
+
+/* Border Colour */
+
+.__bd-1 {
+    border-color: var(--theme1);
+}
+
+.__bd-2 {
+    border-color: var(--theme2);
+}
+
+.__bd-3 {
+    border-color: var(--theme3);
+}
+
+.__bd-4 {
+    border-color: var(--theme4);
+}
+
+.__bd-5 {
+    border-color: var(--theme5);
+}
+
+.__bd-6 {
+    border-color: var(--theme6);
+}
+
+/* Fill Colour */
+
+.__fill-1 {
+    fill: var(--theme1);
+}
+
+.__fill-2 {
+    fill: var(--theme2);
+}
+
+.__fill-3 {
+    fill: var(--theme3);
+}
+
+.__fill-4 {
+    fill: var(--theme4);
+}
+
+.__fill-5 {
+    fill: var(--theme5);
+}
+
+.__fill-6 {
+    fill: var(--theme6);
+}
+
+/* Hover Fill Colour */
+
+.__hfi-1:hover {
+    fill: var(--theme1);
+}
+
+.__hfi-2:hover {
+    fill: var(--theme2);
+}
+
+.__hfi-3:hover {
+    fill: var(--theme3);
+}
+
+.__hfi-4:hover {
+    fill: var(--theme4);
+}
+
+.__hfi-5:hover {
+    fill: var(--theme5);
+}
+
+.__hfi-6:hover {
+    fill: var(--theme6);
+}
+
+/* Background Colour on Hover */
+
+.__hv-1:hover {
+    background-color: var(--theme1);
+}
+
+.__hv-2:hover {
+    background-color: var(--theme2);
+}
+
+.__hv-3:hover {
+    background-color: var(--theme3);
+}
+
+.__hv-4:hover {
+    background-color: var(--theme4);
+}
+
+.__hv-5:hover {
+    background-color: var(--theme5);
+}
+
+.__hv-6:hover {
+    background-color: var(--theme6);
+}
+
+/* Text Colour on Hover */
+
+.__ht-1:hover {
+    color: var(--theme1);
+}
+
+.__ht-2:hover {
+    color: var(--theme2);
+}
+
+.__ht-3:hover {
+    color: var(--theme3);
+}
+
+.__ht-4:hover {
+    color: var(--theme4);
+}
+
+.__ht-5:hover {
+    color: var(--theme5);
+}
+
+.__ht-6:hover {
+    color: var(--theme6);
+}
+
+
+/* Info Background Classes */
+.__bg-info-1 {
+    background-color: var(--info_1);
+}
+
+.__bg-info-2 {
+    background-color: var(--info_2);
+}
+
+.__bg-info-3 {
+    background-color: var(--info_3);
+}
+
+.__bg-info-4 {
+    background-color: var(--info_4);
+}
+
+.__bg-info-5 {
+    background-color: var(--info_5);
+}
+
+.__bg-info-6 {
+    background-color: var(--info_6);
+}
+
+.__bg-info-7 {
+    background-color: var(--info_7);
+}
+
+.__bg-info-8 {
+    background-color: var(--info_8);
+}
+
+.__bg-info-9 {
+    background-color: var(--info_9);
+}
+
+.__bg-info-10 {
+    background-color: var(--info_10);
+}
+
+/* Error Background Classes */
+.__bg-err-1 {
+    background-color: var(--err_1);
+}
+
+.__bg-err-2 {
+    background-color: var(--err_2);
+}
+
+.__bg-err-3 {
+    background-color: var(--err_3);
+}
+
+.__bg-err-4 {
+    background-color: var(--err_4);
+}
+
+.__bg-err-5 {
+    background-color: var(--err_5);
+}
+
+.__bg-err-6 {
+    background-color: var(--err_6);
+}
+
+.__bg-err-7 {
+    background-color: var(--err_7);
+}
+
+.__bg-err-8 {
+    background-color: var(--err_8);
+}
+
+.__bg-err-9 {
+    background-color: var(--err_9);
+}
+
+.__bg-err-10 {
+    background-color: var(--err_10);
+}
+
+/* Warning Background Classes */
+.__bg-warn-1 {
+    background-color: var(--warn_1);
+}
+
+.__bg-warn-2 {
+    background-color: var(--warn_2);
+}
+
+.__bg-warn-3 {
+    background-color: var(--warn_3);
+}
+
+.__bg-warn-4 {
+    background-color: var(--warn_4);
+}
+
+.__bg-warn-5 {
+    background-color: var(--warn_5);
+}
+
+.__bg-warn-6 {
+    background-color: var(--warn_6);
+}
+
+.__bg-warn-7 {
+    background-color: var(--warn_7);
+}
+
+.__bg-warn-8 {
+    background-color: var(--warn_8);
+}
+
+.__bg-warn-9 {
+    background-color: var(--warn_9);
+}
+
+.__bg-warn-10 {
+    background-color: var(--warn_10);
+}
+
+/* Grey Background Classes */
+.__bg-grey-1 {
+    background-color: var(--grey_1);
+}
+
+.__bg-grey-2 {
+    background-color: var(--grey_2);
+}
+
+.__bg-grey-3 {
+    background-color: var(--grey_3);
+}
+
+.__bg-grey-4 {
+    background-color: var(--grey_4);
+}
+
+.__bg-grey-5 {
+    background-color: var(--grey_5);
+}
+
+.__bg-grey-6 {
+    background-color: var(--grey_6);
+}
+
+.__bg-grey-7 {
+    background-color: var(--grey_7);
+}
+
+.__bg-grey-8 {
+    background-color: var(--grey_8);
+}
+
+.__bg-grey-9 {
+    background-color: var(--grey_9);
+}
+
+.__bg-grey-10 {
+    background-color: var(--grey_10);
+}
+
+/* Success Background Classes */
+.__bg-succ-1 {
+    background-color: var(--succ_1);
+}
+
+.__bg-succ-2 {
+    background-color: var(--succ_2);
+}
+
+.__bg-succ-3 {
+    background-color: var(--succ_3);
+}
+
+.__bg-succ-4 {
+    background-color: var(--succ_4);
+}
+
+.__bg-succ-5 {
+    background-color: var(--succ_5);
+}
+
+.__bg-succ-6 {
+    background-color: var(--succ_6);
+}
+
+.__bg-succ-7 {
+    background-color: var(--succ_7);
+}
+
+.__bg-succ-8 {
+    background-color: var(--succ_8);
+}
+
+.__bg-succ-9 {
+    background-color: var(--succ_9);
+}
+
+.__bg-succ-10 {
+    background-color: var(--succ_10);
+}
+
+.__bg-none {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+
+/* Info Text Color Classes */
+.__txt-info-1 {
+    color: var(--info_1);
+}
+
+.__txt-info-2 {
+    color: var(--info_2);
+}
+
+.__txt-info-3 {
+    color: var(--info_3);
+}
+
+.__txt-info-4 {
+    color: var(--info_4);
+}
+
+.__txt-info-5 {
+    color: var(--info_5);
+}
+
+.__txt-info-6 {
+    color: var(--info_6);
+}
+
+.__txt-info-7 {
+    color: var(--info_7);
+}
+
+.__txt-info-8 {
+    color: var(--info_8);
+}
+
+.__txt-info-9 {
+    color: var(--info_9);
+}
+
+.__txt-info-10 {
+    color: var(--info_10);
+}
+
+/* Error Text Color Classes */
+.__txt-err-1 {
+    color: var(--err_1);
+}
+
+.__txt-err-2 {
+    color: var(--err_2);
+}
+
+.__txt-err-3 {
+    color: var(--err_3);
+}
+
+.__txt-err-4 {
+    color: var(--err_4);
+}
+
+.__txt-err-5 {
+    color: var(--err_5);
+}
+
+.__txt-err-6 {
+    color: var(--err_6);
+}
+
+.__txt-err-7 {
+    color: var(--err_7);
+}
+
+.__txt-err-8 {
+    color: var(--err_8);
+}
+
+.__txt-err-9 {
+    color: var(--err_9);
+}
+
+.__txt-err-10 {
+    color: var(--err_10);
+}
+
+/* Warning Text Color Classes */
+.__txt-warn-1 {
+    color: var(--warn_1);
+}
+
+.__txt-warn-2 {
+    color: var(--warn_2);
+}
+
+.__txt-warn-3 {
+    color: var(--warn_3);
+}
+
+.__txt-warn-4 {
+    color: var(--warn_4);
+}
+
+.__txt-warn-5 {
+    color: var(--warn_5);
+}
+
+.__txt-warn-6 {
+    color: var(--warn_6);
+}
+
+.__txt-warn-7 {
+    color: var(--warn_7);
+}
+
+.__txt-warn-8 {
+    color: var(--warn_8);
+}
+
+.__txt-warn-9 {
+    color: var(--warn_9);
+}
+
+.__txt-warn-10 {
+    color: var(--warn_10);
+}
+
+/* Grey Text Color Classes */
+.__txt-grey-1 {
+    color: var(--grey_1);
+}
+
+.__txt-grey-2 {
+    color: var(--grey_2);
+}
+
+.__txt-grey-3 {
+    color: var(--grey_3);
+}
+
+.__txt-grey-4 {
+    color: var(--grey_4);
+}
+
+.__txt-grey-5 {
+    color: var(--grey_5);
+}
+
+.__txt-grey-6 {
+    color: var(--grey_6);
+}
+
+.__txt-grey-7 {
+    color: var(--grey_7);
+}
+
+.__txt-grey-8 {
+    color: var(--grey_8);
+}
+
+.__txt-grey-9 {
+    color: var(--grey_9);
+}
+
+.__txt-grey-10 {
+    color: var(--grey_10);
+}
+
+/* Success Text Color Classes */
+.__txt-succ-1 {
+    color: var(--succ_1);
+}
+
+.__txt-succ-2 {
+    color: var(--succ_2);
+}
+
+.__txt-succ-3 {
+    color: var(--succ_3);
+}
+
+.__txt-succ-4 {
+    color: var(--succ_4);
+}
+
+.__txt-succ-5 {
+    color: var(--succ_5);
+}
+
+.__txt-succ-6 {
+    color: var(--succ_6);
+}
+
+.__txt-succ-7 {
+    color: var(--succ_7);
+}
+
+.__txt-succ-8 {
+    color: var(--succ_8);
+}
+
+.__txt-succ-9 {
+    color: var(--succ_9);
+}
+
+.__txt-succ-10 {
+    color: var(--succ_10);
+}
+
+
+
+/* Info Border Classes */
+.__bo-info-1 {
+    border-color: var(--info_1);
+}
+
+.__bo-info-2 {
+    border-color: var(--info_2);
+}
+
+.__bo-info-3 {
+    border-color: var(--info_3);
+}
+
+.__bo-info-4 {
+    border-color: var(--info_4);
+}
+
+.__bo-info-5 {
+    border-color: var(--info_5);
+}
+
+.__bo-info-6 {
+    border-color: var(--info_6);
+}
+
+.__bo-info-7 {
+    border-color: var(--info_7);
+}
+
+.__bo-info-8 {
+    border-color: var(--info_8);
+}
+
+.__bo-info-9 {
+    border-color: var(--info_9);
+}
+
+.__bo-info-10 {
+    border-color: var(--info_10);
+}
+
+/* Error Border Classes */
+.__bo-err-1 {
+    border-color: var(--err_1);
+}
+
+.__bo-err-2 {
+    border-color: var(--err_2);
+}
+
+.__bo-err-3 {
+    border-color: var(--err_3);
+}
+
+.__bo-err-4 {
+    border-color: var(--err_4);
+}
+
+.__bo-err-5 {
+    border-color: var(--err_5);
+}
+
+.__bo-err-6 {
+    border-color: var(--err_6);
+}
+
+.__bo-err-7 {
+    border-color: var(--err_7);
+}
+
+.__bo-err-8 {
+    border-color: var(--err_8);
+}
+
+.__bo-err-9 {
+    border-color: var(--err_9);
+}
+
+.__bo-err-10 {
+    border-color: var(--err_10);
+}
+
+/* Warning Border Classes */
+.__bo-warn-1 {
+    border-color: var(--warn_1);
+}
+
+.__bo-warn-2 {
+    border-color: var(--warn_2);
+}
+
+.__bo-warn-3 {
+    border-color: var(--warn_3);
+}
+
+.__bo-warn-4 {
+    border-color: var(--warn_4);
+}
+
+.__bo-warn-5 {
+    border-color: var(--warn_5);
+}
+
+.__bo-warn-6 {
+    border-color: var(--warn_6);
+}
+
+.__bo-warn-7 {
+    border-color: var(--warn_7);
+}
+
+.__bo-warn-8 {
+    border-color: var(--warn_8);
+}
+
+.__bo-warn-9 {
+    border-color: var(--warn_9);
+}
+
+.__bo-warn-10 {
+    border-color: var(--warn_10);
+}
+
+/* Grey Border Classes */
+.__bo-grey-1 {
+    border-color: var(--grey_1);
+}
+
+.__bo-grey-2 {
+    border-color: var(--grey_2);
+}
+
+.__bo-grey-3 {
+    border-color: var(--grey_3);
+}
+
+.__bo-grey-4 {
+    border-color: var(--grey_4);
+}
+
+.__bo-grey-5 {
+    border-color: var(--grey_5);
+}
+
+.__bo-grey-6 {
+    border-color: var(--grey_6);
+}
+
+.__bo-grey-7 {
+    border-color: var(--grey_7);
+}
+
+.__bo-grey-8 {
+    border-color: var(--grey_8);
+}
+
+.__bo-grey-9 {
+    border-color: var(--grey_9);
+}
+
+.__bo-grey-10 {
+    border-color: var(--grey_10);
+}
+
+/* Success Border Classes */
+.__bo-succ-1 {
+    border-color: var(--succ_1);
+}
+
+.__bo-succ-2 {
+    border-color: var(--succ_2);
+}
+
+.__bo-succ-3 {
+    border-color: var(--succ_3);
+}
+
+.__bo-succ-4 {
+    border-color: var(--succ_4);
+}
+
+.__bo-succ-5 {
+    border-color: var(--succ_5);
+}
+
+.__bo-succ-6 {
+    border-color: var(--succ_6);
+}
+
+.__bo-succ-7 {
+    border-color: var(--succ_7);
+}
+
+.__bo-succ-8 {
+    border-color: var(--succ_8);
+}
+
+.__bo-succ-9 {
+    border-color: var(--succ_9);
+}
+
+.__bo-succ-10 {
+    border-color: var(--succ_10);
+}
+
+/* Border Widths */
+
+.__bod {
+    border-width: 1px;
+    border-style: solid;
+}
+
+.__bo-2 {
+    border-width: 2px;
+    border-style: solid;
+}
+
+.__bo-3 {
+    border-width: 3px;
+    border-style: solid;
+}
+
+.__bo-4 {
+    border-width: 4px;
+    border-style: solid;
+}
+
+.__bo-5 {
+    border-width: 5px;
+    border-style: solid;
+}
+
+.__bo-none {
+    border: none;
+}
+
+
+/* Info Hover Background Classes */
+.__hv-info-1:hover {
+    background-color: var(--info_1);
+}
+
+.__hv-info-2:hover {
+    background-color: var(--info_2);
+}
+
+.__hv-info-3:hover {
+    background-color: var(--info_3);
+}
+
+.__hv-info-4:hover {
+    background-color: var(--info_4);
+}
+
+.__hv-info-5:hover {
+    background-color: var(--info_5);
+}
+
+.__hv-info-6:hover {
+    background-color: var(--info_6);
+}
+
+.__hv-info-7:hover {
+    background-color: var(--info_7);
+}
+
+.__hv-info-8:hover {
+    background-color: var(--info_8);
+}
+
+.__hv-info-9:hover {
+    background-color: var(--info_9);
+}
+
+.__hv-info-10:hover {
+    background-color: var(--info_10);
+}
+
+/* Error Hover Background Classes */
+.__hv-err-1:hover {
+    background-color: var(--err_1);
+}
+
+.__hv-err-2:hover {
+    background-color: var(--err_2);
+}
+
+.__hv-err-3:hover {
+    background-color: var(--err_3);
+}
+
+.__hv-err-4:hover {
+    background-color: var(--err_4);
+}
+
+.__hv-err-5:hover {
+    background-color: var(--err_5);
+}
+
+.__hv-err-6:hover {
+    background-color: var(--err_6);
+}
+
+.__hv-err-7:hover {
+    background-color: var(--err_7);
+}
+
+.__hv-err-8:hover {
+    background-color: var(--err_8);
+}
+
+.__hv-err-9:hover {
+    background-color: var(--err_9);
+}
+
+.__hv-err-10:hover {
+    background-color: var(--err_10);
+}
+
+/* Warning Hover Background Classes */
+.__hv-warn-1:hover {
+    background-color: var(--warn_1);
+}
+
+.__hv-warn-2:hover {
+    background-color: var(--warn_2);
+}
+
+.__hv-warn-3:hover {
+    background-color: var(--warn_3);
+}
+
+.__hv-warn-4:hover {
+    background-color: var(--warn_4);
+}
+
+.__hv-warn-5:hover {
+    background-color: var(--warn_5);
+}
+
+.__hv-warn-6:hover {
+    background-color: var(--warn_6);
+}
+
+.__hv-warn-7:hover {
+    background-color: var(--warn_7);
+}
+
+.__hv-warn-8:hover {
+    background-color: var(--warn_8);
+}
+
+.__hv-warn-9:hover {
+    background-color: var(--warn_9);
+}
+
+.__hv-warn-10:hover {
+    background-color: var(--warn_10);
+}
+
+/* Grey Hover Background Classes */
+.__hv-grey-1:hover {
+    background-color: var(--grey_1);
+}
+
+.__hv-grey-2:hover {
+    background-color: var(--grey_2);
+}
+
+.__hv-grey-3:hover {
+    background-color: var(--grey_3);
+}
+
+.__hv-grey-4:hover {
+    background-color: var(--grey_4);
+}
+
+.__hv-grey-5:hover {
+    background-color: var(--grey_5);
+}
+
+.__hv-grey-6:hover {
+    background-color: var(--grey_6);
+}
+
+.__hv-grey-7:hover {
+    background-color: var(--grey_7);
+}
+
+.__hv-grey-8:hover {
+    background-color: var(--grey_8);
+}
+
+.__hv-grey-9:hover {
+    background-color: var(--grey_9);
+}
+
+.__hv-grey-10:hover {
+    background-color: var(--grey_10);
+}
+
+/* Success Hover Background Classes */
+.__hv-succ-1:hover {
+    background-color: var(--succ_1);
+}
+
+.__hv-succ-2:hover {
+    background-color: var(--succ_2);
+}
+
+.__hv-succ-3:hover {
+    background-color: var(--succ_3);
+}
+
+.__hv-succ-4:hover {
+    background-color: var(--succ_4);
+}
+
+.__hv-succ-5:hover {
+    background-color: var(--succ_5);
+}
+
+.__hv-succ-6:hover {
+    background-color: var(--succ_6);
+}
+
+.__hv-succ-7:hover {
+    background-color: var(--succ_7);
+}
+
+.__hv-succ-8:hover {
+    background-color: var(--succ_8);
+}
+
+.__hv-succ-9:hover {
+    background-color: var(--succ_9);
+}
+
+.__hv-succ-10:hover {
+    background-color: var(--succ_10);
+}
+
+/* Info Hover Text Color Classes */
+.__ht-info-1:hover {
+    color: var(--info_1);
+}
+
+.__ht-info-2:hover {
+    color: var(--info_2);
+}
+
+.__ht-info-3:hover {
+    color: var(--info_3);
+}
+
+.__ht-info-4:hover {
+    color: var(--info_4);
+}
+
+.__ht-info-5:hover {
+    color: var(--info_5);
+}
+
+.__ht-info-6:hover {
+    color: var(--info_6);
+}
+
+.__ht-info-7:hover {
+    color: var(--info_7);
+}
+
+.__ht-info-8:hover {
+    color: var(--info_8);
+}
+
+.__ht-info-9:hover {
+    color: var(--info_9);
+}
+
+.__ht-info-10:hover {
+    color: var(--info_10);
+}
+
+/* Error Hover Text Color Classes */
+.__ht-err-1:hover {
+    color: var(--err_1);
+}
+
+.__ht-err-2:hover {
+    color: var(--err_2);
+}
+
+.__ht-err-3:hover {
+    color: var(--err_3);
+}
+
+.__ht-err-4:hover {
+    color: var(--err_4);
+}
+
+.__ht-err-5:hover {
+    color: var(--err_5);
+}
+
+.__ht-err-6:hover {
+    color: var(--err_6);
+}
+
+.__ht-err-7:hover {
+    color: var(--err_7);
+}
+
+.__ht-err-8:hover {
+    color: var(--err_8);
+}
+
+.__ht-err-9:hover {
+    color: var(--err_9);
+}
+
+.__ht-err-10:hover {
+    color: var(--err_10);
+}
+
+/* Warning Hover Text Color Classes */
+.__ht-warn-1:hover {
+    color: var(--warn_1);
+}
+
+.__ht-warn-2:hover {
+    color: var(--warn_2);
+}
+
+.__ht-warn-3:hover {
+    color: var(--warn_3);
+}
+
+.__ht-warn-4:hover {
+    color: var(--warn_4);
+}
+
+.__ht-warn-5:hover {
+    color: var(--warn_5);
+}
+
+.__ht-warn-6:hover {
+    color: var(--warn_6);
+}
+
+.__ht-warn-7:hover {
+    color: var(--warn_7);
+}
+
+.__ht-warn-8:hover {
+    color: var(--warn_8);
+}
+
+.__ht-warn-9:hover {
+    color: var(--warn_9);
+}
+
+.__ht-warn-10:hover {
+    color: var(--warn_10);
+}
+
+/* Grey Hover Text Color Classes */
+.__ht-grey-1:hover {
+    color: var(--grey_1);
+}
+
+.__ht-grey-2:hover {
+    color: var(--grey_2);
+}
+
+.__ht-grey-3:hover {
+    color: var(--grey_3);
+}
+
+.__ht-grey-4:hover {
+    color: var(--grey_4);
+}
+
+.__ht-grey-5:hover {
+    color: var(--grey_5);
+}
+
+.__ht-grey-6:hover {
+    color: var(--grey_6);
+}
+
+.__ht-grey-7:hover {
+    color: var(--grey_7);
+}
+
+.__ht-grey-8:hover {
+    color: var(--grey_8);
+}
+
+.__ht-grey-9:hover {
+    color: var(--grey_9);
+}
+
+.__ht-grey-10:hover {
+    color: var(--grey_10);
+}
+
+/* Success Hover Text Color Classes */
+.__ht-succ-1:hover {
+    color: var(--succ_1);
+}
+
+.__ht-succ-2:hover {
+    color: var(--succ_2);
+}
+
+.__ht-succ-3:hover {
+    color: var(--succ_3);
+}
+
+.__ht-succ-4:hover {
+    color: var(--succ_4);
+}
+
+.__ht-succ-5:hover {
+    color: var(--succ_5);
+}
+
+.__ht-succ-6:hover {
+    color: var(--succ_6);
+}
+
+.__ht-succ-7:hover {
+    color: var(--succ_7);
+}
+
+.__ht-succ-8:hover {
+    color: var(--succ_8);
+}
+
+.__ht-succ-9:hover {
+    color: var(--succ_9);
+}
+
+.__ht-succ-10:hover {
+    color: var(--succ_10);
+}
+
+.__ht-un:hover {
+    text-decoration: underline;
+}
+
+.__hv-op:hover {
+    opacity: 0.7;
+}
+
+.__hv {
+    transition: 0.25s;
+}
+
+
+
+/* Info Fill Classes */
+.__fi-info-1 {
+    fill: var(--info_1);
+}
+
+.__fi-info-2 {
+    fill: var(--info_2);
+}
+
+.__fi-info-3 {
+    fill: var(--info_3);
+}
+
+.__fi-info-4 {
+    fill: var(--info_4);
+}
+
+.__fi-info-5 {
+    fill: var(--info_5);
+}
+
+.__fi-info-6 {
+    fill: var(--info_6);
+}
+
+.__fi-info-7 {
+    fill: var(--info_7);
+}
+
+.__fi-info-8 {
+    fill: var(--info_8);
+}
+
+.__fi-info-9 {
+    fill: var(--info_9);
+}
+
+.__fi-info-10 {
+    fill: var(--info_10);
+}
+
+/* Error Fill Classes */
+.__fi-err-1 {
+    fill: var(--err_1);
+}
+
+.__fi-err-2 {
+    fill: var(--err_2);
+}
+
+.__fi-err-3 {
+    fill: var(--err_3);
+}
+
+.__fi-err-4 {
+    fill: var(--err_4);
+}
+
+.__fi-err-5 {
+    fill: var(--err_5);
+}
+
+.__fi-err-6 {
+    fill: var(--err_6);
+}
+
+.__fi-err-7 {
+    fill: var(--err_7);
+}
+
+.__fi-err-8 {
+    fill: var(--err_8);
+}
+
+.__fi-err-9 {
+    fill: var(--err_9);
+}
+
+.__fi-err-10 {
+    fill: var(--err_10);
+}
+
+/* Warning Fill Classes */
+.__fi-warn-1 {
+    fill: var(--warn_1);
+}
+
+.__fi-warn-2 {
+    fill: var(--warn_2);
+}
+
+.__fi-warn-3 {
+    fill: var(--warn_3);
+}
+
+.__fi-warn-4 {
+    fill: var(--warn_4);
+}
+
+.__fi-warn-5 {
+    fill: var(--warn_5);
+}
+
+.__fi-warn-6 {
+    fill: var(--warn_6);
+}
+
+.__fi-warn-7 {
+    fill: var(--warn_7);
+}
+
+.__fi-warn-8 {
+    fill: var(--warn_8);
+}
+
+.__fi-warn-9 {
+    fill: var(--warn_9);
+}
+
+.__fi-warn-10 {
+    fill: var(--warn_10);
+}
+
+/* Grey Fill Classes */
+.__fi-grey-1 {
+    fill: var(--grey_1);
+}
+
+.__fi-grey-2 {
+    fill: var(--grey_2);
+}
+
+.__fi-grey-3 {
+    fill: var(--grey_3);
+}
+
+.__fi-grey-4 {
+    fill: var(--grey_4);
+}
+
+.__fi-grey-5 {
+    fill: var(--grey_5);
+}
+
+.__fi-grey-6 {
+    fill: var(--grey_6);
+}
+
+.__fi-grey-7 {
+    fill: var(--grey_7);
+}
+
+.__fi-grey-8 {
+    fill: var(--grey_8);
+}
+
+.__fi-grey-9 {
+    fill: var(--grey_9);
+}
+
+.__fi-grey-10 {
+    fill: var(--grey_10);
+}
+
+/* Success Fill Classes */
+.__fi-succ-1 {
+    fill: var(--succ_1);
+}
+
+.__fi-succ-2 {
+    fill: var(--succ_2);
+}
+
+.__fi-succ-3 {
+    fill: var(--succ_3);
+}
+
+.__fi-succ-4 {
+    fill: var(--succ_4);
+}
+
+.__fi-succ-5 {
+    fill: var(--succ_5);
+}
+
+.__fi-succ-6 {
+    fill: var(--succ_6);
+}
+
+.__fi-succ-7 {
+    fill: var(--succ_7);
+}
+
+.__fi-succ-8 {
+    fill: var(--succ_8);
+}
+
+.__fi-succ-9 {
+    fill: var(--succ_9);
+}
+
+.__fi-succ-10 {
+    fill: var(--succ_10);
+}
+
+
+
+/* Info Fill Classes Hover */
+.__hfi-info-1:hover {
+    fill: var(--info_1);
+}
+
+.__hfi-info-2:hover {
+    fill: var(--info_2);
+}
+
+.__hfi-info-3:hover {
+    fill: var(--info_3);
+}
+
+.__hfi-info-4:hover {
+    fill: var(--info_4);
+}
+
+.__hfi-info-5:hover {
+    fill: var(--info_5);
+}
+
+.__hfi-info-6:hover {
+    fill: var(--info_6);
+}
+
+.__hfi-info-7:hover {
+    fill: var(--info_7);
+}
+
+.__hfi-info-8:hover {
+    fill: var(--info_8);
+}
+
+.__hfi-info-9:hover {
+    fill: var(--info_9);
+}
+
+.__hfi-info-10:hover {
+    fill: var(--info_10);
+}
+
+/* Error Fill Classes Hover */
+.__hfi-err-1:hover {
+    fill: var(--err_1);
+}
+
+.__hfi-err-2:hover {
+    fill: var(--err_2);
+}
+
+.__hfi-err-3:hover {
+    fill: var(--err_3);
+}
+
+.__hfi-err-4:hover {
+    fill: var(--err_4);
+}
+
+.__hfi-err-5:hover {
+    fill: var(--err_5);
+}
+
+.__hfi-err-6:hover {
+    fill: var(--err_6);
+}
+
+.__hfi-err-7:hover {
+    fill: var(--err_7);
+}
+
+.__hfi-err-8:hover {
+    fill: var(--err_8);
+}
+
+.__hfi-err-9:hover {
+    fill: var(--err_9);
+}
+
+.__hfi-err-10:hover {
+    fill: var(--err_10);
+}
+
+/* Warning Fill Classes Hover */
+.__hfi-warn-1:hover {
+    fill: var(--warn_1);
+}
+
+.__hfi-warn-2:hover {
+    fill: var(--warn_2);
+}
+
+.__hfi-warn-3:hover {
+    fill: var(--warn_3);
+}
+
+.__hfi-warn-4:hover {
+    fill: var(--warn_4);
+}
+
+.__hfi-warn-5:hover {
+    fill: var(--warn_5);
+}
+
+.__hfi-warn-6:hover {
+    fill: var(--warn_6);
+}
+
+.__hfi-warn-7:hover {
+    fill: var(--warn_7);
+}
+
+.__hfi-warn-8:hover {
+    fill: var(--warn_8);
+}
+
+.__hfi-warn-9:hover {
+    fill: var(--warn_9);
+}
+
+.__hfi-warn-10:hover {
+    fill: var(--warn_10);
+}
+
+/* Grey Fill Classes Hover */
+.__hfi-grey-1:hover {
+    fill: var(--grey_1);
+}
+
+.__hfi-grey-2:hover {
+    fill: var(--grey_2);
+}
+
+.__hfi-grey-3:hover {
+    fill: var(--grey_3);
+}
+
+.__hfi-grey-4:hover {
+    fill: var(--grey_4);
+}
+
+.__hfi-grey-5:hover {
+    fill: var(--grey_5);
+}
+
+.__hfi-grey-6:hover {
+    fill: var(--grey_6);
+}
+
+.__hfi-grey-7:hover {
+    fill: var(--grey_7);
+}
+
+.__hfi-grey-8:hover {
+    fill: var(--grey_8);
+}
+
+.__hfi-grey-9:hover {
+    fill: var(--grey_9);
+}
+
+.__hfi-grey-10:hover {
+    fill: var(--grey_10);
+}
+
+/* Success Fill Classes Hover */
+.__hfi-succ-1:hover {
+    fill: var(--succ_1);
+}
+
+.__hfi-succ-2:hover {
+    fill: var(--succ_2);
+}
+
+.__hfi-succ-3:hover {
+    fill: var(--succ_3);
+}
+
+.__hfi-succ-4:hover {
+    fill: var(--succ_4);
+}
+
+.__hfi-succ-5:hover {
+    fill: var(--succ_5);
+}
+
+.__hfi-succ-6:hover {
+    fill: var(--succ_6);
+}
+
+.__hfi-succ-7:hover {
+    fill: var(--succ_7);
+}
+
+.__hfi-succ-8:hover {
+    fill: var(--succ_8);
+}
+
+.__hfi-succ-9:hover {
+    fill: var(--succ_9);
+}
+
+.__hfi-succ-10:hover {
+    fill: var(--succ_10);
+}
+
+
+
+/* Opacity */
+.__op1 {
+    opacity: 0.1;
+}
+
+.__op2 {
+    opacity: 0.2;
+}
+
+.__op3 {
+    opacity: 0.3;
+}
+
+.__op4 {
+    opacity: 0.4;
+}
+
+.__op5 {
+    opacity: 0.5;
+}
+
+.__op6 {
+    opacity: 0.6;
+}
+
+.__op7 {
+    opacity: 0.7;
+}
+
+.__op8 {
+    opacity: 0.8;
+}
+
+.__op9 {
+    opacity: 0.9;
+}
+
+
+
+/* Breaks */
+.__brxs {
+    margin-top: 10px;
+}
+
+.__brsm {
+    margin-top: 20px;
+}
+
+.__brmd {
+    margin-top: 25px;
+}
+
+.__brlg {
+    margin-top: 40px;
+}
+
+.__brxl {
+    margin-top: 50px;
+}
+
+.__brgl {
+    margin-top: 70px;
+}
+
+
+
+/* Widths */
+.__1w {
+    max-width: 10%;
+}
+
+.__2w {
+    max-width: 20%;
+}
+
+.__3w {
+    max-width: 30%;
+}
+
+.__4w {
+    max-width: 40%;
+}
+
+.__5w {
+    max-width: 50%;
+}
+
+.__6w {
+    max-width: 60%;
+}
+
+.__7w {
+    max-width: 70%;
+}
+
+.__8w {
+    max-width: 80%;
+}
+
+.__9w {
+    max-width: 90%;
+}
+
+.__10w {
+    max-width: 100%;
+}
+
+.__w {
+    max-width: 90vw
+}
+
+.__wmx {
+    min-width: max-content;
+}
+
+/* Pixel Widths */
+
+.__15 {
+    width: 1500px;
+}
+
+.__14 {
+    width: 1400px;
+}
+
+.__13 {
+    width: 1300px;
+}
+
+.__12 {
+    width: 1200px;
+}
+
+.__11 {
+    width: 1100px;
+}
+
+.__10 {
+    width: 1000px;
+}
+
+
+
+/* Box Shadows */
+
+.__shd {
+    box-shadow: 3px 2px 3px 1px rgba(127, 126, 126, 0.1), 2px 2px 4px rgba(92, 90, 90, 0.1)
+}
+
+.__shdxs {
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), ;
+}
+
+.__shdsm {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.__shdmd {
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.__shdlg {
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+
+
+/* Font Size */
+.__txs {
+    font-size: 10px;
+}
+
+.__tsm {
+    font-size: 15px;
+}
+
+.__tmd {
+    font-size: 20px;
+}
+
+.__tlg {
+    font-size: 25px;
+}
+
+.__txl {
+    font-size: 40px;
+}
+
+.__tlx {
+    font-size: 50px;
+}
+
+.__tgl {
+    font-size: 70px;
+}
+
+
+
+
+/* Text Align */
+.__tal {
+    text-align: center;
+}
+
+.__tle {
+    text-align: left;
+}
+
+.__tri {
+    text-align: right;
+}
+
+
+
+/* Margins */
+.__mauto {
+    margin: auto;
+}
+
+.__mlauto {
+    margin-left: auto;
+}
+
+.__mrauto {
+    margin-right: auto;
+}
+
+
+
+/* Border Radius */
+.__bdxs {
+    border-radius: 5px;
+}
+
+.__bdsm {
+    border-radius: 20px;
+}
+
+.__bdmd {
+    border-radius: 25px;
+}
+
+.__bdlg {
+    border-radius: 40px;
+}
+
+.__bdxl {
+    border-radius: 50px;
+}
+
+.__bdgl {
+    border-radius: 70px;
+}
+
+/* Round (circular) */
+.__bdro {
+    border-radius: 50%;
+}
+
+
+
+/* Padding */
+.__padxs {
+    padding: 10px;
+}
+
+.__padsm {
+    padding: 20px;
+}
+
+.__padmd {
+    padding: 25px;
+}
+
+.__padlg {
+    padding: 40px;
+}
+
+.__padxl {
+    padding: 50px;
+}
+
+.__padgl {
+    padding: 70px;
+}
+
+
+
+/* Text Styles */
+
+.__nun {
+    text-decoration: none;
+}
+
+.__un {
+    text-decoration: underline;
+}
+
+.__em {
+    font-style: italic;
+}
+
+.__bo {
+    font-weight: bold;
+}
+
+
+
+/* 100% Width & Height */
+.__b {
+    width: 100%;
+}
+
+.__hack {
+    height: 100%;
+}
+
+
+
+/* Dividers */
+.__hr {
+    height: 1px;
+    width: 100%;
+    border-style: solid;
+}
+
+
+/* Text Wrap */
+.__twrap {
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+
+/* Border Box */
+.__bobox {
+    box-sizing: border-box;
+}
+
+
+
+/* Overflow */
+
+.__nxflow {
+    overflow-x: hidden;
+}
+
+.__nyflow {
+    overflow-y: hidden;
+}
+.__xflow {
+    overflow-x: auto;
+}
+.__yflow {
+    overflow-y: auto;
+}
