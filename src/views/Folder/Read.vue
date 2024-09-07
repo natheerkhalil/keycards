@@ -75,7 +75,7 @@
                             <p class="__txt-grey-10">Create Folder</p>
                         </div>
                     </router-link> &nbsp; &nbsp;
-                    <router-link class="__nun" to="/card/create">
+                    <router-link class="__nun" :to="`/card/create?f=${folder.id}`">
                         <div class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 _fd-ro __bg-none __po">
                             <svg class="__fi-grey-10" width="25" height="25" clip-rule="evenodd" fill-rule="evenodd"
                                 stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
@@ -253,6 +253,8 @@
 <script>
 import { useResponseStore } from '@/stores/response';
 
+import { useDataStore } from '@/stores/data';
+
 export default {
     methods: {
         searchCards() {
@@ -283,6 +285,8 @@ export default {
                 this.cards.forEach(card => card.selected = true);
         },
 
+
+        // CARD OPERATIONS //
         editCard(e) {
             e.preventDefault();
 
@@ -328,6 +332,7 @@ export default {
             id = Number(id);
         },
 
+        // MASS SELECT CARD OPERATIONS //
         toggleSelected(id) {
             this.cards.find(card => card.id === id).selected = !this.cards.find(card => card.id === id).selected;
         },
@@ -363,22 +368,18 @@ export default {
     },
 
     created() {
-        /*this.allCards = this.cards;
-
-        this.folder.theme = this.themes[Math.floor(Math.random() * this.themes.length)];*/
-
         let id = this.$route.params.id;
 
+        // if id parameter is not provided, redirect to 404 page
         if (!id) {
             this.$router.push({ name: "404" });
 
             return;
         }
 
-        let folders = JSON.parse(localStorage.getItem("folders")) || [];
+        let folder = useDataStore().readFolder(id);
 
-        let folder = folders.find(f => f.id === Number(id));
-
+        // if folder with given id does not exist, redirect to 404 page
         if (!folder) {
             this.$router.push({ name: "404" });
 
@@ -386,6 +387,9 @@ export default {
         }
 
         this.folder = folder;
+
+        this.cards = useDataStore().getCards(id);
+        this.allCards = this.cards;
     },
 
 
@@ -394,6 +398,8 @@ export default {
             editing: false,
 
             cardLimit: 75,
+
+            folders: useDataStore().getFolders(),
 
             folder: {
             },
@@ -415,7 +421,81 @@ export default {
             searchResults: [],
 
             allCards: [],
-            cards: [{ q: "What is the process of photosynthesis?", a: "Photosynthesis is the process by which green plants, algae, and some bacteria convert sunlight into glucose, carbon dioxide, and water. This process takes place in the chloroplasts of plant cells.", status: "1", id: 609240 },
+            cards: []
+        }
+    },
+}
+</script>
+
+<style scoped>
+.card {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 5px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 250px;
+    height: 200px;
+    max-height: 200px;
+    margin: 15px;
+}
+
+.card:hover {
+    opacity: 0.8;
+}
+
+@media screen and (max-width: 600px) {
+    .card {
+        width: 100%;
+        height: 150px;
+        max-height: 150px;
+    }
+}
+
+.create-btn:hover svg {
+    fill: var(--grey_10);
+}
+
+.create-btn:hover p {
+    color: var(--grey_10);
+}
+
+.custcheck {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    min-width: 24px;
+    min-height: 24px;
+    border: 2px solid var(--grey_10);
+    border-radius: 50%;
+    padding: 4px;
+    cursor: pointer;
+    position: relative;
+}
+
+.custcheck:checked {
+    background-color: var(--info_5);
+}
+
+.custcheck:checked::before {
+    content: '';
+    display: block;
+    width: 12px;
+    height: 12px;
+    background-color: var(--info_7);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+</style>
+
+<!--
+
+ cards: [{ q: "What is the process of photosynthesis?", a: "Photosynthesis is the process by which green plants, algae, and some bacteria convert sunlight into glucose, carbon dioxide, and water. This process takes place in the chloroplasts of plant cells.", status: "1", id: 609240 },
 
             { q: "What is the significance of photosynthesis in the ecosystem?", a: "Photosynthesis plays a crucial role in maintaining the balance of the ecosystem by providing essential nutrients for all organisms, supporting the growth and reproduction of plants and animals, and contributing to the overall health of the environment.", status: "0", id: 804205 },
 
@@ -599,73 +679,5 @@ export default {
 
             { q: "What is the effect of ultraviolet light on photosynthesis?", a: "Excessive ultraviolet light can damage DNA and proteins involved in photosynthesis, leading to reduced efficiency and potential harm to the plant's cellular structures.", status: "2", id: 660963 },
             ],
-        }
-    },
-}
-</script>
 
-<style scoped>
-.card {
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-    border-radius: 5px;
-
-    overflow-y: auto;
-    overflow-x: hidden;
-    width: 250px;
-    height: 200px;
-    max-height: 200px;
-    margin: 15px;
-}
-
-.card:hover {
-    opacity: 0.8;
-}
-
-@media screen and (max-width: 600px) {
-    .card {
-        width: 100%;
-        height: 150px;
-        max-height: 150px;
-    }
-}
-
-.create-btn:hover svg {
-    fill: var(--grey_10);
-}
-
-.create-btn:hover p {
-    color: var(--grey_10);
-}
-
-.custcheck {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    min-width: 24px;
-    min-height: 24px;
-    border: 2px solid var(--grey_10);
-    border-radius: 50%;
-    padding: 4px;
-    cursor: pointer;
-    position: relative;
-}
-
-.custcheck:checked {
-    background-color: var(--info_5);
-}
-
-.custcheck:checked::before {
-    content: '';
-    display: block;
-    width: 12px;
-    height: 12px;
-    background-color: var(--info_7);
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-</style>
+-->

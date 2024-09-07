@@ -84,15 +84,22 @@ import { useResponseStore } from "@/stores/response";
 
 import { uauth } from "@/utils/auth";
 
+import { PLACEHOLDER_CAPTCHA_TOKEN } from "../../config";
+
 export default {
     data() {
         return {
             formData: {
                 username: '',
-                password: ''
+                password: '',
+                token: ''
             },
             loading: false,
         }
+    },
+
+    created() {
+        this.formData.token = PLACEHOLDER_CAPTCHA_TOKEN;
     },
 
     methods: {
@@ -104,7 +111,7 @@ export default {
             if (this.formData.username.trim() && this.formData.password) {
                 this.loading = true;
 
-                uauth.login({ username: this.formData.username, password: this.formData.password }).then(res => {
+                uauth.login(this.formData).then(res => {
                     if (localStorage.getItem("auth_token")) {
                         useResponseStore().updateResponse("Logged in successfully. Redirecting...", "succ");
                         setTimeout(() => {

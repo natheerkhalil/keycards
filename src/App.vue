@@ -4,9 +4,7 @@
     <UnauthenticatedHeader v-if="!authenticated" />
     <br>
     <router-view v-slot="{ Component }">
-      <keep-alive>
         <component :is="Component" />
-      </keep-alive>
     </router-view>
     <ResponseMsg></ResponseMsg>
   </div>

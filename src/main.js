@@ -24,6 +24,9 @@ axios.defaults.headers.common['Accept'] = 'application/json';
 // axios requests
 import { request } from "@/utils/api";
 
+// cache functions
+import { cacheFolders } from "@/utils/cache";
+
 const app = createApp(App);
 
 app.use(createPinia());

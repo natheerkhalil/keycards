@@ -59,38 +59,49 @@
 
 <script>
 import { useResponseStore } from '@/stores/response';
+import { useDataStore } from '@/stores/data';
 
 export default {
     methods: {
+        checkForParent() {
+            let parent = this.$route.query.p;
+
+            if (parent) {
+                parent = this.folders.find(f => f.id == parent);
+
+                if (parent) {
+                    this.folder.parent = parent.id;
+                }
+            }
+        },
+
         createFolder() {
             if (this.folder.name.trim().length == 0 || this.folder.name.trim() > 50) {
                 useResponseStore().updateResponse("Folder name must be between 1 and 50 characters long", "warn");
                 return;
             }
 
-            let folders = localStorage.getItem("folders") || "[]";
-            folders = JSON.parse(folders);
+            if (!useDataStore().readFolder(this.folder.parent) && this.folder.parent) {
+                useResponseStore().updateResponse("Parent folder does not exist", "warn");
+                return;
+            }
 
             this.folder.name = this.folder.name.trim();
             this.folder.id = Math.floor(Math.random() * 10000000000);
 
-            while (folders.find(f => f.id == this.folder.id)) {
+            while (this.folders.find(f => f.id == this.folder.id)) {
                 this.folder.id = Math.floor(Math.random() * 10000000000);
             }
 
-            folders.unshift(this.folder);
+            useDataStore().addFolder([this.folder.id, this.folder.name, this.folder.parent, this.folder.theme]);
 
             useResponseStore().updateResponse("Folder created successfully!", "succ");
-
-            localStorage.setItem("folders", JSON.stringify(folders));
 
             this.$router.push("/folder/" + this.folder.id);
         },
 
         changeTheme(v) {
-            if (this.folder.theme == v) {
-                this.folder.theme = "default";
-            } else {
+            if (this.folder.theme != v) {
                 this.folder.theme = v;
             }
         },
@@ -102,49 +113,32 @@ export default {
         }
     },
 
-    created() {
-        // check for query parameter of "parent" and set parent folder
-        let parent = this.$route.query.parent;
-
-        if (parent) {
-            let folders = localStorage.getItem("folders") || "[]";
-            folders = JSON.parse(folders);
-
-            parent = folders.find(f => f.id == parent);
-
-            if (parent) {
-                this.folder.parent = parent.id;
+    computed: {
+        parentFolder() {
+            if (this.folder.parent) {
+                return this.folders.find(f => f.id == this.folder.parent);
+            } else {
+                return null;
             }
         }
+    },
 
-        console.log(this.folders);
+    created() {
+        this.checkForParent();
     },
 
     data() {
         return {
             folder: {
                 name: "",
-                theme: "default",
+                theme: useDataStore().getThemes()[Math.floor(Math.random() * useDataStore().getThemes().length)],
                 insideFolder: 232,
                 parent: null
             },
 
-            folders: JSON.parse(localStorage.getItem("folders") || "[]"),
+            folders: useDataStore().getFolders(),
 
-            parentFolder: null,
-
-            themes: [
-                "aura",
-                "dune",
-                "ciel",
-                "topiary",
-                "navy",
-                "alpine",
-                "eventide",
-                "mythical",
-                "shroud",
-                "lite"
-            ]
+            themes: useDataStore().getThemes()
         }
     }
 }
