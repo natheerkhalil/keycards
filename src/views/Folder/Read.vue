@@ -2,51 +2,98 @@
     <div class="__15 __mlauto __mrauto _flex _fd-co __w">
 
         <br>
+        <div :style="`background-image: url('/themes/${folder.theme}.png'); position: relative; background-position: center; background-size: cover; `"
+            class="__b _flex _fd-co">
 
-        <div class="__b _flex _cc _fd-ro">
-            <svg @click="share" class="__po __hfi-4" width="24" height="24" xmlns="http://www.w3.org/2000/svg"
-                fill-rule="evenodd" clip-rule="evenodd">
-                <path
-                    d="M16.272 5.451c-.176-.45-.272-.939-.272-1.451 0-2.208 1.792-4 4-4s4 1.792 4 4-1.792 4-4 4c-1.339 0-2.525-.659-3.251-1.67l-7.131 3.751c.246.591.382 1.239.382 1.919 0 .681-.136 1.33-.384 1.922l7.131 3.751c.726-1.013 1.913-1.673 3.253-1.673 2.208 0 4 1.792 4 4s-1.792 4-4 4-4-1.792-4-4c0-.51.096-.999.27-1.447l-7.129-3.751c-.9 1.326-2.419 2.198-4.141 2.198-2.76 0-5-2.24-5-5s2.24-5 5-5c1.723 0 3.243.873 4.143 2.201l7.129-3.75zm3.728 11.549c1.656 0 3 1.344 3 3s-1.344 3-3 3-3-1.344-3-3 1.344-3 3-3zm-15-9c2.208 0 4 1.792 4 4s-1.792 4-4 4-4-1.792-4-4 1.792-4 4-4zm15-7c1.656 0 3 1.344 3 3s-1.344 3-3 3-3-1.344-3-3 1.344-3 3-3z" />
-            </svg>
+            <div
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
+            </div>
 
-            &nbsp; &nbsp;
+            <div style="z-index: 999" class="__b _flex _fd-co __txt-grey-10 __padsm __fi-grey-10">
 
-            <svg @click="destroy" class="__po __hfi-4" width="24" height="24" clip-rule="evenodd" fill-rule="evenodd"
-                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M9 3h6v-1.75c0-.066-.026-.13-.073-.177-.047-.047-.111-.073-.177-.073h-5.5c-.066 0-.13.026-.177.073-.047.047-.073.111-.073.177v1.75zm11 1h-16v18c0 .552.448 1 1 1h14c.552 0 1-.448 1-1v-18zm-10 3.5c0-.276-.224-.5-.5-.5s-.5.224-.5.5v12c0 .276.224.5.5.5s.5-.224.5-.5v-12zm5 0c0-.276-.224-.5-.5-.5s-.5.224-.5.5v12c0 .276.224.5.5.5s.5-.224.5-.5v-12zm8-4.5v1h-2v18c0 1.105-.895 2-2 2h-14c-1.105 0-2-.895-2-2v-18h-2v-1h7v-2c0-.552.448-1 1-1h6c.552 0 1 .448 1 1v2h7z" />
-            </svg>
+                <div class="__b __hack _flex _cc _fd-ro">
+                    <svg @click="share" class="__po __hfi-1" width="24" height="24" xmlns="http://www.w3.org/2000/svg"
+                        fill-rule="evenodd" clip-rule="evenodd">
+                        <path
+                            d="M16.272 5.451c-.176-.45-.272-.939-.272-1.451 0-2.208 1.792-4 4-4s4 1.792 4 4-1.792 4-4 4c-1.339 0-2.525-.659-3.251-1.67l-7.131 3.751c.246.591.382 1.239.382 1.919 0 .681-.136 1.33-.384 1.922l7.131 3.751c.726-1.013 1.913-1.673 3.253-1.673 2.208 0 4 1.792 4 4s-1.792 4-4 4-4-1.792-4-4c0-.51.096-.999.27-1.447l-7.129-3.751c-.9 1.326-2.419 2.198-4.141 2.198-2.76 0-5-2.24-5-5s2.24-5 5-5c1.723 0 3.243.873 4.143 2.201l7.129-3.75zm3.728 11.549c1.656 0 3 1.344 3 3s-1.344 3-3 3-3-1.344-3-3 1.344-3 3-3zm-15-9c2.208 0 4 1.792 4 4s-1.792 4-4 4-4-1.792-4-4 1.792-4 4-4zm15-7c1.656 0 3 1.344 3 3s-1.344 3-3 3-3-1.344-3-3 1.344-3 3-3z" />
+                    </svg>
 
-            &nbsp; &nbsp;
+                    &nbsp; &nbsp;
 
-            <svg v-if="!editing" @click="edit" class="__po __hfi-4" width="24" height="24"
-                xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
-                <path
-                    d="M8.071 21.586l-7.071 1.414 1.414-7.071 14.929-14.929 5.657 5.657-14.929 14.929zm-.493-.921l-4.243-4.243-1.06 5.303 5.303-1.06zm9.765-18.251l-13.3 13.301 4.242 4.242 13.301-13.3-4.243-4.243z" />
-            </svg>
+                    <svg @click="destroy" class="__po __hfi-1" width="24" height="24" clip-rule="evenodd"
+                        fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M9 3h6v-1.75c0-.066-.026-.13-.073-.177-.047-.047-.111-.073-.177-.073h-5.5c-.066 0-.13.026-.177.073-.047.047-.073.111-.073.177v1.75zm11 1h-16v18c0 .552.448 1 1 1h14c.552 0 1-.448 1-1v-18zm-10 3.5c0-.276-.224-.5-.5-.5s-.5.224-.5.5v12c0 .276.224.5.5.5s.5-.224.5-.5v-12zm5 0c0-.276-.224-.5-.5-.5s-.5.224-.5.5v12c0 .276.224.5.5.5s.5-.224.5-.5v-12zm8-4.5v1h-2v18c0 1.105-.895 2-2 2h-14c-1.105 0-2-.895-2-2v-18h-2v-1h7v-2c0-.552.448-1 1-1h6c.552 0 1 .448 1 1v2h7z" />
+                    </svg>
 
-            <svg class="__po __hfi-4" @click="confirmEdit" v-if="editing" width="24" height="24"
-                xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50">
-                <path
-                    d="M 41.9375 8.625 C 41.273438 8.648438 40.664063 9 40.3125 9.5625 L 21.5 38.34375 L 9.3125 27.8125 C 8.789063 27.269531 8.003906 27.066406 7.28125 27.292969 C 6.5625 27.515625 6.027344 28.125 5.902344 28.867188 C 5.777344 29.613281 6.078125 30.363281 6.6875 30.8125 L 20.625 42.875 C 21.0625 43.246094 21.640625 43.410156 22.207031 43.328125 C 22.777344 43.242188 23.28125 42.917969 23.59375 42.4375 L 43.6875 11.75 C 44.117188 11.121094 44.152344 10.308594 43.78125 9.644531 C 43.410156 8.984375 42.695313 8.589844 41.9375 8.625 Z">
-                </path>
-            </svg> <span v-if="editing">&nbsp; &nbsp;</span>
-            <svg class="__po __hfi-4" @click="cancelEdit" v-if="editing" width="19" height="19" clip-rule="evenodd"
-                fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M12 11.293l10.293-10.293.707.707-10.293 10.293 10.293 10.293-.707.707-10.293-10.293-10.293 10.293-.707-.707 10.293-10.293-10.293-10.293.707-.707 10.293 10.293z" />
-            </svg>
+                    &nbsp; &nbsp;
+
+                    <svg v-if="!editing" @click="edit" class="__po __hfi-1" width="24" height="24"
+                        xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+                        <path
+                            d="M8.071 21.586l-7.071 1.414 1.414-7.071 14.929-14.929 5.657 5.657-14.929 14.929zm-.493-.921l-4.243-4.243-1.06 5.303 5.303-1.06zm9.765-18.251l-13.3 13.301 4.242 4.242 13.301-13.3-4.243-4.243z" />
+                    </svg>
+
+                    <svg class="__po __hfi-1" @click="confirmEdit" v-if="editing" width="24" height="24"
+                        xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50">
+                        <path
+                            d="M 41.9375 8.625 C 41.273438 8.648438 40.664063 9 40.3125 9.5625 L 21.5 38.34375 L 9.3125 27.8125 C 8.789063 27.269531 8.003906 27.066406 7.28125 27.292969 C 6.5625 27.515625 6.027344 28.125 5.902344 28.867188 C 5.777344 29.613281 6.078125 30.363281 6.6875 30.8125 L 20.625 42.875 C 21.0625 43.246094 21.640625 43.410156 22.207031 43.328125 C 22.777344 43.242188 23.28125 42.917969 23.59375 42.4375 L 43.6875 11.75 C 44.117188 11.121094 44.152344 10.308594 43.78125 9.644531 C 43.410156 8.984375 42.695313 8.589844 41.9375 8.625 Z">
+                        </path>
+                    </svg> <span v-if="editing">&nbsp; &nbsp;</span>
+                    <svg class="__po __hfi-1" @click="cancelEdit" v-if="editing" width="19" height="19"
+                        clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 11.293l10.293-10.293.707.707-10.293 10.293 10.293 10.293-.707.707-10.293-10.293-10.293 10.293-.707-.707 10.293-10.293-10.293-10.293.707-.707 10.293 10.293z" />
+                    </svg>
+                </div>
+
+                <br>
+
+                <div class="__b _flex _cc">
+                    <svg class="__po" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path
+                            d="M2 9l-1-7h5.694c1.265 1.583 1.327 2 3.306 2h13l-1 5h-4.193l-3.9-3-1.464 1.903 1.428 1.097h-1.971l-3.9-3-2.307 3h-3.693zm-2 2l2 11h20l2-11h-24z" />
+                    </svg>
+                </div>
+
+                <br>
+
+                <p :class="`__b __tal __txl __bo`" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
+
+                <div style="margin-top: 10px;" class="__b _flex _jc-en _fd-ro _ai-ce _m-xs-fd-co">
+                    <router-link class="__nun" :to="`/folder/create?p=${folder.id}`">
+                        <div class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 _fd-ro __bg-none __po">
+                            <svg class="__fi-grey-10" width="25" height="25" clip-rule="evenodd" fill-rule="evenodd"
+                                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="m11 11h-7.25c-.414 0-.75.336-.75.75s.336.75.75.75h7.25v7.25c0 .414.336.75.75.75s.75-.336.75-.75v-7.25h7.25c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-7.25v-7.25c0-.414-.336-.75-.75-.75s-.75.336-.75.75z"
+                                    fill-rule="nonzero" />
+                            </svg> &nbsp;
+                            <p class="__txt-grey-10">Create Folder</p>
+                        </div>
+                    </router-link> &nbsp; &nbsp;
+                    <router-link class="__nun" to="/card/create">
+                        <div class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 _fd-ro __bg-none __po">
+                            <svg class="__fi-grey-10" width="25" height="25" clip-rule="evenodd" fill-rule="evenodd"
+                                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="m11 11h-7.25c-.414 0-.75.336-.75.75s.336.75.75.75h7.25v7.25c0 .414.336.75.75.75s.75-.336.75-.75v-7.25h7.25c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-7.25v-7.25c0-.414-.336-.75-.75-.75s-.75.336-.75.75z"
+                                    fill-rule="nonzero" />
+                            </svg> &nbsp;
+                            <p class="__txt-grey-10">Create Cards</p>
+                        </div>
+                    </router-link>
+                </div>
+
+                <br>
+
+                <hr class="__b __bg-grey-10">
+            </div>
         </div>
-
-        <br>
-
-        <p class="__b __tal __txl">Biology</p>
-
-        <br>
-
-        <div class="gradient-hr" style="width: 100%"></div>
 
         <br>
 
@@ -78,12 +125,29 @@
                     </svg> &nbsp; &nbsp;
 
                     <!-- MARK -->
-                    <svg @click="v.showMark = !v.showMark" class="__po __fi-grey-3 __hfi-5"
-                        xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 24 24">
+                    <svg class="__po" @click="markSelected(2)"
+                        style="margin-right: 5px; margin-left: 5px; fill: var(--succ_6); " width="27" height="27"
+                        clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
+                    </svg>
+                    <svg class="__po" @click="markSelected(1)"
+                        style="margin-right: 5px; margin-left: 5px; fill: var(--err_6); " width="27" height="27"
+                        clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
+                    </svg>
+                    <svg class="__po" @click="markSelected(0)"
+                        style="margin-right: 5px; margin-left: 5px; fill: var(--grey_6); " width="27" height="27"
+                        clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
                     </svg>
                 </div>
             </div>
+
+            <br class="_hide _m-sm-flex">
+
             <input v-model="search" @input="searchCards" style="border: none; border-bottom: 1px solid var(--grey_7);"
                 type="text" placeholder="Search cards..."
                 class="__w __padxs __bg-grey-10 __txt-grey-1 __bod __bo-grey-7">
@@ -92,7 +156,7 @@
         <br>
 
         <div class="__b _fw-wr _flex _cc _fd-ro">
-            <div v-if="searchResults.length == 0" v-for="v in cards.slice(0, cardLimit)"
+            <div style="flex-grow: 1;" v-if="searchResults.length == 0" v-for="v in cards.slice(0, cardLimit)"
                 :class='[["__bg-grey-6", "__bg-err-6", "__bg-succ-6"][Number(v.status)], "card", "__custscroll"]'>
 
                 <div @click="toggleSelected(v.id)" class="__po __b _flex _cc">
@@ -105,9 +169,9 @@
                     <p class="__txt-grey-10 __mauto __nosel" style="margin-top: 15px; max-width: 100%">{{ v.q }}</p>
 
                     <div style="align-self: flex-end; margin-top: auto;" v-if="!v.showOptions" class="__b _flex _jc-en">
-                        <svg class="__hfi-grey-9 __fi-grey-10 __po" :id="`show-opts_${v.id}`" @click="options" width="20" height="20"
-                            clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="__hfi-grey-9 __fi-grey-10 __po" :id="`show-opts_${v.id}`" @click="options"
+                            width="20" height="20" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
+                            stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="m12.002 2c5.518 0 9.998 4.48 9.998 9.998 0 5.517-4.48 9.997-9.998 9.997-5.517 0-9.997-4.48-9.997-9.997 0-5.518 4.48-9.998 9.997-9.998zm2.498 9.995c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25zm-3.75 0c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25zm-3.75 0c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25z" />
                         </svg>
@@ -143,9 +207,8 @@
                         </svg>
 
                         <!-- MARK -->
-                        <svg :id="`mark-card_${v.id}`" @click="markCard"
-                            class="__po __fi-grey-10 __hfi-grey-9" xmlns="http://www.w3.org/2000/svg" width="20"
-                            height="20" viewBox="0 0 24 24">
+                        <svg :id="`mark-card_${v.id}`" @click="markCard" class="__po __fi-grey-10 __hfi-grey-9"
+                            xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
                             <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
                         </svg>
 
@@ -160,19 +223,22 @@
                     </div>
 
                     <div v-if="v.showMark && v.showOptions" style="margin-top: 15px;" class="__b _flex _cc _fd-ro">
-                        <svg @click="updateCardStatus" :id="`status-2_${v.id}`" v-if="v.status != 2" style="margin-right: 5px; margin-left: 5px; fill: var(--succ_6); "
-                            width="20" height="20" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
-                            stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg @click="updateCardStatus" :id="`status-2_${v.id}`" v-if="v.status != 2"
+                            style="margin-right: 5px; margin-left: 5px; fill: var(--succ_6); " width="20" height="20"
+                            clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
                         </svg>
-                        <svg @click="updateCardStatus" :id="`status-1_${v.id}`" v-if="v.status != 1" style="margin-right: 5px; margin-left: 5px; fill: var(--err_6); "
-                            width="20" height="20" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
-                            stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg @click="updateCardStatus" :id="`status-1_${v.id}`" v-if="v.status != 1"
+                            style="margin-right: 5px; margin-left: 5px; fill: var(--err_6); " width="20" height="20"
+                            clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
                         </svg>
-                        <svg @click="updateCardStatus" :id="`status-0_${v.id}`" v-if="v.status != 0" style="margin-right: 5px; margin-left: 5px; fill: var(--grey_6); "
-                            width="20" height="20" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
-                            stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg @click="updateCardStatus" :id="`status-0_${v.id}`" v-if="v.status != 0"
+                            style="margin-right: 5px; margin-left: 5px; fill: var(--grey_6); " width="20" height="20"
+                            clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
                         </svg>
                     </div>
@@ -180,31 +246,20 @@
                 </router-link>
 
             </div>
-
-            <div v-if="searchResults.length > 0" v-for="v in searchResults.slice(0, cardLimit)"
-                :class='[["__bg-grey-6", "__bg-err-6", "__bg-succ-6"][Number(v.status)], "card"]'>
-
-                <p class="__txt-grey-10 __mauto" style="max-width: 100%">{{ v.q }}</p>
-
-                <svg class="__fi-grey-10 __mlauto __po" :id="`more_${v.id}`" @click="more" width="20" height="20"
-                    clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
-                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="m12.002 2c5.518 0 9.998 4.48 9.998 9.998 0 5.517-4.48 9.997-9.998 9.997-5.517 0-9.997-4.48-9.997-9.997 0-5.518 4.48-9.998 9.997-9.998zm2.498 9.995c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25zm-3.75 0c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25zm-3.75 0c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25z" />
-                </svg>
-            </div>
         </div>
     </div>
 </template>
 
 <script>
+import { useResponseStore } from '@/stores/response';
+
 export default {
     methods: {
         searchCards() {
-            this.searchResults = this.cards.filter(card => card.q.toLowerCase().includes(this.search.toLowerCase().trim()));
+            this.cards = this.allCards.filter(card => card.q.toLowerCase().includes(this.search.toLowerCase().trim()));
 
             if (this.search.trim() === "") {
-                this.searchResults = [];
+                this.cards = this.allCards;
             }
         },
 
@@ -277,14 +332,60 @@ export default {
             this.cards.find(card => card.id === id).selected = !this.cards.find(card => card.id === id).selected;
         },
         deleteSelected() {
-            if (window.confirm("Are you sure you want to delete the selected cards?")) { }
+            if (window.confirm("Are you sure you want to delete the selected cards?")) {
+                this.cards = this.cards.filter(card => !card.selected);
+            }
         },
         moveSelected() {
             let folder = window.prompt("Move selected cards to which folder?", "Folder name");
         },
-        markSelected() {
-            let status = window.prompt("Mark selected cards as?", "Status");
+        markSelected(status) {
+            let msg;
+
+            switch (status) {
+                case 2:
+                    msg = "correct";
+                    break;
+                case 1:
+                    msg = "incorrect";
+                    break;
+                case 0:
+                    msg = "unstudied";
+                    break;
+            }
+
+            if (window.confirm(`Are you sure you want to mark the selected cards as ${msg}?`)) {
+
+                this.cards.filter(card => card.selected == true).forEach(card => card.status = status);
+
+            }
         },
+    },
+
+    created() {
+        /*this.allCards = this.cards;
+
+        this.folder.theme = this.themes[Math.floor(Math.random() * this.themes.length)];*/
+
+        let id = this.$route.params.id;
+
+        if (!id) {
+            this.$router.push({ name: "404" });
+
+            return;
+        }
+
+        let folders = JSON.parse(localStorage.getItem("folders")) || [];
+
+        let folder = folders.find(f => f.id === Number(id));
+
+        if (!folder) {
+            this.$router.push({ name: "404" });
+
+            return;
+        }
+
+        this.folder = folder;
     },
 
 
@@ -294,9 +395,26 @@ export default {
 
             cardLimit: 75,
 
+            folder: {
+            },
+
+            themes: [
+                "aura",
+                "dune",
+                "ciel",
+                "topiary",
+                "navy",
+                "alpine",
+                "eventide",
+                "mythical",
+                "shroud",
+                "lite"
+            ],
+
             search: "",
             searchResults: [],
 
+            allCards: [],
             cards: [{ q: "What is the process of photosynthesis?", a: "Photosynthesis is the process by which green plants, algae, and some bacteria convert sunlight into glucose, carbon dioxide, and water. This process takes place in the chloroplasts of plant cells.", status: "1", id: 609240 },
 
             { q: "What is the significance of photosynthesis in the ecosystem?", a: "Photosynthesis plays a crucial role in maintaining the balance of the ecosystem by providing essential nutrients for all organisms, supporting the growth and reproduction of plants and animals, and contributing to the overall health of the environment.", status: "0", id: 804205 },
@@ -433,7 +551,7 @@ export default {
 
             { q: "What is the photolysis of water in photosynthesis?", a: "Photolysis is the process of splitting water molecules using light energy in Photosystem II, producing oxygen, electrons, and protons essential for ATP and NADPH production.", status: "2", id: 629970 },
 
-            { q: "How do desert plants adapt their photosynthesis?", a: "Desert plants, often CAM plants, open their stomata at night to minimize water loss while storing CO2 for use in photosynthesis during the day, reducing evaporation.", status: "0", id: 609224 },
+            { q: "How do dune plants adapt their photosynthesis?", a: "dune plants, often CAM plants, open their stomata at night to minimize water loss while storing CO2 for use in photosynthesis during the day, reducing evaporation.", status: "0", id: 609224 },
 
             { q: "What is the Emerson enhancement effect?", a: "The Emerson enhancement effect describes the increase in the rate of photosynthesis when plants are exposed to both red and far-red light, demonstrating the cooperation of two photosystems.", status: "1", id: 154532 },
 
@@ -513,6 +631,13 @@ export default {
     }
 }
 
+.create-btn:hover svg {
+    fill: var(--grey_10);
+}
+
+.create-btn:hover p {
+    color: var(--grey_10);
+}
 
 .custcheck {
     -webkit-appearance: none;

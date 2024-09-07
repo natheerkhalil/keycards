@@ -49,7 +49,7 @@
 
     /* Black & White */
     --dark: rgb(26, 26, 26);
-    --lite: rgb(254, 254, 254);
+    --white: rgb(254, 254, 254);
 
     /* Success Color */
     --succ_1: rgb(0, 102, 0);
@@ -72,10 +72,371 @@
     --theme4: #ad4444;
     --theme5:#2E2E2E;
     --theme6: #f5f2f2;
+
+    /* Folder Styles */
+    --aura: gold;
+    --dune: red;
+    --ciel: blue;
+    --topiary: green;
+    --navy: navy;
+    --alpine: silver;
+    --eventide: orange;
+    --mythical: purple;
+    --shroud: black;
+    --lite: wheat;
+
+    --aura: #A97F5A ;
+    --aura2: #D2A671 ;
+    --aura3: #F5E1B5 ;
+    --aura4: #FAF0DB;
+
+    --dune: #7F1D1D;
+    --dune2: #B84242;
+    --dune3: #D16D6D;
+    --dune4: #F7E0E0;
+
+    --ciel: #568699 ;
+    --ciel2: #609ECC ;
+    --ciel3: #A3D3F8 ;
+    --ciel4: #E7F1FB;
+
+    --topiary: #4F612C;
+    --topiary2: #6B8342;
+    --topiary3: #86A557;
+    --topiary4: #ECF4E2;
+
+    --navy: #253B5E ;
+    --navy2: #5C7D99 ;
+    --navy3: #A8C3D8 ;
+    --navy4: #E5EFF6;
+
+    --alpine: #6C7074 ;
+    --alpine2: #A8ACB0 ;
+    --alpine3: #AEAFB1 ;
+    --alpine4: #EBECED;
+
+    --eventide: #ff9864 ;
+    --eventide2: #FFA564 ;
+    --eventide3: #FAD3B3 ;
+    --eventide4: #FFEEDB;
+
+    --mythical: #645E99 ;
+    --mythical2: #B69FD4 ;
+    --mythical3: #D3C0E3 ;
+    --mythical4: #EEE8F4;
+
+    --shroud: #2A2A2A ;
+    --shroud2: #424242 ;
+    --shroud3: #636363 ;
+    --shroud4: #E3E3E3;
+
+    --lite: #D2B894 ;
+    --lite2: #F5D7B7 ;
+    --lite3: #F4E6D0 ;
+    --lite4: #FBF7F1;
+
+
+
+    
 }
 
 * {
     font-family: var(--font), var(--secfont), sans-serif;
+}
+
+/* Folder Styles */
+
+/* Background Colour */
+.__bg-aura {
+    background-color: var(--aura);
+}
+
+.__bg-dune {
+    background-color: var(--dune);
+}
+
+.__bg-ciel {
+    background-color: var(--ciel);
+}
+
+.__bg-topiary {
+    background-color: var(--topiary);
+}
+
+.__bg-navy {
+    background-color: var(--navy);
+}
+
+.__bg-alpine {
+    background-color: var(--alpine);
+}
+
+.__bg-eventide {
+    background-color: var(--eventide);
+}
+
+.__bg-mythical {
+    background-color: var(--mythical);
+}
+
+.__bg-shroud {
+    background-color: var(--shroud);
+}
+
+.__bg-lite {
+    background-color: var(--lite);
+}
+
+/* Text Colour */
+
+.__txt-aura {
+    color: var(--aura);
+}
+
+.__txt-dune {
+    color: var(--dune);
+}
+
+.__txt-ciel {
+    color: var(--ciel);
+}
+
+.__txt-topiary {
+    color: var(--topiary);
+}
+
+.__txt-navy {
+    color: var(--navy);
+}
+
+.__txt-alpine {
+    color: var(--alpine);
+}
+
+.__txt-eventide {
+    color: var(--eventide);
+}
+
+.__txt-mythical {
+    color: var(--mythical);
+}
+
+.__txt-shroud {
+    color: var(--shroud);
+}
+
+.__txt-lite {
+    color: var(--lite);
+}
+
+/* Fill Colour */
+
+.__fill-aura {
+    fill: var(--aura);
+}
+
+.__fill-dune {
+    fill: var(--dune);
+}
+
+.__fill-ciel {
+    fill: var(--ciel);
+}
+
+.__fill-topiary {
+    fill: var(--topiary);
+}
+
+.__fill-navy {
+    fill: var(--navy);
+}
+
+.__fill-alpine {
+    fill: var(--alpine);
+}
+
+.__fill-eventide {
+    fill: var(--eventide);
+}
+
+.__fill-mythical {
+    fill: var(--mythical);
+}
+
+.__fill-shroud {
+    fill: var(--shroud);
+}
+
+.__fill-lite {
+    fill: var(--lite);
+}
+
+/* Hover Fill Colour */
+
+.__hfi-aura:hover {
+    fill: var(--aura);
+}
+
+.__hfi-dune:hover {
+    fill: var(--dune);
+}
+
+.__hfi-ciel:hover {
+    fill: var(--ciel);
+}
+
+.__hfi-topiary:hover {
+    fill: var(--topiary);
+}
+
+.__hfi-navy:hover {
+    fill: var(--navy);
+}
+
+.__hfi-alpine:hover {
+    fill: var(--alpine);
+}
+
+.__hfi-eventide:hover {
+    fill: var(--eventide);
+}
+
+.__hfi-mythical:hover {
+    fill: var(--mythical);
+}
+
+.__hfi-shroud:hover {
+    fill: var(--shroud);
+}
+
+.__hfi-lite:hover {
+    fill: var(--lite);
+}
+
+/* Background Colour on Hover */
+
+.__hv-aura:hover {
+    background-color: var(--aura);
+}
+
+.__hv-dune:hover {
+    background-color: var(--dune);
+}
+
+.__hv-ciel:hover {
+    background-color: var(--ciel);
+}
+
+.__hv-topiary:hover {
+    background-color: var(--topiary);
+}
+
+.__hv-navy:hover {
+    background-color: var(--navy);
+}
+
+.__hv-alpine:hover {
+    background-color: var(--alpine);
+}
+
+.__hv-eventide:hover {
+    background-color: var(--eventide);
+}
+
+.__hv-mythical:hover {
+    background-color: var(--mythical);
+}
+
+.__hv-shroud:hover {
+    background-color: var(--shroud);
+}
+
+.__hv-lite:hover {
+    background-color: var(--lite);
+}
+
+/* Text Colour on Hover */
+
+.__ht-aura {
+    color: var(--aura);
+}
+
+.__ht-dune {
+    color: var(--dune);
+}
+
+.__ht-ciel {
+    color: var(--ciel);
+}
+
+.__ht-topiary {
+    color: var(--topiary);
+}
+
+.__ht-navy {
+    color: var(--navy);
+}
+
+.__ht-alpine {
+    color: var(--alpine);
+}
+
+.__ht-eventide {
+    color: var(--eventide);
+}
+
+.__ht-mythical {
+    color: var(--mythical);
+}
+
+.__ht-shroud {
+    color: var(--shroud);
+}
+
+.__ht-lite {
+    color: var(--lite);
+}
+
+/* Border Colour */
+
+.__bd-aura {
+    border-color: var(--aura);
+}
+
+.__bd-dune {
+    border-color: var(--dune);
+}
+
+.__bd-ciel {
+    border-color: var(--ciel);
+}
+
+.__bd-topiary {
+    border-color: var(--topiary);
+}
+
+.__bd-navy {
+    border-color: var(--navy);
+}
+
+.__bd-alpine {
+    border-color: var(--alpine);
+}
+
+.__bd-eventide {
+    border-color: var(--eventide);
+}
+
+.__bd-mythical {
+    border-color: var(--mythical);
+}
+
+.__bd-shroud {
+    border-color: var(--shroud);
+}
+
+.__bd-lite {
+    border-color: var(--lite);
 }
 
 /* Theme Styles */

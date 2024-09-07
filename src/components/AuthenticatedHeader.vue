@@ -46,7 +46,7 @@ export default {
 
     methods: {
         create() {
-            this.$router.push('/create');
+            this.$router.push('/folder/create');
         }
     }
 };

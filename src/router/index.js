@@ -61,7 +61,25 @@ if (MAINTENANCE_MODE !== "true" && MAINTENANCE_MODE !== "1") {
       path: "/folder/create",
       name: 'create-folder',
       component: function () {
-        return import("@/views/Folder/Read.vue");
+        return import("@/views/Folder/Create.vue");
+      },
+      meta: { requiresAuth: true }
+    },
+
+    // CARDS
+    {
+      path: "/card/:id",
+      name: 'view-card',
+      component: function () {
+        //return import("@/views/Card/Read.vue");
+      },
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/card/create",
+      name: 'create-card',
+      component: function () {
+        return import("@/views/Card/Create.vue");
       },
       meta: { requiresAuth: true }
     },
