@@ -78,12 +78,13 @@ export const useDataStore = defineStore('data', {
         },
 
         // CRUD CARD OPERATIONS //
-        addCard([q, a, folder]) {
-            this.cards.push({ q: q, a: a, folder: folder });
+        addCard([id, q, a, folder]) {
+            this.cards.push({ id: id, q: q, a: a, folder: folder, status: "0" });
             this.saveCards();
         },
         deleteCard(cardId) {
             this.cards = this.cards.filter(card => card.id != cardId);
+            console.log("Card deleted: ", cardId);
             this.saveCards();
         },
         editCard(cardId, updatedCard) {
@@ -91,6 +92,22 @@ export const useDataStore = defineStore('data', {
 
             if (index !== -1) {
                 this.cards[index] = updatedCard;
+                this.saveCards();
+            }
+        },
+        markCard(cardId, mark) {
+            const index = this.cards.findIndex(card => card.id == cardId);
+
+            if (index !== -1) {
+                this.cards[index]["status"] = mark;
+                this.saveCards();
+            }
+        },
+        moveCard(cardId, folderId) {
+            const index = this.cards.findIndex(card => card.id == cardId);
+
+            if (index!== -1) {
+                this.cards[index]["folder"] = folderId;
                 this.saveCards();
             }
         },
@@ -131,5 +148,19 @@ export const useDataStore = defineStore('data', {
             else
                 return null;
         },
+
+
+        getAncestors(folderId) {
+            let ancestors = [];
+            let currentFolder = this.folders.find(folder => folder.id == folderId);
+            while (currentFolder) {
+                ancestors.unshift(currentFolder);
+                currentFolder = this.folders.find(folder => folder.id == currentFolder.parent);
+            }
+
+            ancestors = ancestors.filter(f => f.id != folderId);
+
+            return ancestors;
+        }
     },
 });

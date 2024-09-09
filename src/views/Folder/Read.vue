@@ -60,6 +60,14 @@
 
                 <br>
 
+                <div class="__b _flex _cc _fd-ro">
+                    <router-link class="__nun" :to="`/folder/${v.id}`" v-for="v, i in folderAncestors">
+                        <p class="__bo" :style="`color: var(--${v.theme}4)`">{{ v.name }} <span v-if="(i + 1) != folderAncestors.length">-></span></p>
+                    </router-link>
+                </div>
+
+                <br>
+
                 <p :class="`__b __tal __txl __bo`" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
 
                 <div style="margin-top: 10px;" class="__b _flex _jc-en _fd-ro _ai-ce _m-xs-fd-co">
@@ -248,6 +256,37 @@
             </div>
         </div>
     </div>
+
+    <div @click="hideSearchFolders" v-if="showSearchFolders" class="_flex modal-overlay">
+        <div style="max-width: 90%; max-height: 80vh; width: 1300px;" class="__mauto _flex _fd-co __bg-grey-10 __padsm">
+            <div class="__b _flex _fd-ro _jc-be _ai-ce _m-sm-fd-co">
+                <p class="__b __tle __tlg __txt-grey-2">Move Card(s) to Folder</p>
+                <input v-model="searchFolders" type="text" placeholder="Search folder..."
+                    class="__b __bg-none __bo-none __padxs">
+            </div>
+            <hr style="margin: 10px 0px;" class="__b __bg-grey-2">
+            <div @scroll="updateSearchFoldersLimit" style="max-height: 500px; overflow-y: auto;"
+                class="__custscroll __b _flex _fd-co">
+                <div @click="selectFolderToMove(v.id)"
+                    :style="`position: relative; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${v.theme}.png')`"
+                    v-for="v in folders.filter(f => f.name.toLowerCase().trim().includes(searchFolders)).slice(0, searchFoldersLimit).filter(f => f.id != this.folderId)"
+                    class="__po __b _flex _fd-ro __padsm">
+
+                    <div
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
+                    </div>
+
+
+                    <div style="z-index: 999;" class="_flex _fd-ro _ai-ce _jc-be">
+                        <p class="__bo __tmd" :style="`color: var(--${v.theme}4)`">{{ v.name }}</p>
+                        <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; {{ globalCards.filter(c => c.folder == v.id).length
+                            }}
+                            cards</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -256,6 +295,53 @@ import { useResponseStore } from '@/stores/response';
 import { useDataStore } from '@/stores/data';
 
 export default {
+    computed: {
+        globalCards() {
+            return useDataStore().getCards();
+        },
+
+        folderAncestors() {
+            return useDataStore().getAncestors(this.folder.id);
+        },
+
+        folderId() {
+            return this.$route.params.id || null;
+        },
+
+        folder() {
+            return useDataStore().readFolder(this.folderId);
+        },
+
+        folders() {
+            return useDataStore().getFolders();
+        },
+
+        themes() {
+            return useDataStore().getThemes();
+        }
+    },
+
+    data() {
+        return {
+            searchFolders: "",
+            searchFoldersLimit: 8,
+            showSearchFolders: false,
+
+            editing: false,
+
+            cardLimit: 75,
+
+            cardsToBeMoved: [],
+
+            search: "",
+            searchResults: [],
+
+            allCards: [],
+            cards: []
+        }
+    },
+
+
     methods: {
         searchCards() {
             this.cards = this.allCards.filter(card => card.q.toLowerCase().includes(this.search.toLowerCase().trim()));
@@ -275,7 +361,15 @@ export default {
             let id = e.target.id.split("_")[1] || e.target.parentElement.id.split("_")[1];
             id = Number(id);
 
-            this.cards.find(card => card.id === id).showOptions = !this.cards.find(card => card.id === id).showOptions;
+            let card = this.cards.find(card => card.id === id);
+
+            if (card.showOptions) {
+                card.showOptions = false;
+            } else {
+                card.showOptions = true;
+            }
+
+            //this.cards.find(card => card.id === id).showOptions = !this.cards.find(card => card.id === id).showOptions || true;
         },
 
         selectAll() {
@@ -283,6 +377,13 @@ export default {
                 this.cards.forEach(card => card.selected = false);
             else
                 this.cards.forEach(card => card.selected = true);
+        },
+
+        // SEARCH FOLDERS //
+        updateSearchFoldersLimit(e) {
+            if (e.target.scrollTop + e.target.offsetHeight >= e.target.scrollHeight) {
+                this.searchFoldersLimit += 25;
+            }
         },
 
 
@@ -303,6 +404,8 @@ export default {
 
             if (window.confirm("Are you sure you want to delete this card?")) {
                 this.cards = this.cards.filter(card => card.id !== id);
+
+                useDataStore().deleteCard(id);
             }
         },
         markCard(e) {
@@ -322,15 +425,48 @@ export default {
             let status = e.target.id.split("_")[0] || e.target.parentElement.id.split("_")[0]
             status = status.split("-")[1];
 
+            useDataStore().markCard(id, status);
 
             this.cards.find(card => card.id === id).status = status;
         },
+
+
+
+        // MOVING CARD //
         moveCard(e) {
             e.preventDefault();
 
             let id = e.target.id.split("_")[1] || e.target.parentElement.id.split("_")[1];
             id = Number(id);
+
+            this.cardsToBeMoved.push(id);
+
+            this.showSearchFolders = true;
         },
+        selectFolderToMove(id) {
+            if (window.confirm("Are you sure you want to move the card(s) to the folder: " + this.folders.find(f => f.id === id).name + "?")) {
+                this.cards.filter(c => this.cardsToBeMoved.includes(c.id)).forEach(c => {
+                    useDataStore().moveCard(c.id, id);
+                });
+
+                this.cards.filter(c => this.cardsToBeMoved.includes(c.id)).forEach(card => card.folder = id);
+
+                this.cardsToBeMoved = [];
+                this.showSearchFolders = false;
+
+                this.cards = this.cards.filter(c => c.folder == this.folder.id);
+
+                console.log(useDataStore().getCards());
+
+            }
+        },
+        hideSearchFolders(e) {
+            if (e.target.className.includes("modal-overlay")) {
+                this.showSearchFolders = false;
+            }
+        },
+
+
 
         // MASS SELECT CARD OPERATIONS //
         toggleSelected(id) {
@@ -338,11 +474,23 @@ export default {
         },
         deleteSelected() {
             if (window.confirm("Are you sure you want to delete the selected cards?")) {
-                this.cards = this.cards.filter(card => !card.selected);
+
+                this.cards.forEach(c => {
+                    if (c.selected) {
+                        useDataStore().deleteCard(c.id);
+                        this.cards = this.cards.filter(card => card.id !== c.id);
+                    }
+                });
             }
         },
         moveSelected() {
-            let folder = window.prompt("Move selected cards to which folder?", "Folder name");
+            this.cards.forEach(c => {
+                if (c.selected) {
+                    this.cardsToBeMoved.push(c.id);
+                };
+            });
+
+            this.showSearchFolders = true;
         },
         markSelected(status) {
             let msg;
@@ -361,23 +509,22 @@ export default {
 
             if (window.confirm(`Are you sure you want to mark the selected cards as ${msg}?`)) {
 
+                this.cards.forEach(c => {
+                    if (c.selected) {
+                        useDataStore().markCard(c.id, status);
+                        this.cards.find(card => card.id === c.id).status = status;
+                    }
+                });
+
                 this.cards.filter(card => card.selected == true).forEach(card => card.status = status);
 
+                this.cards.forEach(c => c.selected = false);
             }
         },
     },
 
     created() {
-        let id = this.$route.params.id;
-
-        // if id parameter is not provided, redirect to 404 page
-        if (!id) {
-            this.$router.push({ name: "404" });
-
-            return;
-        }
-
-        let folder = useDataStore().readFolder(id);
+        let folder = useDataStore().readFolder(this.folderId);
 
         // if folder with given id does not exist, redirect to 404 page
         if (!folder) {
@@ -388,41 +535,8 @@ export default {
 
         this.folder = folder;
 
-        this.cards = useDataStore().getCards(id);
+        this.cards = useDataStore().getCards(this.folderId);
         this.allCards = this.cards;
-    },
-
-
-    data() {
-        return {
-            editing: false,
-
-            cardLimit: 75,
-
-            folders: useDataStore().getFolders(),
-
-            folder: {
-            },
-
-            themes: [
-                "aura",
-                "dune",
-                "ciel",
-                "topiary",
-                "navy",
-                "alpine",
-                "eventide",
-                "mythical",
-                "shroud",
-                "lite"
-            ],
-
-            search: "",
-            searchResults: [],
-
-            allCards: [],
-            cards: []
-        }
     },
 }
 </script>
@@ -490,6 +604,16 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.modal-overlay {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99999;
 }
 </style>
 

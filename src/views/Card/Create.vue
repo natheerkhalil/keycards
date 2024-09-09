@@ -17,19 +17,19 @@
         <form @submit.prevent="create" class="__b _flex __mlauto __mrauto _fd-co">
             <div v-for="c, i in cards" class="__b _flex _cc _fd-co">
                 <br v-if="i != 0">
-                <div class="__b _flex _fd-ro _m-sm-fd-co">
+                <div class="__b _flex _fd-ro _jc-be _m-sm-fd-co">
                     <textarea maxlength="9999" placeholder="Question" v-model="cards[i]['q']" class="qa"></textarea>
                     <br class="_hide _m-sm-flex">
                     <span class="_sm-hide">&nbsp; &nbsp; &nbsp;</span>
                     <textarea maxlength="9999" placeholder="Answer" v-model="cards[i]['a']" id="" class="qa"></textarea>
                 </div>
                 <br>
-                <div class="__b _flex _jc-en">
+                <div style="margin-bottom: 7.5px;" class="__b _flex _jc-en">
                     <svg v-if="cards.length > 1" @click="deleteCard(i)" class="__po __fi-err-5 __hfi-err-6" width="24"
                         height="24" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
                         stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
-                            d="m21 4c0-.478-.379-1-1-1h-16c-.62 0-1 .519-1 1v16c0 .621.52 1 1 1h16c.478 0 1-.379 1-1zm-16.5.5h15v15h-15zm11.75 6.752h-8.5c-.414 0-.75.336-.75.75s.336.75.75.75h8.5c.414 0 .75-.336.75-.75s-.336-.75-.75-.75z"
+                            d="m20.015 6.506h-16v14.423c0 .591.448 1.071 1 1.071h14c.552 0 1-.48 1-1.071 0-3.905 0-14.423 0-14.423zm-5.75 2.494c.414 0 .75.336.75.75v8.5c0 .414-.336.75-.75.75s-.75-.336-.75-.75v-8.5c0-.414.336-.75.75-.75zm-4.5 0c.414 0 .75.336.75.75v8.5c0 .414-.336.75-.75.75s-.75-.336-.75-.75v-8.5c0-.414.336-.75.75-.75zm-.75-5v-1c0-.535.474-1 1-1h4c.526 0 1 .465 1 1v1h5.254c.412 0 .746.335.746.747s-.334.747-.746.747h-16.507c-.413 0-.747-.335-.747-.747s.334-.747.747-.747zm4.5 0v-.5h-3v.5z"
                             fill-rule="nonzero" />
                     </svg>
                 </div>
@@ -149,6 +149,17 @@ export default {
                 useResponseStore().updateResponse("Some of the questions or answers exceed the limit of 10,000 characters.", "warn");
                 return;
             }
+
+            this.cards.forEach((card, i) => {
+                let id = Math.floor(Math.random() * 1000000000);
+                while (useDataStore().readCard(id)) {
+                    id = Math.floor(Math.random() * 1000000000);
+                }
+                useDataStore().addCard([id, card.q, card.a, this.folder.id]);
+            });
+
+            useResponseStore().updateResponse("Cards created successfully.", "succ");
+            this.$router.push({ path: `/folder/${this.folder.id}` });
         },
 
         addCard() {

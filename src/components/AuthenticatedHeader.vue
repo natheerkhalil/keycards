@@ -60,7 +60,7 @@ export default {
 
         clearData() {
             localStorage.setItem("cards", JSON.stringify([]));
-            localStorage.setItem("folders", JSON.stringify([]));
+         //   localStorage.setItem("folders", JSON.stringify([]));
         }
     }
 };
