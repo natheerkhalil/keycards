@@ -61,9 +61,19 @@
                 <br>
 
                 <div class="__b _flex _cc _fd-ro">
-                    <router-link class="__nun" :to="`/folder/${v.id}`" v-for="v, i in folderAncestors">
-                        <p class="__bo" :style="`color: var(--${v.theme}4)`">{{ v.name }} <span v-if="(i + 1) != folderAncestors.length">-></span></p>
-                    </router-link>
+                    <div class="_flex _fd-ro _cc" v-for="v, i in folderAncestors">
+                        <router-link class="__nun" :to="`/folder/${v.id}`">
+                            <p class="__bo" :style="`color: var(--${v.theme}4)`">{{ v.name }}</p>
+                        </router-link>
+                        &nbsp;&nbsp;
+                        <svg :fill="`var(--${v.theme})4`" v-if="(i + 1) != folderAncestors.length" width="24"
+                            height="24" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
+                            stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="m13.022 14.999v3.251c0 .412.335.75.752.75.188 0 .375-.071.518-.206 1.775-1.685 4.945-4.692 6.396-6.069.2-.189.312-.452.312-.725 0-.274-.112-.536-.312-.725-1.451-1.377-4.621-4.385-6.396-6.068-.143-.136-.33-.207-.518-.207-.417 0-.752.337-.752.75v3.251h-9.02c-.531 0-1.002.47-1.002 1v3.998c0 .53.471 1 1.002 1z"
+                                fill-rule="nonzero" />
+                        </svg>&nbsp;&nbsp;
+                    </div>
                 </div>
 
                 <br>
@@ -101,6 +111,83 @@
 
                 <hr class="__b __bg-grey-10">
             </div>
+        </div>
+
+        <div v-if="showChildrenFolders" class="__b _flex _fd-co">
+
+            <br>
+
+            <div class="__b _flex _jc-en">
+                <input v-model="searchChildrenFolders" style="border: none; border-bottom: 1px solid var(--grey_7);"
+                    type="text" placeholder="Search folders..."
+                    class="__w __padxs __bg-grey-10 __txt-grey-1 __bod __bo-grey-7">
+            </div>
+
+            <br>
+
+            <div style="overflow-x: auto;" class="__b _flex _ai-ce _fd-ro __w __custscroll">
+                <router-link style="margin-bottom: 10px; " v-for="v in childrenFolders" class="__nun" :to="`${v.id}`">
+
+                    <div :id="`child-folder_${v.id}`"
+                        :style="`width: 300px; border-color: var(--${v.theme}3); position: relative; background-size: cover; background-image: url('/themes/${v.theme}.png'); background-position: center;`"
+                        :class="`folder __po __hv-6 __hv __13 __w _flex __mlauto __mauto _fd-co __padsm __bdxs __bo-2`">
+
+
+                        <div
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
+                        </div>
+
+                        <div style="z-index: 999;" class="__b _flex _fd-co">
+                            <div class="__b _flex _jc-be _ai-ce _m-sm-fd-co _m-sm-cc">
+
+                                <div class="__noscroll _flex" style="max-width: 70%; overflow-x: auto;">
+                                    <p :style="`color: var(--${v.theme}4); overflow-x: auto; white-space: wrap;min-width: max-content; outline: none;`"
+                                        :id="`ftitle_${v.id}`" :class="['__txt-4', '__tlg', '__bo']">{{
+                                            v.name }}</p>
+                                </div>
+
+                                <p :style="`color: var(--${v.theme}4)`">{{ globalCards.filter(c => c.folder ==
+                                    v.id).length
+                                    }} cards</p>
+                            </div>
+                            <br>
+                            <div style="background: linear-gradient(to right, var(--err_4) 0%, var(--err_5) 33.33%, var(--succ_5) 33.33%, var(--succ_5) 66.66%, var(--grey_5) 66.66%, var(--grey_5) 100%);"
+                                class="progress">
+                                <div class="progress-overlay">
+                                    <span class="__bo __txt-err-4">{{
+                                        globalCards.filter(c => c.folder == v.id).filter(c => c.status == "1").length
+                                        || 0 }}</span>
+
+                                    &nbsp;
+
+                                    <span class="__txt-grey-10">/</span>
+
+                                    &nbsp;
+
+                                    <span class="__bo __txt-succ-2">{{ globalCards.filter(c => c.folder ==
+                                        v.id).filter(c =>
+                                            c.status == "2").length
+                                        || 0 }}</span>
+
+                                    &nbsp;
+
+                                    <span class="__txt-grey-10">/</span>
+
+                                    &nbsp;
+
+                                    <span class="__bo __txt-grey-3">{{ globalCards.filter(c => c.folder ==
+                                        v.id).filter(c =>
+                                            c.status == "0").length
+                                        || 0 }}</span>
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+
+                </router-link>
+            </div>
+
         </div>
 
         <br>
@@ -316,6 +403,13 @@ export default {
             return useDataStore().getFolders();
         },
 
+        childrenFolders() {
+            return useDataStore().getChildren(this.folderId).filter(f => f.name.toLowerCase().trim().includes(this.searchChildrenFolders));
+        },
+        showChildrenFolders() {
+            return useDataStore().getChildren(this.folderId).length > 0;
+        },
+
         themes() {
             return useDataStore().getThemes();
         }
@@ -337,7 +431,9 @@ export default {
             searchResults: [],
 
             allCards: [],
-            cards: []
+            cards: [],
+
+            searchChildrenFolders: ""
         }
     },
 
@@ -537,7 +633,16 @@ export default {
 
         this.cards = useDataStore().getCards(this.folderId);
         this.allCards = this.cards;
+
+        console.log(useDataStore().getCards());
     },
+
+    watch: {
+        folderId(newVal, oldVal) {
+            this.cards = useDataStore().getCards(newVal);
+            this.allCards = this.cards;
+        }
+    }
 }
 </script>
 

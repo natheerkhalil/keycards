@@ -161,6 +161,9 @@ export const useDataStore = defineStore('data', {
             ancestors = ancestors.filter(f => f.id != folderId);
 
             return ancestors;
+        },
+        getChildren(folderId) {
+            return this.deepClone(this.folders).filter(folder => folder.parent == folderId);
         }
     },
 });
