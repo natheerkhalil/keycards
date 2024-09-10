@@ -51,16 +51,7 @@
 
                 <br>
 
-                <div class="__b _flex _cc">
-                    <svg class="__po" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                        <path
-                            d="M2 9l-1-7h5.694c1.265 1.583 1.327 2 3.306 2h13l-1 5h-4.193l-3.9-3-1.464 1.903 1.428 1.097h-1.971l-3.9-3-2.307 3h-3.693zm-2 2l2 11h20l2-11h-24z" />
-                    </svg>
-                </div>
-
-                <br>
-
-                <div class="__b _flex _cc _fd-ro">
+                <div class="__b _fw-wr _flex _cc _fd-ro">
                     <div class="_flex _fd-ro _cc" v-for="v, i in folderAncestors">
                         <router-link class="__nun" :to="`/folder/${v.id}`">
                             <p class="__bo" :style="`color: var(--${v.theme}4)`">{{ v.name }}</p>
@@ -80,7 +71,7 @@
 
                 <p :class="`__b __tal __txl __bo`" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
 
-                <div style="margin-top: 10px;" class="__b _flex _jc-en _fd-ro _ai-ce _m-xs-fd-co">
+                <div style="margin-top: 10px;" class="__b _flex _sm-hide _jc-en _fd-ro _ai-ce">
                     <router-link class="__nun" :to="`/folder/create?p=${folder.id}`">
                         <div class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 _fd-ro __bg-none __po">
                             <svg class="__fi-grey-10" width="25" height="25" clip-rule="evenodd" fill-rule="evenodd"
@@ -103,6 +94,33 @@
                                     fill-rule="nonzero" />
                             </svg> &nbsp;
                             <p class="__txt-grey-10">Create Cards</p>
+                        </div>
+                    </router-link>
+                </div>
+
+                <div style="margin-top: 10px;" class="__b _hide _m-sm-flex _jc-be _ai-ce _fd-ro">
+                    <router-link class="__nun" :to="`/folder/create?p=${folder.id}`">
+                        <div class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 _fd-ro __bg-none __po">
+                            <svg class="__fi-grey-10" width="25" height="25" clip-rule="evenodd" fill-rule="evenodd"
+                                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="m11 11h-7.25c-.414 0-.75.336-.75.75s.336.75.75.75h7.25v7.25c0 .414.336.75.75.75s.75-.336.75-.75v-7.25h7.25c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-7.25v-7.25c0-.414-.336-.75-.75-.75s-.75.336-.75.75z"
+                                    fill-rule="nonzero" />
+                            </svg> &nbsp;
+                            <p class="__txt-grey-10">Folder</p>
+                        </div>
+                    </router-link> &nbsp; &nbsp;
+                    <router-link class="__nun" :to="`/card/create?f=${folder.id}`">
+                        <div class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 _fd-ro __bg-none __po">
+                            <svg class="__fi-grey-10" width="25" height="25" clip-rule="evenodd" fill-rule="evenodd"
+                                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="m11 11h-7.25c-.414 0-.75.336-.75.75s.336.75.75.75h7.25v7.25c0 .414.336.75.75.75s.75-.336.75-.75v-7.25h7.25c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-7.25v-7.25c0-.414-.336-.75-.75-.75s-.75.336-.75.75z"
+                                    fill-rule="nonzero" />
+                            </svg> &nbsp;
+                            <p class="__txt-grey-10">Cards</p>
                         </div>
                     </router-link>
                 </div>
