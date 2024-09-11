@@ -14,14 +14,28 @@
 
         <br>
 
-        <form @submit.prevent="create" class="__b _flex __mlauto __mrauto _fd-co">
+        <div class="__b _flex _jc-en">
+            <div @click="switchMethod" class="switch-method __po _flex _fd-ro _ai-ce">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path
+                        d="M6 18h-2v5h-2v-5h-2v-3h6v3zm-2-17h-2v12h2v-12zm11 7h-6v3h2v12h2v-12h2v-3zm-2-7h-2v5h2v-5zm11 14h-6v3h2v5h2v-5h2v-3zm-2-14h-2v12h2v-12z" />
+                </svg> &nbsp;
+                <p>Switch method</p>
+            </div>
+        </div>
+
+        <br>
+
+        <form v-if="method == 'm'" @submit.prevent="create" class="__b _flex __mlauto __mrauto _fd-co">
             <div v-for="c, i in cards" class="__b _flex _cc _fd-co">
                 <br v-if="i != 0">
                 <div class="__b _flex _fd-ro _jc-be _m-sm-fd-co">
-                    <textarea maxlength="9999" placeholder="Question" v-model="cards[i]['q']" class="qa"></textarea>
+                    <textarea maxlength="9999" placeholder="Question" v-model="cards[i]['q']"
+                        class="outline-focus qa"></textarea>
                     <br class="_hide _m-sm-flex">
                     <span class="_sm-hide">&nbsp; &nbsp; &nbsp;</span>
-                    <textarea maxlength="9999" placeholder="Answer" v-model="cards[i]['a']" id="" class="qa"></textarea>
+                    <textarea maxlength="9999" placeholder="Answer" v-model="cards[i]['a']" id=""
+                        class="outline-focus qa"></textarea>
                 </div>
                 <br>
                 <div style="margin-bottom: 7.5px;" class="__b _flex _jc-en">
@@ -48,6 +62,19 @@
             </div>
         </form>
 
+        <form v-if="method == 's'" @submit.prevent="create" class="__b _flex __mlauto __mrauto _fd-co">
+            <textarea maxlength="9999" v-model="cards2"
+                style="height: 400px; max-height: 500px; overflow-y: auto; resize: none;"
+                class="outline-focus __padsm __bo-grey-7 __bo-2 __b __bdsm"></textarea>
+            <br>
+            <div class="__b _flex _jc-be _ai-ce">
+                <input maxlength="10" @input="updateSeparators" v-model="sep_cd" style="margin-right: 10px;" type="text" placeholder="Between Cards"
+                    class="__bo-grey-7 __b __bod __padxs __bg-none __txt-grey-2">
+                <input maxlength="10" @input="updateSeparators" v-model="sep_qa" type="text" placeholder="Between Q & A"
+                    class="__bo-grey-7 __b __bod __padxs __bg-none __txt-grey-2">
+            </div>
+        </form>
+
         <br>
 
         <div class="__b _flex _jc-en">
@@ -69,6 +96,15 @@
     resize: none;
     outline: none;
     height: 150px;
+}
+
+.outline-focus {
+    outline: none
+}
+
+.outline-focus:focus {
+    outline: 1px solid var(--theme4);
+    border: 1px solid var(--theme4);
 }
 
 .create-btn:hover p {
@@ -101,6 +137,14 @@
 .add:hover svg {
     fill: #c84444;
 }
+
+.switch-method:hover p {
+    color: var(--theme4);
+}
+
+.switch-method:hover svg {
+    fill: var(--theme4);
+}
 </style>
 
 <script>
@@ -110,6 +154,18 @@ import { useDataStore } from '@/stores/data';
 
 export default {
     methods: {
+        switchMethod() {
+            useDataStore().toggleMethod(this.method);
+        },
+
+        updateSeparators() {
+            if (this.sep_cd.trim().length == 0 || this.sep_qa.trim().length == 0) {
+                return;
+            }
+
+            useDataStore().updateCardSeparators(this.sep_qa.trim(), this.sep_cd.trim());
+        },
+
         create() {
             let exceedLimit = false;
             let empty = false;
@@ -191,6 +247,17 @@ export default {
 
     created() {
         this.setFolder();
+
+        this.sep_qa = useDataStore().getSeparators()['qa'];
+        this.sep_cd = useDataStore().getSeparators()['cd'];
+
+        console.log(this.method)
+    },
+
+    computed: {
+        method() {
+            return useDataStore().getMethod();
+        }
     },
 
     data() {
@@ -204,7 +271,21 @@ export default {
                     q: "q",
                     a: "a"
                 }
-            ]
+            ],
+
+            cards2: "",
+
+            sep_qa: "",
+            sep_cd: ""
+        }
+    },
+
+    watch: {
+        sep_cd(val) {
+            this.updateSeparators();
+        },
+        sep_qa(val) {
+            this.updateSeparators();
         }
     }
 }

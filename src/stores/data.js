@@ -6,6 +6,10 @@ export const useDataStore = defineStore('data', {
         folders: localStorage.getItem('folders') ? JSON.parse(localStorage.getItem('folders')) : [],
         cards: localStorage.getItem('cards') ? JSON.parse(localStorage.getItem('cards')) : [],
 
+        method: localStorage.getItem('method') || 'm',
+        sep_qa: localStorage.getItem('sep_qa') || ']',
+        sep_cd: localStorage.getItem('sep_cd') || '=',
+
         themes: [
             "aura",
             "dune",
@@ -55,12 +59,32 @@ export const useDataStore = defineStore('data', {
             console.log("Folders saved to local storage: ", this.folders)
         },
 
+        saveMethod() {
+            localStorage.setItem('method', this.method);
+
+            console.log("Method saved to local storage: ", this.method)
+        },
+        saveSeparators() {
+            localStorage.setItem('sep_qa', this.sep_qa);
+            localStorage.setItem('sep_cd', this.sep_cd);
+        },
+
         // RETURNING DATA //
         getCards(folder = null) {
             if (!folder)
                 return this.deepClone(this.cards);
             else
                 return this.deepClone(this.cards).filter(card => card.folder == folder);
+        },
+
+        getMethod() {
+            return this.deepClone(this.method);
+        },
+        getSeparators() {
+            return {
+                qa: this.deepClone(this.sep_qa),
+                cd: this.deepClone(this.sep_cd)
+            }
         },
 
         getFolders(parent = null) {
@@ -75,6 +99,23 @@ export const useDataStore = defineStore('data', {
 
         getThemes() {
             return this.deepClone(this.themes);
+        },
+
+        // UPDATE SEPARATORS //
+        updateCardSeparators(sep_qa, sep_cd) {
+            this.sep_qa = sep_qa;
+            this.sep_cd = sep_cd;
+            this.saveSeparators();
+        },
+
+        // TOGGLE METHOD //
+        toggleMethod() {
+            if (this.method === "m")
+                this.method = "s";
+            else
+                this.method = "m";
+
+            this.saveMethod();
         },
 
         // CRUD CARD OPERATIONS //
@@ -95,6 +136,15 @@ export const useDataStore = defineStore('data', {
                 this.saveCards();
             }
         },
+        updateCard(cardId, q, a) {
+            const index = this.cards.findIndex(card => card.id == cardId);
+
+            if (index !== -1) {
+                this.cards[index]["q"] = q;
+                this.cards[index]["a"] = a;
+                this.saveCards();
+            }
+        },
         markCard(cardId, mark) {
             const index = this.cards.findIndex(card => card.id == cardId);
 
@@ -106,7 +156,7 @@ export const useDataStore = defineStore('data', {
         moveCard(cardId, folderId) {
             const index = this.cards.findIndex(card => card.id == cardId);
 
-            if (index!== -1) {
+            if (index !== -1) {
                 this.cards[index]["folder"] = folderId;
                 this.saveCards();
             }
@@ -150,7 +200,7 @@ export const useDataStore = defineStore('data', {
         },
 
 
-        getAncestors(folderId) {
+        getAncestors(folderId, removeSelf = true) {
             let ancestors = [];
             let currentFolder = this.folders.find(folder => folder.id == folderId);
             while (currentFolder) {
@@ -158,7 +208,8 @@ export const useDataStore = defineStore('data', {
                 currentFolder = this.folders.find(folder => folder.id == currentFolder.parent);
             }
 
-            ancestors = ancestors.filter(f => f.id != folderId);
+            if (removeSelf)
+                ancestors = ancestors.filter(f => f.id != folderId);
 
             return ancestors;
         },

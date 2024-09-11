@@ -570,8 +570,6 @@ export default {
 
                 this.cards = this.cards.filter(c => c.folder == this.folder.id);
 
-                console.log(useDataStore().getCards());
-
             }
         },
         hideSearchFolders(e) {

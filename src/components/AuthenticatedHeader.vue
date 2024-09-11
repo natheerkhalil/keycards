@@ -9,14 +9,6 @@
             </div>
         </router-link>
         <div class="right _flex _fd-ro _ai-ce">
-            <svg @click="clearData" class="__po __fill-1 __hfi-err-4" width="45" height="45" clip-rule="evenodd"
-                fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M5.662 23l-5.369-5.365c-.195-.195-.293-.45-.293-.707 0-.256.098-.512.293-.707l14.929-14.928c.195-.194.451-.293.707-.293.255 0 .512.099.707.293l7.071 7.073c.196.195.293.451.293.708 0 .256-.097.511-.293.707l-11.216 11.219h5.514v2h-12.343zm3.657-2l-5.486-5.486-1.419 1.414 4.076 4.072h2.829zm.456-11.429l-4.528 4.528 5.658 5.659 4.527-4.53-5.657-5.657z" />
-            </svg>
-
-            &nbsp; &nbsp; &nbsp; &nbsp;
 
             <svg @click="create" class="__po __fill-1 __hfi-err-4" width="45" height="45" clip-rule="evenodd"
                 fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
@@ -36,8 +28,7 @@
                         d="M24 0v24h-24v-24h24zm-6.118 16.064c-2.293-.529-4.427-.993-3.394-2.945 3.146-5.942.834-9.119-2.488-9.119-3.388 0-5.643 3.299-2.488 9.119 1.064 1.963-1.15 2.427-3.394 2.945-2.048.473-2.124 1.49-2.118 3.269l.004.667h15.993l.003-.646c.007-1.792-.062-2.815-2.118-3.29z" />
                 </svg>
                 <div class="dropdown" v-if="dropdown2Visible">
-                    <div class="dropdown-item">Account</div>
-                    <div class="dropdown-item">Logout</div>
+                    <div @click="logout" class="dropdown-item">Logout</div>
                 </div>
             </div>
         </div>
@@ -45,6 +36,8 @@
 </template>
 
 <script>
+import { uauth } from '@/utils/auth';
+
 export default {
     data() {
         return {
@@ -58,10 +51,10 @@ export default {
             this.$router.push('/folder/create');
         },
 
-        clearData() {
-            localStorage.setItem("cards", JSON.stringify([]));
-         //   localStorage.setItem("folders", JSON.stringify([]));
-        }
+        logout() {
+            uauth.logout();
+            this.$router.push('/');
+        },
     }
 };
 </script>

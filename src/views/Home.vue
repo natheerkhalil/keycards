@@ -1,11 +1,17 @@
 <template>
   <div style="margin-top: 25px;" class="__b _flex _fd-co _cc">
 
-    <router-link style="margin-bottom: 20px; " v-for="v in folders" class="__nun" :to="`folder/${v.id}`">
+    <div class="__13 __w _flex _jc-en">
+      <input v-model="search" type="text" placeholder="Search folder..." class="__bg-none __bo-none __padxs" style="border-bottom: 1px solid var(--grey_7);">
+    </div>
+
+    <br>
+
+    <router-link style="margin-bottom: 20px; " v-for="v in folders.filter(f => f.name.toLowerCase().trim().includes(search.toLowerCase().trim()))" class="__nun" :to="`folder/${v.id}`">
 
       <div :id="`el-folder_${v.id}`"
-        :style="`border-color: var(--${v.theme}3); position: relative; background-size: cover; background-image: url('/themes/${v.theme}.png'); background-position: center;`"
-        :class="`folder __po __hv-6 __hv __13 __w _flex __mlauto __mauto _fd-co __padsm __bdxs __bo-2`">
+        :style="`position: relative; background-size: cover; background-image: url('/themes/${v.theme}.png'); background-position: center;`"
+        :class="`folder __po __hv-6 __hv __13 __w _flex __mlauto __mauto _fd-co __padsm`">
 
 
         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
@@ -24,7 +30,7 @@
           </div>
           <br>
           <div
-            style="background: linear-gradient(to right, var(--err_4) 0%, var(--err_5) 33.33%, var(--succ_5) 33.33%, var(--succ_5) 66.66%, var(--grey_5) 66.66%, var(--grey_5) 100%);"
+            :style="`background: linear-gradient(to right, ${calc(v.id)});`"
             class="progress">
             <div class="progress-overlay">
               <span class="__bo __txt-err-4">{{ folderCards[v.id].filter(c => c.status == "1").length || 0 }}</span>
@@ -72,15 +78,16 @@
                 d="M8.071 21.586l-7.071 1.414 1.414-7.071 14.929-14.929 5.657 5.657-14.929 14.929zm-.493-.921l-4.243-4.243-1.06 5.303 5.303-1.06zm9.765-18.251l-13.3 13.301 4.242 4.242 13.301-13.3-4.243-4.243z" />
             </svg>
 
-            <svg :style="`fill: var(--${v.theme}4)`" class="__po __hfi-4" :id="`confirm-edit_${v.id}`" @click="confirmEdit" v-if="v.editing" width="24"
-              height="24" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50">
+            <svg :style="`fill: var(--${v.theme}4)`" class="__po __hfi-4" :id="`confirm-edit_${v.id}`"
+              @click="confirmEdit" v-if="v.editing" width="24" height="24" xmlns="http://www.w3.org/2000/svg" x="0px"
+              y="0px" viewBox="0 0 50 50">
               <path
                 d="M 41.9375 8.625 C 41.273438 8.648438 40.664063 9 40.3125 9.5625 L 21.5 38.34375 L 9.3125 27.8125 C 8.789063 27.269531 8.003906 27.066406 7.28125 27.292969 C 6.5625 27.515625 6.027344 28.125 5.902344 28.867188 C 5.777344 29.613281 6.078125 30.363281 6.6875 30.8125 L 20.625 42.875 C 21.0625 43.246094 21.640625 43.410156 22.207031 43.328125 C 22.777344 43.242188 23.28125 42.917969 23.59375 42.4375 L 43.6875 11.75 C 44.117188 11.121094 44.152344 10.308594 43.78125 9.644531 C 43.410156 8.984375 42.695313 8.589844 41.9375 8.625 Z">
               </path>
             </svg> <span v-if="v.editing">&nbsp; &nbsp;</span>
-            <svg :style="`fill: var(--${v.theme}4)`" class="__po __hfi-4" :id="`cancel-edit_${v.id}`" @click="cancelEdit" v-if="v.editing" width="19"
-              height="19" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
-              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg :style="`fill: var(--${v.theme}4)`" class="__po __hfi-4" :id="`cancel-edit_${v.id}`"
+              @click="cancelEdit" v-if="v.editing" width="19" height="19" clip-rule="evenodd" fill-rule="evenodd"
+              stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M12 11.293l10.293-10.293.707.707-10.293 10.293 10.293 10.293-.707.707-10.293-10.293-10.293 10.293-.707-.707 10.293-10.293-10.293-10.293.707-.707 10.293 10.293z" />
             </svg>
@@ -92,7 +99,10 @@
         <br v-if="v.editing">
 
         <div v-if="v.editing" style="z-index: 999;" class="__b _flex _jc-ar _ai-ce _fw-wr">
-          <div @mouseover="previewTheme" @mouseout="endPreview" :id="`${t}_${v.id}`" @click="editTheme" v-for="t in themes.filter(theme => theme !== v.theme)" :style="`border: 1px solid white; height: 30px; width: 30px; border-radius: 50%; background: var(--${t})`"></div>
+          <div @mouseover="previewTheme" @mouseout="endPreview" :id="`${t}_${v.id}`" @click="editTheme"
+            v-for="t in themes.filter(theme => theme !== v.theme)"
+            :style="`border: 1px solid white; height: 30px; width: 30px; border-radius: 50%; background: var(--${t})`">
+          </div>
         </div>
 
       </div>
@@ -128,6 +138,9 @@ export default {
 
       // CARDS IN RELATION TO FOLDERS
       folderCards: [],
+
+      // SEARCH
+      search: ""
     }
   },
 
@@ -151,6 +164,27 @@ export default {
   },
 
   methods: {
+    calc(id) {
+      let cards = this.folderCards[id];
+
+      if (cards.length === 0) {
+        return `var(--err_4) 0%, var(--err_5) 0%, var(--succ_5) 0%, var(--succ_5) 0%, var(--grey_5) 0%, var(--grey_5) 100%`;
+      }
+
+      let total = cards.length;
+      let redCount = cards.filter(c => c.status == "1").length;
+      let greenCount = cards.filter(c => c.status == "2").length;
+      let greyCount = cards.filter(c => c.status == "0").length;
+
+      let redPercent = (redCount / total) * 100;
+      let greenPercent = (greenCount / total) * 100;
+      let greyPercent = (greyCount / total) * 100;
+
+      let str = `var(--err_4) 0%, var(--err_4) ${redPercent}%, var(--succ_5) ${redPercent}%, var(--succ_5) ${redPercent + greenPercent}%, var(--grey_5) ${redPercent + greenPercent}%, var(--grey_5) 100%`;
+
+      return str;
+    },
+
     destroy(e) {
       e.preventDefault();
 
@@ -174,7 +208,7 @@ export default {
     },
     editTheme(e) {
       e.preventDefault();
-      
+
       let id = e.target.id.split("_")[1] || e.target.parentElement.id.split("_")[1];
       let col = e.target.id.split("_")[0] || e.target.parentElement.id.split("_")[0];
 
