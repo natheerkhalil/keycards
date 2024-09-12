@@ -7,6 +7,7 @@
         </div>
         <div class="_flex _fd-ro _cc">
             <router-link class="__nun __bd-5 __hv-5 __bod __padxs __txt-5 __hv __ht-1" to="/login">Login</router-link>
+            <p @click="altLogin">alt login</p>
         </div>
     </div>
 </template>
@@ -16,6 +17,13 @@ export default {
     methods: {
         goHome() {
             this.$router.push('/')
+        },
+
+        altLogin() {
+            localStorage.setItem("auth_token", "nnn");
+            alert("Token", localStorage.getItem("auth_token"))
+
+            this.location.reload();
         }
     }
 }

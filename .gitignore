@@ -32,6 +32,9 @@ coverage
 # Stripe
 stripe.exe
 
+# Replit
+.replit
+
 # Testing page
 src/views/New.vue
 

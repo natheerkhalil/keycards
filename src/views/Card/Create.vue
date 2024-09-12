@@ -167,6 +167,7 @@ export default {
         },
 
         create() {
+            if (this.method == "m") {
             let exceedLimit = false;
             let empty = false;
 
@@ -216,7 +217,128 @@ export default {
 
             useResponseStore().updateResponse("Cards created successfully.", "succ");
             this.$router.push({ path: `/folder/${this.folder.id}` });
-        },
+            } else if (this.method == "s") {
+                let str = this.cards2.trim();
+
+                if (str.length == 0) {
+                    useResponseStore().updateResponse("No cards found.", "warn");
+                    return;
+                }
+
+                let cds = str.split(this.sep_cd);
+
+                if (cds.length == 0) {
+                    useResponseStore().updateResponse("No cards found.", "warn");
+                    return;
+                }
+
+                if (cds.length > 100) {
+                    useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
+                    return;
+                }
+
+                let empty_cards = false;
+                let too_long = false;
+
+                let arr = [];
+
+                for (let i = 0; i < cds.length; i++) {
+                    let c = cds[i].trim();
+
+                    if (c.length == 0) {
+                        continue;
+                    }
+
+                    let q = c.split(this.sep_qa)[0] || '';
+                    let a = c.split(this.sep_qa)[1] || '';
+
+                    q = q.trim();
+                    a = a.trim();
+
+                    if (q.length == 0 || a.length == 0) {
+                        empty_cards = true;
+                        continue;
+                    }
+
+                    /*if (c.split(this.sep_qa).length > 1) {
+                        a = '';
+                        for (let i = 0; i < a.split(this.sep_qa).length; i++) {
+                            a = a + a.split(this.sep_qa)[i];
+                        }
+                    }*/
+
+                    if (q.length > 9999 || a.length > 9999) {
+                        too_long = true;
+                        continue;
+                    }
+
+                    arr.push({
+                        q: q,
+                        a: a
+                    });
+                }
+
+                if (empty_cards) {
+                    useResponseStore().updateResponse("Some of the cards are empty.", "warn");
+                    return;
+                }
+
+                if (too_long) {
+                    useResponseStore().updateResponse("Some of the cards exceed the limit of 10,000 characters.", "warn");
+                    return;
+                }
+
+                if (arr.length == 0) {
+                    useResponseStore().updateResponse("No cards found.", "warn");
+                    return;
+                }
+
+                let failed = [];
+
+                for (let i = 0; i < arr.length; i++) {
+                    let card = arr[i];
+
+                    let id = Math.floor(Math.random() * 1000000000);
+                    while (useDataStore().readCard(id)) {
+                        id = Math.floor(Math.random() * 1000000000);
+                    }
+
+                    useDataStore().addCard([id, card.q, card.a, this.folder.id])
+
+                    if (!useDataStore().readCard(id)) {
+                        failed.push({
+                            q: card.q,
+                            a: card.a
+                        })
+                    }
+                }
+
+                console.log("failed", failed)
+
+
+                if (failed.length > 0) {
+                    useResponseStore().updateResponse("Some cards failed to create.", "warn");
+
+                    let str = "";
+
+                    failed.forEach((card, i) => {
+                        str = str + card.q + " " + this.sep_qa + card.a + this.sep_cd + "\n\n";
+                    })
+
+                    this.cards2 = str;
+                    return;
+                };
+
+                useResponseStore().updateResponse("Cards created successfully.", "succ");
+                this.$router.push({ path: `/folder/${this.folder.id}` });
+                
+                }
+
+
+
+            
+            },
+//        },
 
         addCard() {
             this.cards.push({
