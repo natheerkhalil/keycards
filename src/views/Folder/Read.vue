@@ -12,6 +12,7 @@
             <div style="z-index: 999" class="__b _flex _fd-co __txt-grey-10 __padsm __fi-grey-10">
 
                 <div class="__b __hack _flex _cc _fd-ro">
+                    <!-- SHARE FOLDER -->
                     <svg @click="share" class="__po __hfi-1" width="24" height="24" xmlns="http://www.w3.org/2000/svg"
                         fill-rule="evenodd" clip-rule="evenodd">
                         <path
@@ -20,7 +21,8 @@
 
                     &nbsp; &nbsp;
 
-                    <svg @click="destroy" class="__po __hfi-1" width="24" height="24" clip-rule="evenodd"
+                    <!-- DELETE FOLDER -->
+                    <svg @click="deleteFolder" class="__po __hfi-1" width="24" height="24" clip-rule="evenodd"
                         fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -29,6 +31,7 @@
 
                     &nbsp; &nbsp;
 
+                    <!-- EDIT FOLDER -->
                     <svg v-if="!editing" @click="edit" class="__po __hfi-1" width="24" height="24"
                         xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                         <path
@@ -421,6 +424,10 @@ export default {
             return useDataStore().getFolders();
         },
 
+        folderCards() {
+            return useDataStore().getCards().filter(c => c.folder == this.folderId);
+        },
+
         childrenFolders() {
             return useDataStore().getChildren(this.folderId).filter(f => f.name.toLowerCase().trim().includes(this.searchChildrenFolders));
         },
@@ -457,32 +464,51 @@ export default {
 
 
     methods: {
-    deleteFolder() {
-        if (window.confirm("Are you sure you want to delete this folder?")) {
-            if (cards.length > 0) {
-                if (window.confirm("Are you sure you want to delete all the cards in this folder? This cannot be undone")) {
+        deleteFolder() {
+            if (!window.confirm("Are you sure you want to delete this folder?")) {
+                return;
+            }
+
+            try {
+
+                if (this.folderCards.length > 0) {
+
+                    if (!window.confirm("Are you sure you want to delete all the cards in this folder? This cannot be undone")) {
+                        return;
+                    }
+
                     let all_cards_deleted = true;
 
-                    for (let i = 0; i < cards.length; i++) {
-                        useDataStore().deleteCard(cards[i].id);
+                    for (let i = 0; i < this.folderCards.length; i++) {
+                        useDataStore().deleteCard(this.folderCards[i].id);
 
-                        if (useDataStore().readCard(cards[i].id)) {
+                        if (useDataStore().readCard(this.folderCards[i].id)) {
                             all_cards_deleted = false;
                         }
                     }
 
-                    if (all_cards_deleted) {
-                        useDataStore().deleteFolder(this.folderId);
-                        useResponseStore().updateResponse("Folder & cards deleted successfully")
-                } else {
+                    if (!all_cards_deleted) {
                         useResponseStore().updateResponse("Some cards were not deleted. Try manually deleting them and try again", "warn")
+                    } else {
+                        useResponseStore().updateResponse("Cards deleted successfully", "info");
+                    }
                 }
-                    
-                } 
+
+                useDataStore().deleteFolder(this.folderId);
+
+                if (!useDataStore().readFolder(this.folderId)) {
+                    this.$router.push("/");
+                    useResponseStore().updateResponse("Folder deleted successfully", "info");
+                } else {
+                    useResponseStore().updateResponse("Failed to delete folder", "err");
+                }
+            } catch (err) {
+                useResponseStore().updateResponse("Failed to delete folder", "err");
+
+                console.log(err);
             }
-        }
-    },
-        
+        },
+
         searchCards() {
             this.cards = this.allCards.filter(card => card.q.toLowerCase().includes(this.search.toLowerCase().trim()));
 

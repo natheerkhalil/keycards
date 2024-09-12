@@ -68,8 +68,8 @@
                 class="outline-focus __padsm __bo-grey-7 __bo-2 __b __bdsm"></textarea>
             <br>
             <div class="__b _flex _jc-be _ai-ce">
-                <input maxlength="10" @input="updateSeparators" v-model="sep_cd" style="margin-right: 10px;" type="text" placeholder="Between Cards"
-                    class="__bo-grey-7 __b __bod __padxs __bg-none __txt-grey-2">
+                <input maxlength="10" @input="updateSeparators" v-model="sep_cd" style="margin-right: 10px;" type="text"
+                    placeholder="Between Cards" class="__bo-grey-7 __b __bod __padxs __bg-none __txt-grey-2">
                 <input maxlength="10" @input="updateSeparators" v-model="sep_qa" type="text" placeholder="Between Q & A"
                     class="__bo-grey-7 __b __bod __padxs __bg-none __txt-grey-2">
             </div>
@@ -168,55 +168,55 @@ export default {
 
         create() {
             if (this.method == "m") {
-            let exceedLimit = false;
-            let empty = false;
+                let exceedLimit = false;
+                let empty = false;
 
-            if (this.cards.length == 0) {
-                useResponseStore().updateResponse("No cards created yet.", "warn");
-                return;
-            }
-
-            if (this.cards.length > 100) {
-                useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
-                return;
-            }
-
-            this.cards.forEach((card, i) => {
-                let q = card.q.trim();
-                let a = card.a.trim();
-
-                if (q.length == 0 || a.length == 0) {
-                    empty = true;
+                if (this.cards.length == 0) {
+                    useResponseStore().updateResponse("No cards created yet.", "warn");
+                    return;
                 }
 
-                if (q.length > 9999 || a.length > 9999) {
-                    exceedLimit = true;
+                if (this.cards.length > 100) {
+                    useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
+                    return;
                 }
 
-                card.q = card.q.trim();
-                card.a = card.a.trim();
-            });
+                this.cards.forEach((card, i) => {
+                    let q = card.q.trim();
+                    let a = card.a.trim();
 
-            if (empty) {
-                useResponseStore().updateResponse("Some of the questions or answers are empty.", "warn");
-                return;
-            }
+                    if (q.length == 0 || a.length == 0) {
+                        empty = true;
+                    }
 
-            if (exceedLimit) {
-                useResponseStore().updateResponse("Some of the questions or answers exceed the limit of 10,000 characters.", "warn");
-                return;
-            }
+                    if (q.length > 9999 || a.length > 9999) {
+                        exceedLimit = true;
+                    }
 
-            this.cards.forEach((card, i) => {
-                let id = Math.floor(Math.random() * 1000000000);
-                while (useDataStore().readCard(id)) {
-                    id = Math.floor(Math.random() * 1000000000);
+                    card.q = card.q.trim();
+                    card.a = card.a.trim();
+                });
+
+                if (empty) {
+                    useResponseStore().updateResponse("Some of the questions or answers are empty.", "warn");
+                    return;
                 }
-                useDataStore().addCard([id, card.q, card.a, this.folder.id]);
-            });
 
-            useResponseStore().updateResponse("Cards created successfully.", "succ");
-            this.$router.push({ path: `/folder/${this.folder.id}` });
+                if (exceedLimit) {
+                    useResponseStore().updateResponse("Some of the questions or answers exceed the limit of 10,000 characters.", "warn");
+                    return;
+                }
+
+                this.cards.forEach((card, i) => {
+                    let id = Math.floor(Math.random() * 1000000000);
+                    while (useDataStore().readCard(id)) {
+                        id = Math.floor(Math.random() * 1000000000);
+                    }
+                    useDataStore().addCard([id, card.q, card.a, this.folder.id]);
+                });
+
+                useResponseStore().updateResponse("Cards created successfully.", "succ");
+                this.$router.push({ path: `/folder/${this.folder.id}` });
             } else if (this.method == "s") {
                 let str = this.cards2.trim();
 
@@ -331,14 +331,14 @@ export default {
 
                 useResponseStore().updateResponse("Cards created successfully.", "succ");
                 this.$router.push({ path: `/folder/${this.folder.id}` });
-                
-                }
+
+            }
 
 
 
-            
-            },
-//        },
+
+        },
+        //        },
 
         addCard() {
             this.cards.push({
