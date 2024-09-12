@@ -457,6 +457,32 @@ export default {
 
 
     methods: {
+    deleteFolder() {
+        if (window.confirm("Are you sure you want to delete this folder?")) {
+            if (cards.length > 0) {
+                if (window.confirm("Are you sure you want to delete all the cards in this folder? This cannot be undone")) {
+                    let all_cards_deleted = true;
+
+                    for (let i = 0; i < cards.length; i++) {
+                        useDataStore().deleteCard(cards[i].id);
+
+                        if (useDataStore().readCard(cards[i].id)) {
+                            all_cards_deleted = false;
+                        }
+                    }
+
+                    if (all_cards_deleted) {
+                        useDataStore().deleteFolder(this.folderId);
+                        useResponseStore().updateResponse("Folder & cards deleted successfully")
+                } else {
+                        useResponseStore().updateResponse("Some cards were not deleted. Try manually deleting them and try again", "warn")
+                }
+                    
+                } 
+            }
+        }
+    },
+        
         searchCards() {
             this.cards = this.allCards.filter(card => card.q.toLowerCase().includes(this.search.toLowerCase().trim()));
 
