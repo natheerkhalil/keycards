@@ -65,7 +65,7 @@
 
 .gradient-text {
   background-color: red;
-  background-image: linear-gradient(45deg, #f3a578, #f3a578, #af4261, #af4261, var(--theme3), var(--theme3));
+  background-image: linear-gradient(45deg, #D4502D, #D4502D, #dab359 , #4A3D3C );
   background-size: 100%;
   background-repeat: repeat;
 
@@ -80,10 +80,8 @@
 
 
 .gradient-hr {
-  background: linear-gradient(to left, #f3a578, var(--theme3), #af4261, #af4261, var(--theme3), var(--theme3));
+  background: linear-gradient(to left, #D4502D, #F4E2B7 , #4A3D3C );
   height: 2px;
-  width: 1300px;
-  max-width: 90vw;
   margin: auto;
 }
 

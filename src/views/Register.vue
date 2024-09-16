@@ -2,10 +2,14 @@
     <div class="__b _flex _fd-co _cc">
         <div style="min-height: 75vh; " class="__mauto __b _flex _fd-co _cc __13 __w">
             <div class="form-wrap">
-                <h1 class="__b __tal __tlg">Register</h1>
+                <p class="__b __tal __txl gradient-text">Register</p>
+                
                 <br>
-                <hr class="__hr __b __bg-grey-8">
+
+                <div class="__b gradient-hr"></div>
+
                 <br>
+
                 <div v-if="errors.length > 0" v-html="errors"
                     class="__b _flex __padxs _cc __bg-err-7 __bod __bdxs __bo-err-2 __txt-err-2"></div>
                 <br v-if="errors.length > 0">
@@ -45,7 +49,7 @@
     color: var(--grey_3);
     max-width: 100%;
     border: 1px solid var(--grey_7);
-    background: white;
+    background: whitesmoke;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -72,7 +76,7 @@ input::placeholder {
 
 input[type="submit"] {
     padding: 7.5px;
-    background: var(--succ_6);
+    background: var(--err_6);
     border: 1px solid var(--grey_10);
     font-size: 1.5em;
     cursor: pointer;
@@ -82,7 +86,8 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    background: var(--succ_5);
+    background: var(--err_5);
+    color: var(--grey_10);
 }
 </style>
 
@@ -132,7 +137,7 @@ export default {
                     if (localStorage.getItem("auth_token")) {
 
                         useResponseStore().updateResponse("Registered successfully. Redirecting...", "succ");
-                        
+
                         setTimeout(() => {
                             window.location.href = "/";
                         }, 2000);

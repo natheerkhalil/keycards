@@ -3,10 +3,14 @@
     <div class="__b _flex _fd-co _cc">
         <div style="min-height: 75vh; " class="__mauto __b _flex _fd-co _cc __13 __w">
             <div class="form-wrap">
-                <h1 class="__b __tal __tlg">Login</h1>
+                <p class="__b __tal __txl gradient-text">Login</p>
+
                 <br>
-                <hr class="__hr __b __bg-grey-8">
+
+                <div class="__b gradient-hr"></div>
+
                 <br>
+
                 <form class="__b _flex __padsm _fd-co _cc" @submit.prevent="login">
                     <input autocomplete="on" type="text" v-model="formData.username" placeholder="Username or Email">
                     <br>
@@ -65,7 +69,7 @@ input::placeholder {
 
 input[type="submit"] {
     padding: 7.5px;
-    background: var(--succ_6);
+    background: var(--err_6);
     border: 1px solid var(--grey_10);
     font-size: 1.5em;
     cursor: pointer;
@@ -75,7 +79,8 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    background: var(--succ_5);
+    background: var(--err_5);
+    color: var(--grey_10);
 }
 </style>
 
@@ -94,6 +99,7 @@ export default {
                 password: '',
                 token: ''
             },
+
             loading: false,
         }
     },
@@ -112,12 +118,16 @@ export default {
                 this.loading = true;
 
                 uauth.login(this.formData).then(res => {
+
                     if (localStorage.getItem("auth_token")) {
+
                         useResponseStore().updateResponse("Logged in successfully. Redirecting...", "succ");
                         setTimeout(() => {
                             window.location.href = "/";
                         }, 2000);
+
                     } else {
+
                         let status = res.msg.response.status;
 
                         if (status === 401) {
@@ -127,11 +137,16 @@ export default {
                         }
 
                         this.loading = false;
+
                     }
                 });
+
             } else if (!this.formData.username.trim()) {
+
                 useResponseStore().updateResponse("Please enter a username", "warn");
+
             } else if (!this.formData.password) {
+
                 useResponseStore().updateResponse("Please enter a password", "warn");
             }
         }

@@ -6,8 +6,7 @@
             <p style="margin-top: 7.5px; font-size: 23px; " class="_xs-hide logo-text">Keycards</p>
         </div>
         <div class="_flex _fd-ro _cc">
-            <router-link class="__nun __bd-5 __hv-5 __bod __padxs __txt-5 __hv __ht-1" to="/login">Login</router-link>
-            <p @click="altLogin">alt login</p>
+            <router-link class="__nun __hv-5 __padxs __txt-5 __hv __ht-1" to="/login">Login</router-link>
         </div>
     </div>
 </template>

@@ -34,6 +34,21 @@ export default {
     return {
       authenticated: uauth.isAuthenticated(),
     }
-  }
+  },
 }
 </script>
+
+<style>
+.progress {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-overlay {
+  background: rgba(255, 255, 255, 0.5);
+  width: 100%;
+  padding: 5px;
+}
+</style>

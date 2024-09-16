@@ -15,7 +15,7 @@
         <br>
 
         <div class="__b _flex _jc-en">
-            <div @click="switchMethod" class="switch-method __po _flex _fd-ro _ai-ce">
+            <div @click="this.ds.toggleMethod(this.method)" class="switch-method __po _flex _fd-ro _ai-ce">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                     <path
                         d="M6 18h-2v5h-2v-5h-2v-3h6v3zm-2-17h-2v12h2v-12zm11 7h-6v3h2v12h2v-12h2v-3zm-2-7h-2v5h2v-5zm11 14h-6v3h2v5h2v-5h2v-3zm-2-14h-2v12h2v-12z" />
@@ -154,192 +154,217 @@ import { useDataStore } from '@/stores/data';
 
 export default {
     methods: {
-        switchMethod() {
-            useDataStore().toggleMethod(this.method);
-        },
-
+        // UPDATE SEPARATORS //
         updateSeparators() {
             if (this.sep_cd.trim().length == 0 || this.sep_qa.trim().length == 0) {
                 return;
             }
 
-            useDataStore().updateCardSeparators(this.sep_qa.trim(), this.sep_cd.trim());
+            this.ds.updateCardSeparators(this.sep_qa.trim(), this.sep_cd.trim());
         },
 
+        // CREATE CARDS //
         create() {
             if (this.method == "m") {
-                let exceedLimit = false;
-                let empty = false;
-
-                if (this.cards.length == 0) {
-                    useResponseStore().updateResponse("No cards created yet.", "warn");
-                    return;
-                }
-
-                if (this.cards.length > 100) {
-                    useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
-                    return;
-                }
-
-                this.cards.forEach((card, i) => {
-                    let q = card.q.trim();
-                    let a = card.a.trim();
-
-                    if (q.length == 0 || a.length == 0) {
-                        empty = true;
-                    }
-
-                    if (q.length > 9999 || a.length > 9999) {
-                        exceedLimit = true;
-                    }
-
-                    card.q = card.q.trim();
-                    card.a = card.a.trim();
-                });
-
-                if (empty) {
-                    useResponseStore().updateResponse("Some of the questions or answers are empty.", "warn");
-                    return;
-                }
-
-                if (exceedLimit) {
-                    useResponseStore().updateResponse("Some of the questions or answers exceed the limit of 10,000 characters.", "warn");
-                    return;
-                }
-
-                this.cards.forEach((card, i) => {
-                    let id = Math.floor(Math.random() * 1000000000);
-                    while (useDataStore().readCard(id)) {
-                        id = Math.floor(Math.random() * 1000000000);
-                    }
-                    useDataStore().addCard([id, card.q, card.a, this.folder.id]);
-                });
-
-                useResponseStore().updateResponse("Cards created successfully.", "succ");
-                this.$router.push({ path: `/folder/${this.folder.id}` });
+                this.createM();
             } else if (this.method == "s") {
-                let str = this.cards2.trim();
+                this.createS();
+            }
+        },
 
-                if (str.length == 0) {
-                    useResponseStore().updateResponse("No cards found.", "warn");
-                    return;
-                }
+        // CREATE METHOD M //
+        createM() {
+            let exceedLimit = false;
+            let empty = false;
 
-                let cds = str.split(this.sep_cd);
+            // If cards array is empty, return
+            if (this.cards.length == 0) {
+                useResponseStore().updateResponse("No cards created yet.", "warn");
 
-                if (cds.length == 0) {
-                    useResponseStore().updateResponse("No cards found.", "warn");
-                    return;
-                }
-
-                if (cds.length > 100) {
-                    useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
-                    return;
-                }
-
-                let empty_cards = false;
-                let too_long = false;
-
-                let arr = [];
-
-                for (let i = 0; i < cds.length; i++) {
-                    let c = cds[i].trim();
-
-                    if (c.length == 0) {
-                        continue;
-                    }
-
-                    let q = c.split(this.sep_qa)[0] || '';
-                    let a = c.split(this.sep_qa)[1] || '';
-
-                    q = q.trim();
-                    a = a.trim();
-
-                    if (q.length == 0 || a.length == 0) {
-                        empty_cards = true;
-                        continue;
-                    }
-
-                    /*if (c.split(this.sep_qa).length > 1) {
-                        a = '';
-                        for (let i = 0; i < a.split(this.sep_qa).length; i++) {
-                            a = a + a.split(this.sep_qa)[i];
-                        }
-                    }*/
-
-                    if (q.length > 9999 || a.length > 9999) {
-                        too_long = true;
-                        continue;
-                    }
-
-                    arr.push({
-                        q: q,
-                        a: a
-                    });
-                }
-
-                if (empty_cards) {
-                    useResponseStore().updateResponse("Some of the cards are empty.", "warn");
-                    return;
-                }
-
-                if (too_long) {
-                    useResponseStore().updateResponse("Some of the cards exceed the limit of 10,000 characters.", "warn");
-                    return;
-                }
-
-                if (arr.length == 0) {
-                    useResponseStore().updateResponse("No cards found.", "warn");
-                    return;
-                }
-
-                let failed = [];
-
-                for (let i = 0; i < arr.length; i++) {
-                    let card = arr[i];
-
-                    let id = Math.floor(Math.random() * 1000000000);
-                    while (useDataStore().readCard(id)) {
-                        id = Math.floor(Math.random() * 1000000000);
-                    }
-
-                    useDataStore().addCard([id, card.q, card.a, this.folder.id])
-
-                    if (!useDataStore().readCard(id)) {
-                        failed.push({
-                            q: card.q,
-                            a: card.a
-                        })
-                    }
-                }
-
-                console.log("failed", failed)
-
-
-                if (failed.length > 0) {
-                    useResponseStore().updateResponse("Some cards failed to create.", "warn");
-
-                    let str = "";
-
-                    failed.forEach((card, i) => {
-                        str = str + card.q + " " + this.sep_qa + card.a + this.sep_cd + "\n\n";
-                    })
-
-                    this.cards2 = str;
-                    return;
-                };
-
-                useResponseStore().updateResponse("Cards created successfully.", "succ");
-                this.$router.push({ path: `/folder/${this.folder.id}` });
-
+                return;
             }
 
+            // If cards array has more than 100 cards, return
+            if (this.cards.length > 100) {
+                useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
+                return;
+            }
 
+            // Trim & check if any cards are empty or too long
+            this.cards.forEach((card, i) => {
+                let q = card.q.trim();
+                let a = card.a.trim();
 
+                if (q.length == 0 || a.length == 0) {
+                    empty = true;
+                }
 
+                if (q.length > 9999 || a.length > 9999) {
+                    exceedLimit = true;
+                }
+
+                card.q = card.q.trim();
+                card.a = card.a.trim();
+            });
+
+            // If any cards are empty or too long, return
+            if (empty) {
+                useResponseStore().updateResponse("Some of the questions or answers are empty.", "warn");
+                return;
+            }
+            if (exceedLimit) {
+                useResponseStore().updateResponse("Some of the questions or answers exceed the limit of 10,000 characters.", "warn");
+                return;
+            }
+
+            // Create cards invidually
+            this.cards.forEach((card, i) => {
+                let id = Math.floor(Math.random() * 1000000000);
+                while (useDataStore().getCard(id)) {
+                    id = Math.floor(Math.random() * 1000000000);
+                }
+                useDataStore().createCard([id, card.q, card.a, this.folder.id]);
+            });
+
+            useResponseStore().updateResponse("Cards created successfully.", "succ");
+
+            // Relocate to folder page
+            this.$router.push({ path: `/folder/${this.folder.id}` });
         },
-        //        },
 
+        // CREATE METHOD S //
+        createS() {
+            // Trim text
+            let str = this.cards2.trim();
+
+            // If text is empty, return
+            if (str.length == 0) {
+                useResponseStore().updateResponse("No cards found.", "warn");
+                return;
+            }
+
+            // Split array based on separators
+            let cds = str.split(this.sep_cd);
+
+            // If array is empty, return
+            if (cds.length == 0) {
+                useResponseStore().updateResponse("No cards found.", "warn");
+                return;
+            }
+
+            // If array has more than 100 cards, return
+            if (cds.length > 100) {
+                useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
+                return;
+            }
+
+            let empty_cards = false;
+            let too_long = false;
+
+            let arr = [];
+
+            // Run through each card
+            for (let i = 0; i < cds.length; i++) {
+                // Trim card
+                let c = cds[i].trim();
+
+                // If card is empty, continue to next iteration
+                if (c.length == 0) {
+                    continue;
+                }
+
+                // Get q & a based on separators from card
+                let q = c.split(this.sep_qa)[0] || '';
+                let a = c.split(this.sep_qa)[1] || '';
+
+                // Trim q & a
+                q = q.trim();
+                a = a.trim();
+
+                // If q or a is empty, set empty_cards to true and continue to next iteration
+                if (q.length == 0 || a.length == 0) {
+                    empty_cards = true;
+                    continue;
+                }
+                
+                // If q or a is too long, set too_long to true and continue to next iteration
+                if (q.length > 9999 || a.length > 9999) {
+                    too_long = true;
+                    continue;
+                }
+
+                // Add card to array
+                arr.push({
+                    q: q,
+                    a: a
+                });
+            }
+
+            // If any cards are empty or too long, return
+            if (empty_cards) {
+                useResponseStore().updateResponse("Some of the cards are empty.", "warn");
+                return;
+            }
+            if (too_long) {
+                useResponseStore().updateResponse("Some of the cards exceed the limit of 10,000 characters.", "warn");
+                return;
+            }
+
+            // If array is empty, return
+            if (arr.length == 0) {
+                useResponseStore().updateResponse("No cards found.", "warn");
+                return;
+            }
+
+            // Create empty failed array
+            let failed = [];
+
+            // Run through each card
+            for (let i = 0; i < arr.length; i++) {
+                let card = arr[i];
+
+                // Assign unique ID to card
+                let id = Math.floor(Math.random() * 1000000000);
+                while (useDataStore().getCard(id)) {
+                    id = Math.floor(Math.random() * 1000000000);
+                }
+
+                // Create card
+                this.ds.createCard([id, card.q, card.a, this.folder.id])
+
+                // If card creation failed, push to failed array
+                if (!useDataStore().getCard(id)) {
+                    failed.push({
+                        q: card.q,
+                        a: card.a
+                    })
+                }
+            }
+
+            console.log("failed", failed)
+
+            // If failed array is not empty, update cards2 with failed cards and return
+            if (failed.length > 0) {
+                useResponseStore().updateResponse("Some cards failed to create.", "warn");
+
+                let str = "";
+
+                failed.forEach((card, i) => {
+                    str = str + card.q + " " + this.sep_qa + card.a + this.sep_cd + "\n\n";
+                })
+
+                this.cards2 = str;
+                return;
+            };
+
+            useResponseStore().updateResponse("Cards created successfully.", "succ");
+
+            // If failed array is empty, relocate to folder page
+            this.$router.push({ path: `/folder/${this.folder.id}` });
+        },
+
+
+        // ADD & DELETE CARDS //
         addCard() {
             this.cards.push({
                 q: "",
@@ -350,8 +375,9 @@ export default {
             this.cards.splice(index, 1);
         },
 
+        // SET FOLDER //
         setFolder() {
-            let folder = this.$route.query.f;
+            let folder = this.folderId;
 
             if (!folder) {
                 this.$router.push({ name: '404' });
@@ -370,23 +396,35 @@ export default {
     created() {
         this.setFolder();
 
-        this.sep_qa = useDataStore().getSeparators()['qa'];
-        this.sep_cd = useDataStore().getSeparators()['cd'];
-
-        console.log(this.method)
+        this.sep_qa = this.ds.getSeparators()['qa'];
+        this.sep_cd = this.ds.getSeparators()['cd'];
     },
 
     computed: {
+        // GET CREATION METHOD //
         method() {
-            return useDataStore().getMethod();
-        }
+            return this.ds.getMethod();
+        },
+
+        // FOLDERS //
+        folders() {
+            return this.ds.getFolders();
+        },
+
+        // FOLDER ID //
+        folderId() {
+            return this.$route.query.f || null;
+        },
+
+        // DATA STORE //
+        ds() {
+            return useDataStore();
+        },
     },
 
     data() {
         return {
             folder: null,
-
-            folders: useDataStore().getFolders(),
 
             cards: [
                 {

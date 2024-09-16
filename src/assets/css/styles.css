@@ -1695,7 +1695,7 @@
     opacity: 0.7;
 }
 
-.__hv {
+.__hv:hover {
     transition: 0.25s;
 }
 

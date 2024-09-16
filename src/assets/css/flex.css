@@ -31,8 +31,8 @@
 
 /* Align Items */
 ._ai-ce { align-items: center; }
-._ai-fs { align-items: flex-start; }
-._ai-fe { align-items: flex-end; }
+._ai-st { align-items: flex-start; }
+._ai-en { align-items: flex-end; }
 ._ai-ba { align-items: baseline; }
 ._ai-se { align-items: stretch; }
 

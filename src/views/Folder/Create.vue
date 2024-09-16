@@ -14,13 +14,12 @@
         <br>
 
         <form @submit.prevent="createFolder" class="__b _flex __mlauto __mrauto _fd-co _cc __padsm">
-            <input maxlength="50" v-model="folder.name"
+            <input maxlength="150" v-model="folder.name"
                 style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7);" type="text"
                 placeholder="Name" class="__tmd __padxs __bg-none __bo-none __txt-grey-2">
             <br>
             <p class="__tmd __tle __txt-grey-4 __padxs"
-                style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); ">Inside the folder:
-                <strong>{{ parentFolder ? parentFolder.name : "Not inside of a folder" }}</strong>
+                style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); "><span class="__bo" v-html="hierarchy"></span>
             </p>
             <br>
 
@@ -76,12 +75,12 @@ export default {
         },
 
         createFolder() {
-            if (this.folder.name.trim().length == 0 || this.folder.name.trim() > 50) {
-                useResponseStore().updateResponse("Folder name must be between 1 and 50 characters long", "warn");
+            if (this.folder.name.trim().length == 0 || this.folder.name.trim() > 150) {
+                useResponseStore().updateResponse("Folder name must be between 1 and 150 characters long", "warn");
                 return;
             }
 
-            if (!useDataStore().readFolder(this.folder.parent) && this.folder.parent) {
+            if (!this.ds.getFolder(this.folder.parent) && this.folder.parent) {
                 useResponseStore().updateResponse("Parent folder does not exist", "warn");
                 return;
             }
@@ -93,7 +92,7 @@ export default {
                 this.folder.id = Math.floor(Math.random() * 10000000000);
             }
 
-            useDataStore().addFolder([this.folder.id, this.folder.name, this.folder.parent, this.folder.theme]);
+            this.ds.createFolder([this.folder.id, this.folder.name, this.folder.parent, this.folder.theme]);
 
             useResponseStore().updateResponse("Folder created successfully!", "succ");
 
@@ -120,6 +119,38 @@ export default {
             } else {
                 return null;
             }
+        },
+
+        hierarchy() {
+            if (!this.folder.parent) {
+                return `Root &rarr; <span style='color: var(--${this.folder.theme}2)'>${this.folder.name}</span>`;
+            }
+
+            let parents = this.ds.getAncestors(this.folder.parent, false);
+
+            let str = "Root";
+
+            parents.forEach(p => {
+                console.log(p);
+                let theme = this.ds.getFolder(p.id).theme;
+                str = `${str} &rarr; <span style='color: var(--${theme}2)'>${p.name}</span>`;
+            })
+
+            str = `${str} &rarr; <span style='color: var(--${this.folder.theme}2)'>${this.folder.name}</span>`;
+
+            return str;
+        },
+
+        ds() {
+            return useDataStore();
+        },
+
+        themes() {
+            return this.ds.getThemes();
+        },
+
+        folders() {
+            return this.ds.getFolders();
         }
     },
 
@@ -133,12 +164,8 @@ export default {
                 name: "",
                 theme: useDataStore().getThemes()[Math.floor(Math.random() * useDataStore().getThemes().length)],
                 insideFolder: 232,
-                parent: null
+                parent: null,
             },
-
-            folders: useDataStore().getFolders(),
-
-            themes: useDataStore().getThemes()
         }
     }
 }
