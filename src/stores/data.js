@@ -69,6 +69,8 @@ export const useDataStore = defineStore('data', {
                     }
 
                     this.saveCards();
+
+                    return true;
                 } else {
                     useResponseStore().updateResponse("Failed to fetch data from server", "err");
 

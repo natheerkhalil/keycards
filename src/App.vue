@@ -3,6 +3,7 @@
     <AuthenticatedHeader v-if="authenticated" />
     <UnauthenticatedHeader v-if="!authenticated" />
     <br>
+    {{ "token:"+ authenticated }}
     <router-view v-slot="{ Component }">
         <!--<keep-alive>-->
             <component :is="Component" />
@@ -20,7 +21,7 @@ import Footer from "@/components/Footer.vue";
 import AuthenticatedHeader from "./components/AuthenticatedHeader.vue";
 import UnauthenticatedHeader from "./components/UnauthenticatedHeader.vue";
 
-import { uauth } from "./utils/auth";
+import { uauth } from "./stores/auth";
 
 export default {
   components: {
@@ -32,7 +33,8 @@ export default {
 
   data() {
     return {
-      authenticated: uauth.isAuthenticated(),
+      uauth: uauth(),
+      authenticated: uauth().token
     }
   },
 }

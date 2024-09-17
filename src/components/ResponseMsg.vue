@@ -14,12 +14,12 @@
 
 <script>
 import { useResponseStore } from '@/stores/response';
-import { useAuthStore } from '@/stores/auth';
+import { uauth } from '@/stores/auth';
 
 export default {
     setup() {
         const responseStore = useResponseStore();
-        const authStore = useAuthStore();
+        const authStore = uauth();
 
         return {
             responseStore,

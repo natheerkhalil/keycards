@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { uauth } from "@/utils/auth";
+import { uauth } from "@/stores/auth";
 
 import { request } from "@/utils/api";
 
@@ -116,9 +116,6 @@ export default {
 
   data() {
     return {
-      // UAUTH
-      uauth: uauth,
-
       // SEARCH
       search: "",
 
@@ -146,7 +143,7 @@ export default {
 
   created() {
     setInterval(() => {
-      if (!uauth.isAuthenticated()) {
+      if (!uauth().token) {
         window.location.href = '/';
       }
     }, 1000);

@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 
-import { uauth } from "@/utils/auth";
 import { useResponseStore } from "@/stores/response";
-import { useAuthStore } from "@/stores/auth";
+import { uauth } from "@/stores/auth";
 
 var HomeRoute = {
   path: "/",

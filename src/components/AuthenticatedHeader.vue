@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { uauth } from '@/utils/auth';
+import { uauth } from '@/stores/auth';
 
 export default {
     data() {
@@ -52,7 +52,7 @@ export default {
         },
 
         logout() {
-            uauth.logout();
+            uauth().logout();
             this.$router.push('/');
         },
     }

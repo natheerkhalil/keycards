@@ -95,7 +95,7 @@ input[type="submit"]:hover {
 
 import { useResponseStore } from "@/stores/response";
 
-import { uauth } from "@/utils/auth";
+import { uauth } from "@/stores/auth";
 
 // import { TURNSTILE_SITE_KEY } from "../../config";
 import { PLACEHOLDER_CAPTCHA_TOKEN } from "../../config";
@@ -133,7 +133,7 @@ export default {
         register() {
             if (this.token) {
                 this.loading = true;
-                uauth.register({ username: this.formData.username, email: this.formData.email, password: this.formData.password, token: this.token }).then(res => {
+                uauth().register({ username: this.formData.username, email: this.formData.email, password: this.formData.password, token: this.token }).then(res => {
                     if (localStorage.getItem("auth_token")) {
 
                         useResponseStore().updateResponse("Registered successfully. Redirecting...", "succ");

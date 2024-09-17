@@ -87,7 +87,7 @@ input[type="submit"]:hover {
 <script>
 import { useResponseStore } from "@/stores/response";
 
-import { uauth } from "@/utils/auth";
+import { uauth } from "@/stores/auth";
 
 import { PLACEHOLDER_CAPTCHA_TOKEN } from "../../config";
 
@@ -117,7 +117,7 @@ export default {
             if (this.formData.username.trim() && this.formData.password) {
                 this.loading = true;
 
-                uauth.login(this.formData).then(res => {
+                uauth().login(this.formData).then(res => {
 
                     if (localStorage.getItem("auth_token")) {
 
