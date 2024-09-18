@@ -3,7 +3,7 @@
         <div style="min-height: 75vh; " class="__mauto __b _flex _fd-co _cc __13 __w">
             <div class="form-wrap">
                 <p class="__b __tal __txl gradient-text">Register</p>
-                
+
                 <br>
 
                 <div class="__b gradient-hr"></div>
@@ -138,9 +138,7 @@ export default {
 
                         useResponseStore().updateResponse("Registered successfully. Redirecting...", "succ");
 
-                        setTimeout(() => {
-                            window.location.href = "/";
-                        }, 2000);
+                        window.location.href = "/";
                     } else {
                         // reset captcha
 

@@ -6,8 +6,8 @@
         <br>
 
         <div class="__b _flex _jc-en">
-            <div @click="create"
-                class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 __bd-4 __bod _fd-ro __bg-none __po">
+            <div :style="[processing ? 'opacity: 0.5' : 'opacity: 1']" @click="create"
+                :class="['create-btn', ' _m-xs-b', '_m-xs-cc', '__padxs', '_flex', '__hv' ,'__bd-4', '__bod', '_fd-ro', '__bg-none', processing ? '' : '__po', '__hv-4']">
                 <p class="__txt-3">Create Card(s)</p>
             </div>
         </div>
@@ -78,8 +78,8 @@
         <br>
 
         <div class="__b _flex _jc-en">
-            <div @click="create"
-                class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 __bd-4 __bod _fd-ro __bg-none __po">
+            <div :style="[processing ? 'opacity: 0.5' : 'opacity: 1']" @click="create"
+                :class="['create-btn', ' _m-xs-b', '_m-xs-cc', '__padxs', '_flex', '__hv' ,'__bd-4', '__bod', '_fd-ro', '__bg-none', processing ? '' : '__po', '__hv-4']">
                 <p class="__txt-3">Create Card(s)</p>
             </div>
         </div>
@@ -217,28 +217,42 @@ export default {
                 return;
             }
 
-            // Create cards invidually
-            this.cards.forEach((card, i) => {
-                let id = Math.floor(Math.random() * 1000000000);
-                while (useDataStore().getCard(id)) {
-                    id = Math.floor(Math.random() * 1000000000);
+            let failed = [];
+
+            // Create cards individually
+            Promise.all(this.cards.map((card, i) => {
+                return this.ds.createCard([card.q, card.a, this.folder.id]).then(res => {
+                    if (!res) {
+                        failed.push({
+                            q: card.q,
+                            a: card.a
+                        });
+                    }
+                });
+            })).then(() => {
+                if (failed.length > 0) {
+                    useResponseStore().updateResponse("Some cards failed to create", "warn");
+                    this.cards = failed;
+                    return;
                 }
-                useDataStore().createCard([id, card.q, card.a, this.folder.id]);
+
+                useResponseStore().updateResponse("Cards created successfully.", "succ");
+
+                // Relocate to folder page
+                this.$router.push({ path: `/folder/${this.folder.id}` });
             });
-
-            useResponseStore().updateResponse("Cards created successfully.", "succ");
-
-            // Relocate to folder page
-            this.$router.push({ path: `/folder/${this.folder.id}` });
         },
 
         // CREATE METHOD S //
         createS() {
+            this.processing = true;
+
             // Trim text
             let str = this.cards2.trim();
 
             // If text is empty, return
             if (str.length == 0) {
+                this.processing = false;
                 useResponseStore().updateResponse("No cards found.", "warn");
                 return;
             }
@@ -248,12 +262,14 @@ export default {
 
             // If array is empty, return
             if (cds.length == 0) {
+                this.processing = false;
                 useResponseStore().updateResponse("No cards found.", "warn");
                 return;
             }
 
             // If array has more than 100 cards, return
             if (cds.length > 100) {
+                this.processing = false;
                 useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
                 return;
             }
@@ -264,6 +280,7 @@ export default {
             let arr = [];
 
             // Run through each card
+
             for (let i = 0; i < cds.length; i++) {
                 // Trim card
                 let c = cds[i].trim();
@@ -286,7 +303,7 @@ export default {
                     empty_cards = true;
                     continue;
                 }
-                
+
                 // If q or a is too long, set too_long to true and continue to next iteration
                 if (q.length > 9999 || a.length > 9999) {
                     too_long = true;
@@ -302,65 +319,57 @@ export default {
 
             // If any cards are empty or too long, return
             if (empty_cards) {
+                this.processing = false;
                 useResponseStore().updateResponse("Some of the cards are empty.", "warn");
                 return;
             }
             if (too_long) {
+                this.processing = false;
                 useResponseStore().updateResponse("Some of the cards exceed the limit of 10,000 characters.", "warn");
                 return;
             }
 
             // If array is empty, return
             if (arr.length == 0) {
+                this.processing = false;
                 useResponseStore().updateResponse("No cards found.", "warn");
                 return;
             }
 
-            // Create empty failed array
+
             let failed = [];
 
-            // Run through each card
-            for (let i = 0; i < arr.length; i++) {
-                let card = arr[i];
+            // Create cards individually
+            Promise.all(this.arr.map((card, i) => {
+                return this.ds.createCard([card.q, card.a, this.folder.id]).then(res => {
+                    if (!res) {
+                        failed.push({
+                            q: card.q,
+                            a: card.a
+                        });
+                    }
+                });
+            })).then(() => {
+                // If failed array is not empty, update cards2 with failed cards and return
+                if (failed.length > 0) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("Some cards failed to create.", "warn");
 
-                // Assign unique ID to card
-                let id = Math.floor(Math.random() * 1000000000);
-                while (useDataStore().getCard(id)) {
-                    id = Math.floor(Math.random() * 1000000000);
-                }
+                    let str = "";
 
-                // Create card
-                this.ds.createCard([id, card.q, card.a, this.folder.id])
-
-                // If card creation failed, push to failed array
-                if (!useDataStore().getCard(id)) {
-                    failed.push({
-                        q: card.q,
-                        a: card.a
+                    failed.forEach((card, i) => {
+                        str = str + card.q + " " + this.sep_qa + card.a + this.sep_cd + "\n\n";
                     })
-                }
-            }
 
-            console.log("failed", failed)
+                    this.cards2 = str;
+                    return;
+                };
 
-            // If failed array is not empty, update cards2 with failed cards and return
-            if (failed.length > 0) {
-                useResponseStore().updateResponse("Some cards failed to create.", "warn");
+                useResponseStore().updateResponse("Cards created successfully.", "succ");
 
-                let str = "";
-
-                failed.forEach((card, i) => {
-                    str = str + card.q + " " + this.sep_qa + card.a + this.sep_cd + "\n\n";
-                })
-
-                this.cards2 = str;
-                return;
-            };
-
-            useResponseStore().updateResponse("Cards created successfully.", "succ");
-
-            // If failed array is empty, relocate to folder page
-            this.$router.push({ path: `/folder/${this.folder.id}` });
+                // If failed array is empty, relocate to folder page
+                this.$router.push({ path: `/folder/${this.folder.id}` });
+            });
         },
 
 
@@ -424,6 +433,8 @@ export default {
 
     data() {
         return {
+            processing: false,
+            
             folder: null,
 
             cards: [

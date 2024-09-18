@@ -91,12 +91,14 @@ import { uauth } from "@/stores/auth";
 
 import { PLACEHOLDER_CAPTCHA_TOKEN } from "../../config";
 
+import { useDataStore } from "@/stores/data";
+
 export default {
     data() {
         return {
             formData: {
-                username: '',
-                password: '',
+                username: 'nka',
+                password: 'posnajem',
                 token: ''
             },
 
@@ -121,10 +123,11 @@ export default {
 
                     if (localStorage.getItem("auth_token")) {
 
+                        useDataStore().addLoadq();
+
                         useResponseStore().updateResponse("Logged in successfully. Redirecting...", "succ");
-                        setTimeout(() => {
-                            window.location.href = "/";
-                        }, 2000);
+
+                        window.location.href = "/";
 
                     } else {
 

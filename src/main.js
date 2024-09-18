@@ -35,6 +35,7 @@ axios.defaults.headers.common['Accept'] = 'application/json';
 
 // IMPORT REQUEST //
 import { request } from "@/utils/api";
+import { useDataStore } from './stores/data'
 
 // CREATE APP //
 const app = createApp(App);
@@ -60,8 +61,19 @@ function checkMaintenanceMode() {
     }
 }
 
-// Check maintenance mode every second
-setInterval(checkMaintenanceMode, 1000);
+function checkLoadq() {
+    if (localStorage.getItem("load_data")) {
+        useDataStore().getAllData();
+
+        console.log("Data loaded from server");
+    }
+}
+
+// Check mode every second
+setInterval(checkMaintenanceMode, 2000);
+if (localStorage.getItem("load_data")) {
+    setInterval(checkLoadq, 100);
+}
 
 export {
     request

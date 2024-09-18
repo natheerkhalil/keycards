@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 
 import { request } from '@/main';
+import { useResponseStore } from './response';
 
 export const useDataStore = defineStore('data', {
 
@@ -49,6 +50,9 @@ export const useDataStore = defineStore('data', {
     actions: {
         // FETCH ALL DATA FROM SERVER //
         getAllData() {
+
+            this.clearq();
+
             request({}, '/all').then(res => {
                 if (!res.failed) {
                     let folders = res.data.folders;
@@ -57,7 +61,7 @@ export const useDataStore = defineStore('data', {
                     for (let i = 0; i < folders.length; i++) {
                         let f = folders[i];
 
-                        this.createFolder([f.id, f.name, f.parent, f.theme]);
+                        this.appendFolder([f.id, f.name, f.parent, f.theme]);
                     }
 
                     this.saveFolders();
@@ -65,7 +69,7 @@ export const useDataStore = defineStore('data', {
                     for (let i = 0; i < cards.length; i++) {
                         let c = cards[i];
 
-                        this.createCard([c.id, c.name, c.folder, c.question, c.answer, c.updatedAt]);
+                        this.appendCard([c.id, c.name, c.folder, c.question, c.answer, c.updatedAt]);
                     }
 
                     this.saveCards();
@@ -77,6 +81,12 @@ export const useDataStore = defineStore('data', {
                     return null;
                 }
             })
+        },
+        addLoadq() {
+            localStorage.setItem("load_data", true);
+        },
+        clearq() {
+            localStorage.removeItem("load_data");
         },
 
         // CHECK DATA SIZE & REMOVE CACHED DATA //
@@ -292,67 +302,167 @@ export const useDataStore = defineStore('data', {
             return this.deepClone(this.themes);
         },
 
-        // CREATE CARD //
-        createCard([id, q, a, folder]) {
-            this.cards.push({ id: id, q: q, a: a, folder: folder, status: "0" });
+        // APPEND FOLDER //
+        appendFolder([id, name, parent, theme]) {
+            this.folders.unshift(
+                {
+                    id: id,
+                    name: name,
+                    parent: parent,
+                    theme: theme,
+                    updatedAt: new Date().getTime()
+                }
+            )
+
+            this.saveFolders();
+        },
+
+        // APPEND CARD //
+        appendCard([id, q, a, folder]) {
+            this.cards.unshift(
+                {
+                    id: id,
+                    q: q,
+                    a: a,
+                    folder: folder,
+                    status: "0",
+                    updatedAt: new Date().getTime()
+                }
+            )
 
             this.saveCards();
+        },
+
+        // CREATE CARD //
+        async createCard([q, a, folder]) {
+            return await request({ q: q, a: a, folder: folder }, '/card/create').then(res => {
+                if (!res.failed) {
+                    let id = res.data.id;
+
+                    this.appendCard([id, q, a, folder]);
+
+                    console.log(id);
+
+                    this.saveCards();
+
+                    return id;
+                } else {
+                    return false;
+                }
+            })
         },
 
         // DELETE CARD //
         deleteCard(cardId) {
-            this.cards = this.cards.filter(card => card.id != cardId);
+            request({ id: cardId }, '/card/delete').then(res => {
+                if (!res.failed) {
+                    this.cards = this.cards.filter(card => card.id != cardId);
+                    this.saveCards();
+                } else {
+                    useResponseStore().updateResponse("Failed to delete card", "err");
 
-            this.saveCards();
+                    return false;
+                }
+            })
         },
 
         // UPDATE CARD //
         updateCard(cardId, q, a) {
-            const index = this.cards.findIndex(card => card.id == cardId);
+            request({ id: cardId, q: q, a: a }, '/card/update').then(res => {
+                if (!res.failed) {
+                    let id = res.data.id;
 
-            if (index !== -1) {
-                this.cards[index]["q"] = q;
-                this.cards[index]["a"] = a;
-                this.saveCards();
-            }
+                    this.cards[id]["q"] = q;
+                    this.cards[id]["a"] = a;
+                    this.cards[id]["updatedAt"] = new Date().getTime();
+
+                    this.saveCards();
+                } else {
+                    useResponseStore().updateResponse("Failed to update card", "err");
+
+                    return false;
+                }
+            })
         },
 
         // MARK CARD //
         markCard(cardId, mark) {
-            const index = this.cards.findIndex(card => card.id == cardId);
+            request({ id: cardId, mark: mark }, '/card/mark').then(res => {
+                if (!res.failed) {
+                    this.cards[index]["status"] = mark;
+                    this.saveCards();
+                } else {
+                    useResponseStore().updateResponse("Failed to mark card", "err");
 
-            if (index !== -1) {
-                this.cards[index]["status"] = mark;
-                this.saveCards();
-            }
+                    return false;
+                }
+            })
         },
 
         // MOVE CARD //
         moveCard(cardId, folderId) {
-            const index = this.cards.findIndex(card => card.id == cardId);
+            request({ id: cardId, folder: folderId }, '/card/move').then(res => {
+                if (!res.failed) {
+                    let id = res.data.id;
 
-            if (index !== -1) {
-                this.cards[index]["folder"] = folderId;
-                this.saveCards();
-            }
+                    let card = this.cards.find(card => card.id == cardId);
+
+                    if (!card) {
+                        this.cards.unshift({ id: id, q: card.q, a: card.a, folder: folderId, status: card.status, updatedAt: new Date().getTime() });
+                    } else {
+                        card["folder"] = folderId;
+                        card["updatedAt"] = new Date().getTime();
+                    }
+
+                    this.saveCards();
+                } else {
+                    useResponseStore().updateResponse("Failed to move card", "err");
+
+                    return false;
+                }
+            })
         },
 
         // GET CARD //
         getCard(cardId) {
-            const card = this.cards.find(card => card.id == cardId);
+            let card = this.cards.find(card => card.id == cardId);
+
+            if (!card) {
+                request({ id: cardId }, '/card/get').then(res => {
+                    if (res.failed) {
+                        useResponseStore().updateResponse("Failed to get card", "err");
+
+                        return false;
+                    }
+
+                    card = res.data;
+                });
+            }
 
             return this.deepClone(card);
         },
 
         // CREATE FOLDER //
-        createFolder([id, name, parent, theme]) {
-            this.folders.push({
-                id: id,
-                name: name,
-                parent: parent,
-                theme: theme
-            });
-            this.saveFolders();
+        async createFolder([name, parent, theme]) {
+            return await request({ name: name, parent: parent, theme: theme }, '/folder/create').then((res) => {
+                if (!res.failed) {
+                    let id = res.data.id;
+
+                    this.folders.unshift({
+                        name: name,
+                        parent: parent,
+                        theme: theme,
+                        id: id,
+                        updatedAt: new Date().getTime()
+                    })
+
+                    this.saveFolders();
+
+                    return id;
+                } else {
+                    return false;
+                }
+            })
         },
 
         // DELETE FOLDER //

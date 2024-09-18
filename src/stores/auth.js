@@ -17,19 +17,22 @@ export const uauth = defineStore('auth', {
 
     actions: {
 
-        // SET AUTH DATA //
+        // MODIFY AUTH DATA //
         setAuthData(username, email, token) {
             localStorage.setItem('auth_token', token);
             localStorage.setItem('auth_username', username);
             localStorage.setItem('auth_email', email);
 
-            this.token = token;
-            this.username = username;
-            this.email = email;
+            this.updateAuthData();
+        },
+        updateAuthData() {
+            this.token = localStorage.getItem('auth_token');
+            this.username = localStorage.getItem('auth_username');
+            this.email = localStorage.getItem('auth_email');
         },
 
         // LOGIN //
-        async login (data) {
+        async login(data) {
             try {
                 const response = await axios.post(API_URL + '/login', data);
 
@@ -55,7 +58,7 @@ export const uauth = defineStore('auth', {
         },
 
         // REGISTER //
-        async register (data) {
+        async register(data) {
             try {
                 const response = await axios.post(API_URL + '/register', data);
 
@@ -97,9 +100,7 @@ export const uauth = defineStore('auth', {
             useResponseStore().updateResponse("Logged out successfully. Redirecting...", "succ");
 
             // redirect to home page after logout
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1000);
+            window.location.href = '/';
         },
     },
 });

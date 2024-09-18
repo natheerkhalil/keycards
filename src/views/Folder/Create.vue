@@ -19,7 +19,8 @@
                 placeholder="Name" class="__tmd __padxs __bg-none __bo-none __txt-grey-2">
             <br>
             <p class="__tmd __tle __txt-grey-4 __padxs"
-                style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); "><span class="__bo" v-html="hierarchy"></span>
+                style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); "><span class="__bo"
+                    v-html="hierarchy"></span>
             </p>
             <br>
 
@@ -86,17 +87,20 @@ export default {
             }
 
             this.folder.name = this.folder.name.trim();
-            this.folder.id = Math.floor(Math.random() * 10000000000);
 
-            while (this.folders.find(f => f.id == this.folder.id)) {
-                this.folder.id = Math.floor(Math.random() * 10000000000);
-            }
+            let data = [this.folder.name, this.folder.parent, this.folder.theme];
 
-            this.ds.createFolder([this.folder.id, this.folder.name, this.folder.parent, this.folder.theme]);
+            this.ds.createFolder(data).then(res => {
+                if (res) {
+                    useResponseStore().updateResponse("Folder created successfully!", "succ");
 
-            useResponseStore().updateResponse("Folder created successfully!", "succ");
+                    this.$router.push("/folder/" + res);
+                } else {
+                    useResponseStore().updateResponse("Failed to create folder", "err");
 
-            this.$router.push("/folder/" + this.folder.id);
+                    return false;
+                }
+            })
         },
 
         changeTheme(v) {

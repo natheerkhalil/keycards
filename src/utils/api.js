@@ -39,7 +39,8 @@ function flattenObject(ob) {
 }
 
 export async function request(data, url, authenticated = true) {
-    console.log(`API request to: ${API_URL}${url} with data ${data}`);
+    console.log(`API request to: ${API_URL}${url} with data:`);
+    console.log(data);
     var res = null;
 
     var headers = {};
@@ -56,6 +57,8 @@ export async function request(data, url, authenticated = true) {
         await axios.post(API_URL + url, data, headers).then(response => {
             res = response;
         })
+
+        console.log(`API response to ${API_URL}${url}: ${JSON.stringify(res.data)}`);
 
         return res;
     } catch (error) {
