@@ -16,6 +16,8 @@
 
     <div v-if="folderExists" class="__15 __mlauto __mrauto _flex _fd-co __w">
 
+        {{ folder + "rferferf"}}
+
         <br>
         <div :style="`background-image: url('/themes/${folder.theme}.png'); position: relative; background-position: center; background-size: cover; `"
             class="__b _flex _fd-co">
@@ -406,12 +408,12 @@
 
                 <!-- MOVE FOLDER -->
                 <Folder @select-folder="selectFolderToMove" v-if="!moveFoldersSearch.trim()"
-                    v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="ds.getFolders()" :level="0"
+                    v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="ds.getFolders()" :omit="[this.folderId]" :level="0"
                     :tab="false" />
 
                 <FolderTab @select-folder="selectFolderToMove" v-if="moveFoldersSearch.trim().length > 0"
                     v-for="f in ds.getFolders().filter(f => f.name.trim().toLowerCase().includes(moveFoldersSearch.trim().toLowerCase()))"
-                    :key="f.id" :folder="f" />
+                    :key="f.id" :omit="[this.folderId]" :folder="f" />
             </div>
         </div>
     </div>
@@ -453,9 +455,6 @@ export default {
         // FOLDER PROPERTIES //
         folderId() {
             return this.$route.params.id || null;
-        },
-        folder() {
-            return this.ds.getFolder(this.folderId);
         },
         folderCards() {
             return this.ds.getCardsByFolder(this.folderId);
@@ -650,7 +649,15 @@ export default {
         // MOVE CARDS TO FOLDER //
         selectFolderToMove(id) {
             id = Number(id);
+
+            if (id == this.folder.id) {
+                this.showmoveFolders = false;
+                useResponseStore().updateResponse("You can't move cards to the same folder.", "err");
+                return;
+            }
+
             if (window.confirm("Are you sure you want to move the card(s) to the folder: " + this.globalFolders.find(f => f.id === id).name + "?")) {
+
                 this.cards.filter(c => this.cardsToBeMoved.includes(c.id)).forEach(c => {
                     this.ds.moveCard(c.id, id);
                 });
@@ -683,12 +690,39 @@ export default {
         deleteSelected() {
             if (window.confirm("Are you sure you want to delete the selected cards?")) {
 
-                this.cards.forEach(c => {
-                    if (c.selected) {
-                        this.ds.deleteCard(c.id);
-                        this.cards = this.cards.filter(card => card.id !== c.id);
-                    }
-                });
+                try {
+
+                    let failed = false;
+
+                    // Delete cards individually
+                    Promise.all(this.cards.filter(c => c.selected == true).map((card, i) => {
+                        console.log(`Deleting card ${card.id}...`);
+                        return this.ds.deleteCard(card.id).then(res => {
+                            if (!res) {
+                                failed = true;
+                            }
+                        });
+                    })).then(() => {
+                        // If failed is true, show alert
+                        if (failed) {
+                            useResponseStore().updateResponse("Some cards failed to be deleted.", "warn");
+
+                            return;
+                        };
+
+                        this.cards = this.cards.filter(card => !card.selected);
+
+                        useResponseStore().updateResponse("Cards deleted successfully.", "info");
+
+                        return;
+                    });
+
+                } catch (err) {
+                    useResponseStore().updateResponse("Some cards failed to be deleted.", "warn");
+
+                    return;
+                }
+
             }
         },
 
@@ -750,11 +784,15 @@ export default {
 
     created() {
         // UPDATE FOLDER EXISTS VARIABLE
-        if (this.folder) {
+        if (!this.folder) {
             this.folderExists = true;
         } else {
             return;
         }
+
+        setInterval(() => {
+            console.log(this.folder);
+        }, 500);
 
         this.cards = this.ds.getCards(this.folderId);
         this.allCards = this.cards;
@@ -789,6 +827,11 @@ export default {
         folderId(newVal, oldVal) {
             this.cards = this.ds.getCards(newVal);
             this.allCards = this.cards;
+
+            this.ds.getFolder(newVal).then(folder => {
+                console.log("watch",folder);
+                this.folder = folder;
+            });
         },
 
         /*folderCards(newVal, oldVal) {

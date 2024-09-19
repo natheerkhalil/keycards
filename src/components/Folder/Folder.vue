@@ -89,7 +89,7 @@ export default {
     },
 
     props: [
-        'folder', 'allFolders', 'level',
+        'folder', 'allFolders', 'level', 'omit'
     ],
 };
 </script>

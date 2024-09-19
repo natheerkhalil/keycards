@@ -6,8 +6,8 @@
         <br>
 
         <div class="__b _flex _jc-en">
-            <div :style="[processing ? 'opacity: 0.5' : 'opacity: 1']" @click="create"
-                :class="['create-btn', ' _m-xs-b', '_m-xs-cc', '__padxs', '_flex', '__hv' ,'__bd-4', '__bod', '_fd-ro', '__bg-none', processing ? '' : '__po', '__hv-4']">
+            <div :style="[processing ? ['opacity: 0.5', 'cursor: not-allowed'] : 'opacity: 1']" @click="create"
+                :class="[' _m-xs-b', '_m-xs-cc', '__padxs', '_flex', '__hv', '__bd-4', '__bod', '_fd-ro', '__bg-none', processing ? '' : ['create-btn', '__hv-4', '__po']]">
                 <p class="__txt-3">Create Card(s)</p>
             </div>
         </div>
@@ -15,13 +15,26 @@
         <br>
 
         <div class="__b _flex _jc-en">
-            <div @click="this.ds.toggleMethod(this.method)" class="switch-method __po _flex _fd-ro _ai-ce">
+            <div @click="this.ds.toggleMethod(this.method)" class="hv-children __po _flex _fd-ro _ai-ce">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                     <path
                         d="M6 18h-2v5h-2v-5h-2v-3h6v3zm-2-17h-2v12h2v-12zm11 7h-6v3h2v12h2v-12h2v-3zm-2-7h-2v5h2v-5zm11 14h-6v3h2v5h2v-5h2v-3zm-2-14h-2v12h2v-12z" />
                 </svg> &nbsp;
                 <p>Switch method</p>
+            </div><span v-if="method == 's'"> &nbsp; &nbsp; &nbsp;</span>
+            <div v-if="method == 's'" @click="formatCards" class="hv-children _flex __po _fd-ro _ai-ce">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path
+                        d="M4 1h20v2h-20v-2zm0 7h20v-2h-20v2zm0 5h20v-2h-20v2zm0 5h20v-2h-20v2zm0 5h20v-2h-20v2zm-2-22h-2v2h2v-2zm0 5h-2v2h2v-2zm0 5h-2v2h2v-2zm0 5h-2v2h2v-2zm0 5h-2v2h2v-2z" />
+                </svg> &nbsp;
+                <p>Format Cards</p>
             </div>
+        </div>
+
+        <br>
+
+        <div class="__b _flex">
+            <p><strong>{{ noOfCards }}</strong> / <span class="__txt-grey-3">100 cards</span></p>
         </div>
 
         <br>
@@ -78,8 +91,8 @@
         <br>
 
         <div class="__b _flex _jc-en">
-            <div :style="[processing ? 'opacity: 0.5' : 'opacity: 1']" @click="create"
-                :class="['create-btn', ' _m-xs-b', '_m-xs-cc', '__padxs', '_flex', '__hv' ,'__bd-4', '__bod', '_fd-ro', '__bg-none', processing ? '' : '__po', '__hv-4']">
+            <div :style="[processing ? ['opacity: 0.5', 'cursor: not-allowed'] : 'opacity: 1']" @click="create"
+                :class="[' _m-xs-b', '_m-xs-cc', '__padxs', '_flex', '__hv', '__bd-4', '__bod', '_fd-ro', '__bg-none', processing ? '' : ['create-btn', '__hv-4', '__po']]">
                 <p class="__txt-3">Create Card(s)</p>
             </div>
         </div>
@@ -138,11 +151,11 @@
     fill: #c84444;
 }
 
-.switch-method:hover p {
+.hv-children:hover p {
     color: var(--theme4);
 }
 
-.switch-method:hover svg {
+.hv-children:hover svg {
     fill: var(--theme4);
 }
 </style>
@@ -163,8 +176,54 @@ export default {
             this.ds.updateCardSeparators(this.sep_qa.trim(), this.sep_cd.trim());
         },
 
+        // FORMAT CARDS //
+        formatCards() {
+            let cs = this.cards2.split(this.sep_cd.trim());
+
+            let str = "";
+
+            for (let i = 0; i < cs.length; i++) {
+                let c = cs[i];
+
+                c = c.replace(/(\\r\\n|\\n|\\r)/gm, ''); 
+                c = c.trim();
+
+                if (c.trim().length == 0) {
+                    continue;
+                }
+
+                if (c.split(this.sep_qa.trim()).length != 2) {
+                    str = str + "\n" + c + "\n";
+                    continue;
+                }
+
+                let q = c.split(this.sep_qa.trim())[0].trim();
+                let a = c.split(this.sep_qa.trim())[1].trim();
+
+                if (q.length == 0 || a.length == 0) {
+                    str = str + "\n" + c + "\n";
+                    continue;
+                }
+
+                str = str + "\n";
+                str = str + q + "\n";
+                str = str + this.sep_qa.trim() + "\n";
+                str = str + a + "\n";
+                str = str + this.sep_cd.trim() + "\n";
+
+            }
+
+            console.log("str", str)
+
+            this.cards2 = str;
+        },
+
         // CREATE CARDS //
         create() {
+            if (this.processing) {
+                return;
+            }
+
             if (this.method == "m") {
                 this.createM();
             } else if (this.method == "s") {
@@ -174,11 +233,14 @@ export default {
 
         // CREATE METHOD M //
         createM() {
+            this.processing = true;
+
             let exceedLimit = false;
             let empty = false;
 
             // If cards array is empty, return
             if (this.cards.length == 0) {
+                this.processing = false;
                 useResponseStore().updateResponse("No cards created yet.", "warn");
 
                 return;
@@ -186,6 +248,7 @@ export default {
 
             // If cards array has more than 100 cards, return
             if (this.cards.length > 100) {
+                this.processing = false;
                 useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
                 return;
             }
@@ -209,10 +272,12 @@ export default {
 
             // If any cards are empty or too long, return
             if (empty) {
+                this.processing = false;
                 useResponseStore().updateResponse("Some of the questions or answers are empty.", "warn");
                 return;
             }
             if (exceedLimit) {
+                this.processing = false;
                 useResponseStore().updateResponse("Some of the questions or answers exceed the limit of 10,000 characters.", "warn");
                 return;
             }
@@ -231,6 +296,7 @@ export default {
                 });
             })).then(() => {
                 if (failed.length > 0) {
+                    this.processing = false;
                     useResponseStore().updateResponse("Some cards failed to create", "warn");
                     this.cards = failed;
                     return;
@@ -247,129 +313,136 @@ export default {
         createS() {
             this.processing = true;
 
-            // Trim text
-            let str = this.cards2.trim();
+            try {
 
-            // If text is empty, return
-            if (str.length == 0) {
-                this.processing = false;
-                useResponseStore().updateResponse("No cards found.", "warn");
-                return;
-            }
+                // Trim text
+                let str = this.cards2.trim();
 
-            // Split array based on separators
-            let cds = str.split(this.sep_cd);
-
-            // If array is empty, return
-            if (cds.length == 0) {
-                this.processing = false;
-                useResponseStore().updateResponse("No cards found.", "warn");
-                return;
-            }
-
-            // If array has more than 100 cards, return
-            if (cds.length > 100) {
-                this.processing = false;
-                useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
-                return;
-            }
-
-            let empty_cards = false;
-            let too_long = false;
-
-            let arr = [];
-
-            // Run through each card
-
-            for (let i = 0; i < cds.length; i++) {
-                // Trim card
-                let c = cds[i].trim();
-
-                // If card is empty, continue to next iteration
-                if (c.length == 0) {
-                    continue;
-                }
-
-                // Get q & a based on separators from card
-                let q = c.split(this.sep_qa)[0] || '';
-                let a = c.split(this.sep_qa)[1] || '';
-
-                // Trim q & a
-                q = q.trim();
-                a = a.trim();
-
-                // If q or a is empty, set empty_cards to true and continue to next iteration
-                if (q.length == 0 || a.length == 0) {
-                    empty_cards = true;
-                    continue;
-                }
-
-                // If q or a is too long, set too_long to true and continue to next iteration
-                if (q.length > 9999 || a.length > 9999) {
-                    too_long = true;
-                    continue;
-                }
-
-                // Add card to array
-                arr.push({
-                    q: q,
-                    a: a
-                });
-            }
-
-            // If any cards are empty or too long, return
-            if (empty_cards) {
-                this.processing = false;
-                useResponseStore().updateResponse("Some of the cards are empty.", "warn");
-                return;
-            }
-            if (too_long) {
-                this.processing = false;
-                useResponseStore().updateResponse("Some of the cards exceed the limit of 10,000 characters.", "warn");
-                return;
-            }
-
-            // If array is empty, return
-            if (arr.length == 0) {
-                this.processing = false;
-                useResponseStore().updateResponse("No cards found.", "warn");
-                return;
-            }
-
-
-            let failed = [];
-
-            // Create cards individually
-            Promise.all(this.arr.map((card, i) => {
-                return this.ds.createCard([card.q, card.a, this.folder.id]).then(res => {
-                    if (!res) {
-                        failed.push({
-                            q: card.q,
-                            a: card.a
-                        });
-                    }
-                });
-            })).then(() => {
-                // If failed array is not empty, update cards2 with failed cards and return
-                if (failed.length > 0) {
+                // If text is empty, return
+                if (str.length == 0) {
                     this.processing = false;
-                    useResponseStore().updateResponse("Some cards failed to create.", "warn");
-
-                    let str = "";
-
-                    failed.forEach((card, i) => {
-                        str = str + card.q + " " + this.sep_qa + card.a + this.sep_cd + "\n\n";
-                    })
-
-                    this.cards2 = str;
+                    useResponseStore().updateResponse("No cards found.", "warn");
                     return;
-                };
+                }
 
-                useResponseStore().updateResponse("Cards created successfully.", "succ");
+                // Split array based on separators
+                let cds = str.split(this.sep_cd);
 
-                // If failed array is empty, relocate to folder page
-                this.$router.push({ path: `/folder/${this.folder.id}` });
-            });
+                // If array is empty, return
+                if (cds.length == 0) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("No cards found.", "warn");
+                    return;
+                }
+
+                // If array has more than 100 cards, return
+                if (cds.length > 100) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
+                    return;
+                }
+
+                let empty_cards = false;
+                let too_long = false;
+
+                let arr = [];
+
+                // Run through each card
+
+                for (let i = 0; i < cds.length; i++) {
+                    // Trim card
+                    let c = cds[i].trim();
+
+                    // If card is empty, continue to next iteration
+                    if (c.length == 0) {
+                        continue;
+                    }
+
+                    // Get q & a based on separators from card
+                    let q = c.split(this.sep_qa)[0] || '';
+                    let a = c.split(this.sep_qa)[1] || '';
+
+                    // Trim q & a
+                    q = q.trim();
+                    a = a.trim();
+
+                    // If q or a is empty, set empty_cards to true and continue to next iteration
+                    if (q.length == 0 || a.length == 0) {
+                        empty_cards = true;
+                        continue;
+                    }
+
+                    // If q or a is too long, set too_long to true and continue to next iteration
+                    if (q.length > 9999 || a.length > 9999) {
+                        too_long = true;
+                        continue;
+                    }
+
+                    // Add card to array
+                    arr.push({
+                        q: q,
+                        a: a
+                    });
+                }
+
+                // If any cards are empty or too long, return
+                if (empty_cards) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("Some of the cards are empty.", "warn");
+                    return;
+                }
+                if (too_long) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("Some of the cards exceed the limit of 10,000 characters.", "warn");
+                    return;
+                }
+
+                // If array is empty, return
+                if (arr.length == 0) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("No cards found.", "warn");
+                    return;
+                }
+
+
+                let failed = [];
+
+                // Create cards individually
+                Promise.all(arr.map((card, i) => {
+                    return this.ds.createCard([card.q, card.a, this.folder.id]).then(res => {
+                        if (!res) {
+                            failed.push({
+                                q: card.q,
+                                a: card.a
+                            });
+                        }
+                    });
+                })).then(() => {
+                    // If failed array is not empty, update cards2 with failed cards and return
+                    if (failed.length > 0) {
+                        this.processing = false;
+                        useResponseStore().updateResponse("Some cards failed to create.", "warn");
+
+                        let str = "";
+
+                        failed.forEach((card, i) => {
+                            str = str + card.q + " " + this.sep_qa + card.a + this.sep_cd + "\n\n";
+                        })
+
+                        this.cards2 = str;
+                        return;
+                    };
+
+                    useResponseStore().updateResponse("Cards created successfully.", "succ");
+
+                    // If failed array is empty, relocate to folder page
+                    this.$router.push({ path: `/folder/${this.folder.id}` });
+                });
+            } catch (err) {
+                this.processing = false;
+                useResponseStore().updateResponse("An error occurred while creating cards.", "err");
+                console.error(err);
+            }
         },
 
 
@@ -429,12 +502,32 @@ export default {
         ds() {
             return useDataStore();
         },
+
+        noOfCards() {
+            let cs = this.cards2.split(this.sep_cd);
+            let count = 0;
+
+            for (let i = 0; i < cs.length; i++) {
+                let c = cs[i].trim();
+
+                if (c.split(this.sep_qa).length == 2) {
+                    let q = c.split(this.sep_qa)[0].trim();
+                    let a = c.split(this.sep_qa)[1].trim();
+
+                    if (q.length > 0 && a.length > 0) {
+                        count = count + 1;
+                    }
+                }
+            }
+
+            return count;
+        }
     },
 
     data() {
         return {
             processing: false,
-            
+
             folder: null,
 
             cards: [

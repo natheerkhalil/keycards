@@ -319,7 +319,7 @@ export const useDataStore = defineStore('data', {
 
         // APPEND CARD //
         appendCard([id, q, a, folder]) {
-            this.cards.unshift(
+            this.cards.push(
                 {
                     id: id,
                     q: q,
@@ -353,13 +353,14 @@ export const useDataStore = defineStore('data', {
         },
 
         // DELETE CARD //
-        deleteCard(cardId) {
-            request({ id: cardId }, '/card/delete').then(res => {
+        async deleteCard(cardId) {
+            return await request({ id: cardId }, '/card/delete').then(res => {
                 if (!res.failed) {
                     this.cards = this.cards.filter(card => card.id != cardId);
                     this.saveCards();
+
+                    return true;
                 } else {
-                    useResponseStore().updateResponse("Failed to delete card", "err");
 
                     return false;
                 }
@@ -377,8 +378,9 @@ export const useDataStore = defineStore('data', {
                     this.cards[id]["updatedAt"] = new Date().getTime();
 
                     this.saveCards();
+
+                    return true;
                 } else {
-                    useResponseStore().updateResponse("Failed to update card", "err");
 
                     return false;
                 }
@@ -386,13 +388,14 @@ export const useDataStore = defineStore('data', {
         },
 
         // MARK CARD //
-        markCard(cardId, mark) {
-            request({ id: cardId, mark: mark }, '/card/mark').then(res => {
+        async markCard(cardId, mark) {
+            return await request({ id: cardId, mark: mark }, '/card/mark').then(res => {
                 if (!res.failed) {
                     this.cards[index]["status"] = mark;
                     this.saveCards();
+
+                    return true;
                 } else {
-                    useResponseStore().updateResponse("Failed to mark card", "err");
 
                     return false;
                 }
@@ -400,8 +403,8 @@ export const useDataStore = defineStore('data', {
         },
 
         // MOVE CARD //
-        moveCard(cardId, folderId) {
-            request({ id: cardId, folder: folderId }, '/card/move').then(res => {
+        async moveCard(cardId, folderId) {
+            return await request({ id: cardId, folder: folderId }, '/card/move').then(res => {
                 if (!res.failed) {
                     let id = res.data.id;
 
@@ -424,22 +427,23 @@ export const useDataStore = defineStore('data', {
         },
 
         // GET CARD //
-        getCard(cardId) {
+        async getCard(cardId) {
             let card = this.cards.find(card => card.id == cardId);
 
-            if (!card) {
-                request({ id: cardId }, '/card/get').then(res => {
-                    if (res.failed) {
-                        useResponseStore().updateResponse("Failed to get card", "err");
+            if (card)
+                return this.deepClone(card);
 
-                        return false;
-                    }
+            return await request({ id: cardId }, '/card/get').then(res => {
+                if (res.failed) {
+                    useResponseStore().updateResponse("Failed to get card", "err");
 
-                    card = res.data;
-                });
-            }
+                    return false;
+                }
 
-            return this.deepClone(card);
+                card = res.data;
+
+                return this.deepClone(card);
+            });
         },
 
         // CREATE FOLDER //
@@ -466,59 +470,79 @@ export const useDataStore = defineStore('data', {
         },
 
         // DELETE FOLDER //
-        deleteFolder(folderId) {
-            this.folders = this.folders.filter(folder => folder.id != folderId);
-            this.saveFolders();
+        async deleteFolder(folderId) {
+            return await request({ id: folderId }, '/folder/delete').then(res => {
+                if (!res.failed) {
+                    this.folders = this.folders.filter(folder => folder.id != folderId);
+                    this.saveFolders();
+
+                    return true;
+                } else {
+                    return false;
+                }
+            })
         },
 
         // GET FOLDER //
-        getFolder(folderId) {
-            const folder = this.folders.find(folder => folder.id == folderId);
+        async getFolder(folderId) {
+            let folder = this.folders.find(folder => folder.id == folderId);
 
             if (folder)
                 return this.deepClone(folder);
-            else
-                console.error("Folder not found.");
 
-            return null;
+            return await request({ id: folderId }, '/folder/get').then(res => {
+                if (res.failed) {
+                    useResponseStore().updateResponse("Failed to get folder", "err");
+
+                    return false;
+                }
+
+                folder = res.data;
+
+                return this.deepClone(folder);
+            });
         },
 
         // UPDATE FOLDER THEME //
-        updateFolderTheme(id, theme) {
-            const index = this.folders.findIndex(folder => folder.id == id);
+        async updateFolderTheme(id, theme) {
+            return await request({ id: id, theme: theme }, '/folder/update').then(res => {
+                if (!res.failed) {
+                    this.folders = this.folders.find(f => f.id == id).theme = theme;
+                    this.saveFolders();
 
-            if (index !== -1) {
-                this.folders[index]["theme"] = theme;
-
-                this.saveFolders();
-            }
+                    return true;
+                } else {
+                    return false;
+                }
+            })
         },
 
         // UPDATE FOLDER NAME //
-        updateFolderName(id, name) {
-            const index = this.folders.findIndex(folder => folder.id == id);
+        async updateFolderName(id, name) {
+            return await request({ id: id, name: name }, '/folder/update').then(res => {
+                if (!res.failed) {
+                    this.folders = this.folders.find(f => f.id == id).name = name;
+                    this.saveFolders();
 
-            if (index !== -1) {
-                this.folders[index]["name"] = name;
-
-                this.saveFolders();
-            }
+                    return true;
+                } else {
+                    return false;
+                }
+            })
         },
 
         // UPDATE FOLDER PARENT //
-        updateFolderParent(id, parent) {
-            const index = this.folders.findIndex(folder => folder.id == id);
+        async updateFolderParent(id, parent) {
+            return await request({ id: id, parent: parent }, '/folder/update').then(res => {
+                if (!res.failed) {
+                    this.folders = this.folders.find(f => f.id == id).parent = parent;
+                    this.saveFolders();
 
-            if (!this.folders.find(f => f.id == parent)) {
-                console.error("Parent folder does not exist.")
-                return;
-            }
-
-            if (index !== -1) {
-                this.folders[index]["parent"] = parent;
-
-                this.saveFolders();
-            }
+                    return true;
+                } else {
+                    return false;
+                }
+            })
         },
 
         // FOLDER CARD PROGRESS //

@@ -52,7 +52,9 @@ export default {
 
         'move', 
 
-        'cards'
+        'cards',
+
+        'omit'
     ],
 };
 </script>
