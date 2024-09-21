@@ -32,20 +32,20 @@
                   v.name }}</p>
 
               <!-- CHILDREN COUNT -->
-              <p :style="`color: var(--${v.theme}4)`">{{ getChildrenFolders(v.id).length }} folders</p>
+              <p :style="`color: var(--${v.theme}4)`">{{ ds.getChildren(v.id).length }} folders</p>
             </div>
 
             <div class="_flex _fd-co _cc">
               <!-- CARD COUNT -->
-              <p :style="`color: var(--${v.theme}4)`">{{ getDescendantCards(v.id).length }} cards</p>
+              <p :style="`color: var(--${v.theme}4)`">{{ ds.getDescendantCards(v.id).length }} cards</p>
             </div>
           </div>
 
           <br>
 
-          <div :style="`background: linear-gradient(to right, ${getFolderCardProgress(v.id)});`" class="progress">
+          <div :style="`background: linear-gradient(to right, ${ ds.getFolderCardProgress(v.id)});`" class="progress">
             <!-- FOLDER CARD PROGRESS -->
-            <div v-html="getFolderProgressOverlay(v.id) " class="progress-overlay">
+            <div v-html="ds.getFolderProgressOverlay(v.id) " class="progress-overlay">
             </div>
             <!-- FOLDER CARD PROGRESS -->
           </div>
@@ -120,7 +120,10 @@ export default {
       search: "",
 
       // ACTIVELY CHANGING THEME
-      changeTheme: []
+      changeTheme: [],
+
+      // DATA STORE
+      ds: useDataStore(),
     }
   },
 
@@ -151,21 +154,6 @@ export default {
 
   methods: {
     // GET FOLDER RELATIVES //
-    getFolderCardProgress(id) {
-      return useDataStore().getFolderCardProgress(id);
-    },
-    getFolderCardStatus(id, status) {
-      return useDataStore().getFolderCardStatus(id, status);
-    },
-    getFolderProgressOverlay(id) {
-      return useDataStore().getFolderProgressOverlay(id);
-    },
-    getFolderCards(id) {
-      return useDataStore().getCardsByFolder(id);
-    },
-    getDescendantCards(id) {
-      return useDataStore().getDescendantCards(id);
-    },
     getChildrenFolders(id) {
       return useDataStore().getChildren(id);
     },

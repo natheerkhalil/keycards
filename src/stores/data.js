@@ -9,7 +9,7 @@ export const useDataStore = defineStore('data', {
         folders: localStorage.getItem('folders') ? JSON.parse(localStorage.getItem('folders')) : [],
         cards: localStorage.getItem('cards') ? JSON.parse(localStorage.getItem('cards')) : [],
 
-        removed: localStorage.getItem('removed') ? JSON.parse(localStorage.getItem('removed')) : [],
+        live: false,
 
         method: localStorage.getItem('method') || 'm',
         sep_qa: localStorage.getItem('sep_qa') || ']',
@@ -91,32 +91,52 @@ export const useDataStore = defineStore('data', {
 
         // CHECK DATA SIZE & REMOVE CACHED DATA //
         makeSpace() {
+            let last_made_space = localStorage.getItem("last_made_space") || null;
+
+            if (last_made_space && (Date.now() - last_made_space < 60000)) {
+                return;
+            }
+
             if (this.totalSize > this.limit) {
+                localStorage.setItem("last_made_space", Date.now());
+
                 // Sort cards by `updatedAt` (oldest first)
                 let sortedCards = Object.values(this.cards).sort((a, b) => a.updatedAt - b.updatedAt);
 
-                // While size is greater than limit, delete oldest card
-                while (this.totalSize > this.limit && sortedCards.length > 0) {
-                    const oldestCard = sortedCards.shift();
+                // clear q and a of each card
+                for (let i = 0; i < sortedCards.length; i++) {
+                    let id = sortedCards[i].id;
 
-                    if (!this.removed.includes({ card: oldestCard.id, folder: oldestCard.folder.id }))
-                        this.removed.push({ card: oldestCard.id, folder: oldestCard.folder.id }); this.saveRemoved();
-
-                    this.deleteCard(oldestCard.id);
+                    this.cards.find(c => c.id === id).q = null;
+                    this.cards.find(c => c.id === id).a = null;
+                    this.cards.find(c => c.id === id).cleared = true;
                 }
 
-                let sortedFolders = Object.values(this.folders).sort((a, b) => a.updatedAt - b.updatedAt);
-
-                // While size is greater than limit and no cards left, delete oldest folder
-                while (this.totalSize > this.limit && sortedFolders.length > 0 && sortedCards.length == 0) {
-                    let descendants = this.getDescendants(sortedFolders.shift().id);
-
-                    for (let d of descendants) {
-                        this.deleteFolder(d);
-                    }
-
-                    this.deleteFolder(sortedFolders.shift().id);
-                }
+                /* // Sort cards by `updatedAt` (oldest first)
+                 let sortedCards = Object.values(this.cards).sort((a, b) => a.updatedAt - b.updatedAt);
+ 
+                 // While size is greater than limit, delete oldest card
+                 while (this.totalSize > this.limit && sortedCards.length > 0) {
+                     const oldestCard = sortedCards.shift();
+ 
+                     if (!this.removed.includes({ card: oldestCard.id, folder: oldestCard.folder.id }))
+                         this.removed.push({ card: oldestCard.id, folder: oldestCard.folder.id }); this.saveRemoved();
+ 
+                     this.deleteCard(oldestCard.id);
+                 }
+ 
+                 let sortedFolders = Object.values(this.folders).sort((a, b) => a.updatedAt - b.updatedAt);
+ 
+                 // While size is greater than limit, delete oldest folder
+                 while (this.totalSize > this.limit && sortedFolders.length > 0 && sortedCards.length == 0) {
+                     let descendants = this.getDescendants(sortedFolders.shift().id);
+ 
+                     for (let d of descendants) {
+                         this.deleteFolder(d);
+                     }
+ 
+                     this.deleteFolder(sortedFolders.shift().id);
+                 }*/
             }
         },
 
@@ -139,6 +159,27 @@ export const useDataStore = defineStore('data', {
                 }
             }
             return clonedObj;
+        },
+
+        // VERIFY CARDS THAT HAVE BEEN CLEARED //
+        verifyCards(cards) {
+            let arr = [];
+            let failed = [];
+
+            return Promise.all(cards.map((c, i) => {
+
+                if (c.cleared) {
+                    this.getCard(c.id).then(card => {
+                        arr.push(card);
+                    });
+                } else {
+                    arr.push(this.cards.filter(card => card.id === c.id)[0]);
+                }
+
+            })).then(() => {
+
+                return arr;
+            });
         },
 
         // SAVING TO LOCAL STORAGE //
@@ -341,8 +382,6 @@ export const useDataStore = defineStore('data', {
 
                     this.appendCard([id, q, a, folder]);
 
-                    console.log(id);
-
                     this.saveCards();
 
                     return id;
@@ -389,9 +428,9 @@ export const useDataStore = defineStore('data', {
 
         // MARK CARD //
         async markCard(cardId, mark) {
-            return await request({ id: cardId, mark: mark }, '/card/mark').then(res => {
+            return await request({ id: cardId, status: Number(mark) }, '/card/mark').then(res => {
                 if (!res.failed) {
-                    this.cards[index]["status"] = mark;
+                    this.cards.find(c => c.id == cardId)["status"] = mark;
                     this.saveCards();
 
                     return true;
@@ -431,11 +470,10 @@ export const useDataStore = defineStore('data', {
             let card = this.cards.find(card => card.id == cardId);
 
             if (card)
-                return this.deepClone(card);
+                return card;
 
             return await request({ id: cardId }, '/card/get').then(res => {
                 if (res.failed) {
-                    useResponseStore().updateResponse("Failed to get card", "err");
 
                     return false;
                 }
@@ -444,6 +482,8 @@ export const useDataStore = defineStore('data', {
 
                 return this.deepClone(card);
             });
+
+            return false;
         },
 
         // CREATE FOLDER //
@@ -452,13 +492,7 @@ export const useDataStore = defineStore('data', {
                 if (!res.failed) {
                     let id = res.data.id;
 
-                    this.folders.unshift({
-                        name: name,
-                        parent: parent,
-                        theme: theme,
-                        id: id,
-                        updatedAt: new Date().getTime()
-                    })
+                    this.appendFolder([name, parent, theme, id]);
 
                     this.saveFolders();
 
@@ -467,6 +501,19 @@ export const useDataStore = defineStore('data', {
                     return false;
                 }
             })
+        },
+
+        // APPEND FOLDER //
+        appendFolder([name, parent, theme, id]) {
+            this.folders.unshift({
+                name: name,
+                parent: parent,
+                theme: theme,
+                id: id,
+                updatedAt: new Date().getTime()
+            })
+
+            this.saveFolders();
         },
 
         // DELETE FOLDER //
@@ -488,16 +535,17 @@ export const useDataStore = defineStore('data', {
             let folder = this.folders.find(folder => folder.id == folderId);
 
             if (folder)
-                return this.deepClone(folder);
+                return await this.deepClone(folder);
 
             return await request({ id: folderId }, '/folder/get').then(res => {
                 if (res.failed) {
-                    useResponseStore().updateResponse("Failed to get folder", "err");
 
                     return false;
                 }
 
                 folder = res.data;
+
+                this.appendFolder([folder.name, folder.parent, folder.theme, folder.id]);
 
                 return this.deepClone(folder);
             });

@@ -20,13 +20,13 @@
             <br>
             <p class="__tmd __tle __txt-grey-4 __padxs"
                 style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); "><span class="__bo"
-                    v-html="hierarchy"></span>
+                    v-html="hierarchy"></span><span class="__bo" :style="`color: var(--${folder.theme}2)`">{{ folder.name }}</span>
             </p>
             <br>
 
             <p class="__tmd __tle __txt-grey-4 __padxs"
                 style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); ">Theme - <strong
-                    :class="`__txt-${folder.theme}`">{{ toSentenceCase(folder.theme) }}</strong></p>
+                :style="`color: var(--${folder.theme}2)`">{{ toSentenceCase(folder.theme) }}</strong></p>
 
             <br>
 
@@ -125,26 +125,6 @@ export default {
             }
         },
 
-        hierarchy() {
-            if (!this.folder.parent) {
-                return `Root &rarr; <span style='color: var(--${this.folder.theme}2)'>${this.folder.name}</span>`;
-            }
-
-            let parents = this.ds.getAncestors(this.folder.parent, false);
-
-            let str = "Root";
-
-            parents.forEach(p => {
-                console.log(p);
-                let theme = this.ds.getFolder(p.id).theme;
-                str = `${str} &rarr; <span style='color: var(--${theme}2)'>${p.name}</span>`;
-            })
-
-            str = `${str} &rarr; <span style='color: var(--${this.folder.theme}2)'>${this.folder.name}</span>`;
-
-            return str;
-        },
-
         ds() {
             return useDataStore();
         },
@@ -160,6 +140,26 @@ export default {
 
     created() {
         this.checkForParent();
+
+
+        if (!this.folder.parent) {
+            this.hierarchy = `Root &rarr; <span style='color: var(--${this.folder.theme}2)'>${this.folder.name}</span>`;
+        }
+
+        let parents = this.ds.getAncestors(this.folder.parent, false);
+
+        let str = "Root";
+
+        parents.forEach(p => {
+            let theme;
+            this.ds.getFolder(p.id).then((f) => {
+                theme = f.theme; str = `${str} &rarr; <span style='color: var(--${theme}2)'>${p.name}</span>`;
+
+                str = `${str} &rarr; `;
+
+                this.hierarchy = str;
+            });
+        })
     },
 
     data() {
@@ -170,6 +170,8 @@ export default {
                 insideFolder: 232,
                 parent: null,
             },
+
+            hierarchy: "Root &rarr; "
         }
     }
 }

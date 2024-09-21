@@ -3,8 +3,6 @@
     <AuthenticatedHeader v-if="authenticated" />
     <UnauthenticatedHeader v-if="!authenticated" />
     <br>
-
-    {{ ds.getCards() }}
     <router-view v-slot="{ Component }">
         <!--<keep-alive>-->
             <component :is="Component" />
@@ -16,7 +14,6 @@
 </template>
 
 <script>
-import ResponseMsg from "@/components/ResponseMsg.vue";
 import Footer from "@/components/Footer.vue";
 
 import AuthenticatedHeader from "./components/AuthenticatedHeader.vue";
@@ -25,6 +22,9 @@ import UnauthenticatedHeader from "./components/UnauthenticatedHeader.vue";
 import { uauth } from "./stores/auth";
 
 import { useDataStore } from "./stores/data";
+import { useResponseStore } from "./stores/response";
+
+import ResponseMsg from "@/components/ResponseMsg.vue";
 
 export default {
   components: {

@@ -1,5 +1,21 @@
 <template>
-    <div class="__15 __mlauto __mrauto _flex _fd-co __w">
+    <div v-if="!cardExists" class="__b _flex _cc _fd-co">
+        <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24">
+            <path
+                d="M12 1c-6.338 0-12 4.226-12 10.007 0 2.05.738 4.063 2.047 5.625.055 1.83-1.023 4.456-1.993 6.368 2.602-.47 6.301-1.508 7.978-2.536 9.236 2.247 15.968-3.405 15.968-9.457 0-5.812-5.701-10.007-12-10.007zm0 15c-.565 0-1.024-.459-1.024-1.025 0-.565.459-1.024 1.024-1.024.566 0 1.024.459 1.024 1.024 0 .566-.458 1.025-1.024 1.025zm1.606-4.858c-.74.799-.775 1.241-.766 1.785h-1.643c-.006-1.208.016-1.742 1.173-2.842.469-.446.84-.799.788-1.493-.047-.66-.599-1.004-1.117-1.004-.581 0-1.261.432-1.261 1.649h-1.646c0-1.966 1.155-3.237 2.941-3.237.849 0 1.592.278 2.09.783.468.473.709 1.125.7 1.883-.013 1.134-.704 1.878-1.259 2.476z" />
+        </svg>
+
+        <br>
+
+        <p class="__b __tal __tgl">Whoops!</p>
+
+        <br>
+
+        <p class="__b __tal __tm">We couldn't seem to find this card</p>
+    </div>
+
+
+    <div v-if="cardExists" class="__15 __mlauto __mrauto _flex _fd-co __w">
 
         <div :style="`background-image: url('/themes/${folder.theme}.png'); position: relative; background-position: center; background-size: cover; `"
             class="__b _flex _fd-co">
@@ -121,7 +137,7 @@
         <div v-if="!editingCard" class="__b _flex _cc _fd-co">
             <!-- REMAINING CARDS -->
             <div class="__b _flex _jc-en">
-                <p class="__txt-grey-4">{{ cardIndex }} / {{ folderCards.length }}</p>
+                <p class="__txt-grey-4">{{ (cardIndex + 1) }} / {{ folderCards.length }}</p>
             </div>
 
             <!-- REVIEW DATE -->
@@ -290,9 +306,13 @@
                 class="__custscroll __b _flex _fd-co">
 
                 <!-- MOVE FOLDER -->
-                <Folder @select-folder="selectFolderToMove" v-if="!moveFoldersSearch.trim()" v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="ds.getFolders()" :level="0" :tab="false"/>
+                <Folder @select-folder="selectFolderToMove" v-if="!moveFoldersSearch.trim()"
+                    v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="ds.getFolders()" :level="0"
+                    :tab="false" />
 
-                <FolderTab @select-folder="selectFolderToMove" v-if="moveFoldersSearch.trim().length > 0" v-for="f in ds.getFolders().filter(f => f.name.trim().toLowerCase().includes(moveFoldersSearch.trim().toLowerCase()))" :key="f.id" :folder="f"/>
+                <FolderTab @select-folder="selectFolderToMove" v-if="moveFoldersSearch.trim().length > 0"
+                    v-for="f in ds.getFolders().filter(f => f.name.trim().toLowerCase().includes(moveFoldersSearch.trim().toLowerCase()))"
+                    :key="f.id" :folder="f" />
             </div>
         </div>
     </div>
@@ -348,9 +368,6 @@ export default {
         cardIndex() {
             return Number(this.folderCards.findIndex(card => card.id === this.cardId));
         },
-        card() {
-            return this.ds.getCard(this.cardId);
-        },
 
         // CARD Q, A, STATUS //
         q() {
@@ -364,9 +381,6 @@ export default {
         },
 
         // FOLDER & RELATIONSHIPS //
-        folder() {
-            return this.ds.getFolder(this.card.folder);
-        },
         folderCards() {
             return this.ds.getCards(this.folder.id);
         },
@@ -514,7 +528,7 @@ export default {
         },
         selectFolderToMove(folderId) {
             useDataStore().moveCard(this.card.id, folderId);
-            
+
             this.showMoveFolders = false;
             this.moveFoldersLimit = 10;
             this.moveFoldersSearch = '';
@@ -536,15 +550,21 @@ export default {
     },
 
     created() {
-        // If card ID is not provided or does not exist, redirect to 404 page
-        if (!this.cardId) {
-            this.$router.push({ name: "404" });
-            return;
-        }
-        if (!this.card) {
-            this.$router.push({ name: "404" });
-            return;
-        }
+        this.ds.getCard(this.cardId).then(card => {
+            this.card = card;
+
+            if (this.card)
+                this.cardExists = true;
+
+            this.ds.getFolder(this.card.folder).then(folder => {
+                this.folder = folder;
+            });
+        });
+
+        setInterval(() => {
+            console.log("card", this.card);
+            console.log("folder", this.folder)
+        }, 500);
 
         this.editData.q = this.card.q;
         this.editData.a = this.card.a;
@@ -557,6 +577,11 @@ export default {
             show: false,
 
             transitioning: false,
+
+            folder: {},
+            card: {},
+
+            cardExists: false,
 
             // EDIT CARD DATA //
             editingCard: false,
@@ -587,6 +612,17 @@ export default {
             this.transitioning = false;
 
             this.showIcons = false;
+
+            this.ds.getCard(this.cardId).then(card => {
+                this.card = card;
+
+                if (!this.card)
+                    this.cardExists = false; return;
+
+                this.ds.getFolder(this.card.folder).then(folder => {
+                    this.folder = folder;
+                });
+            });
         }
     }
 }
