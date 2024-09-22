@@ -1,19 +1,8 @@
 <template>
-    <!-- HEADER -->
-    <div style="border-bottom: 1px solid var(--grey-3); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"
-        class="__b __bg-grey-2 _flex _ai-ce _fd-ro _jc-be __padsm">
-        <div class="_flex _cc _fd-ro">
-            <img style="width: 35px;" src="/icon.png" alt="Logo"> &nbsp;
-            &nbsp;
-            <p class="logo-text _sm-hide __tmd __txt-grey-10">RepeatBeats</p> &nbsp;
-        </div>
-    </div>
-    <!-- HEADER END -->
-
     <br>
 
     <div class="__13 __w __mauto _flex _cc _fd-co">
-        <h1 class="__tlg __b __tal">We're sorry, but RepeatBeats is down right now</h1>
+        <h1 class="__tlg __b __tal">We're sorry, but Keycards is down right now</h1>
         <br>
         <p class="__b __tal __tme __txt-grey-3">We are undergoing some maintenance, or there's a problem with the system. You will be automatically redirected once this has been resolved.</p>
         <p class="__b __tal __tme __txt-grey-3">Estimated time: <strong>{{ eta }}</strong></p>
@@ -30,24 +19,20 @@
 </template>
 
 <script>
-import { useAuthStore } from '@/stores/auth';
 import { MAINTENANCE_MODE_ETA } from "../../config";
 
 export default {
     data() {
         return {
-            isAuthenticated: false,
             eta: 'unknown'
         }
     },
 
     created() {
-        this.isAuthenticated = this.useAuthStore().isAuthenticated;
         this.eta = MAINTENANCE_MODE_ETA;
     },
 
     methods: {
-        useAuthStore: useAuthStore,
         goHome() {
             this.$router.push('/')
         }

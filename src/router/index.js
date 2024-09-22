@@ -107,54 +107,7 @@ if (MAINTENANCE_MODE !== "true" && MAINTENANCE_MODE !== "1") {
       },
       meta: { requiresGuest: true, bg: "img" }
     },
-
-    {
-      path: "/verify-email",
-      name: "verify-email",
-      component: function () {
-        return import("@/views/VerifyEmail.vue");
-      },
-    },
-
-    {
-      path: "/forgot-password",
-      name: "forgot-password",
-      component: function () {
-        return import("@/views/ForgotPassword.vue");
-      },
-      meta: { bg: "img" }
-    },
-    {
-      path: "/change-password",
-      name: "change-password",
-      component: function () {
-        return import("@/views/ChangePassword.vue");
-      },
-      meta: { bg: "img" }
-    },
-    {
-      path: "/change-email",
-      name: "change-email",
-      component: function () {
-        return import("@/views/ChangeEmail.vue");
-      },
-    },
-
-    {
-      path: "/terms",
-      name: "terms",
-      component: function () {
-        return import("@/views/Terms.vue");
-      },
-    },
-    {
-      path: "/privacy",
-      name: "privacy",
-      component: function () {
-        return import("@/views/Privacy.vue");
-      },
-    },
-
+    
     {
       path: '/maintenance',
       name: 'maintenance',
