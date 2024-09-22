@@ -90,8 +90,6 @@ import { useResponseStore } from "@/stores/response";
 
 import { uauth } from "@/stores/auth";
 
-import { PLACEHOLDER_CAPTCHA_TOKEN } from "../../config";
-
 import { useDataStore } from "@/stores/data";
 
 export default {
@@ -105,10 +103,6 @@ export default {
 
             loading: false,
         }
-    },
-
-    created() {
-        this.formData.token = PLACEHOLDER_CAPTCHA_TOKEN;
     },
 
     methods: {
