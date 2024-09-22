@@ -139,20 +139,6 @@ if (MAINTENANCE_MODE !== "true" && MAINTENANCE_MODE !== "1") {
         return import("@/views/Maintenance.vue");
       },
     },
-    {
-      path: "/terms",
-      name: "terms",
-      component: function () {
-        return import("@/views/Terms.vue");
-      },
-    },
-    {
-      path: "/privacy",
-      name: "privacy",
-      component: function () {
-        return import("@/views/Privacy.vue");
-      },
-    },
   ];
 }
 
