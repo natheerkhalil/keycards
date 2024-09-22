@@ -34,7 +34,7 @@ export const uauth = defineStore('auth', {
         // LOGIN //
         async login(data) {
             try {
-                const response = await axios.post(API_URL + '/api/login', data);
+                const response = await axios.post(API_URL + '/login', data);
 
                 var username = response.data.username;
                 var email = response.data.email;
@@ -60,7 +60,7 @@ export const uauth = defineStore('auth', {
         // REGISTER //
         async register(data) {
             try {
-                const response = await axios.post(API_URL + '/api/register', data);
+                const response = await axios.post(API_URL + '/register', data);
 
                 var username = response.data.username;
                 var email = response.data.email;

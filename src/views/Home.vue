@@ -14,7 +14,7 @@
       :to="`folder/${v.id}`">
 
       <div :id="`el-folder_${v.id}`"
-        :style="`position: relative; background-size: cover; background-image: url('/themes/${v.theme}.png'); background-position: center;`"
+        :style="`position: relative; background-size: cover; background-image: url('/themes/${v.theme}.webp'); background-position: center;`"
         :class="`folder __po __hv-6 __hv __13 __w _flex __mlauto __mauto _fd-co __padsm`">
 
 
@@ -229,7 +229,7 @@ export default {
       let el = document.getElementById("el-folder_" + id);
       let title = document.getElementById("ftitle_" + id);
 
-      el.style.backgroundImage = `url('/themes/${col}.png')`;
+      el.style.backgroundImage = `url('/themes/${col}.webp')`;
       title.style.color = `var(--${col}4)`;
     },
     // END PREVIEW THEME //
@@ -241,7 +241,7 @@ export default {
       let el = document.getElementById("el-folder_" + id);
       let title = document.getElementById("ftitle_" + id);
 
-      el.style.backgroundImage = "url('/themes/" + col + ".png')";
+      el.style.backgroundImage = "url('/themes/" + col + ".webp')";
       title.style.color = `var(--${col}4)`;
     },
 
