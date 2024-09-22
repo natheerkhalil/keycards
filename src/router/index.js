@@ -64,6 +64,14 @@ if (MAINTENANCE_MODE !== "true" && MAINTENANCE_MODE !== "1") {
       },
       meta: { requiresAuth: true }
     },
+    {
+      path: "/folder/:id/edit",
+      name: 'edit-folder',
+      component: function () {
+        return import("@/views/Folder/Edit.vue");
+      },
+      meta: { requiresAuth: true }
+    },
 
     // CARDS
     {

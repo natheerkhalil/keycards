@@ -27,6 +27,9 @@ import { MAINTENANCE_MODE } from '../config'
 // IMPORT COMPONENTS //
 import Folder from './components/Folder/Folder.vue'
 
+// IMPORT UTILS //
+import { text } from "@/utils/text";
+
 // CONFIGURE AXIOS //
 axios.defaults.timeout = 999999;
 axios.defaults.baseURL = API_URL;
@@ -76,5 +79,5 @@ if (localStorage.getItem("load_data")) {
 }
 
 export {
-    request
+    request, text
 };

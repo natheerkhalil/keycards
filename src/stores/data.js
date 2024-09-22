@@ -3,6 +3,8 @@ import { defineStore } from 'pinia';
 import { request } from '@/main';
 import { useResponseStore } from './response';
 
+import { text } from "@/utils/text";
+
 export const useDataStore = defineStore('data', {
 
     state: () => ({
@@ -69,7 +71,7 @@ export const useDataStore = defineStore('data', {
                     for (let i = 0; i < cards.length; i++) {
                         let c = cards[i];
 
-                        this.appendCard([c.id, c.name, c.folder, c.question, c.answer, c.updatedAt]);
+                        this.appendCard([c.id, c.q, c.a, c.folder]);
                     }
 
                     this.saveCards();
@@ -392,10 +394,15 @@ export const useDataStore = defineStore('data', {
         },
 
         // DELETE CARD //
-        async deleteCard(cardId) {
-            return await request({ id: cardId }, '/card/delete').then(res => {
+        async deleteCard(cards) {
+            return await request({ cards: cards }, '/card/delete').then(res => {
                 if (!res.failed) {
-                    this.cards = this.cards.filter(card => card.id != cardId);
+                    cards = cards.map(card => card.id);
+                    this.cards = this.cards.filter(card => !cards.includes(card.id));
+
+                    console.log('Deleted cards:', cards);
+                    console.log('Remaining cards:', this.cards.map(card => card.id));
+
                     this.saveCards();
 
                     return true;
@@ -488,11 +495,12 @@ export const useDataStore = defineStore('data', {
 
         // CREATE FOLDER //
         async createFolder([name, parent, theme]) {
+            name = text.cleanup(name);
             return await request({ name: name, parent: parent, theme: theme }, '/folder/create').then((res) => {
                 if (!res.failed) {
                     let id = res.data.id;
 
-                    this.appendFolder([name, parent, theme, id]);
+                    this.appendFolder([id, name, parent, theme]);
 
                     this.saveFolders();
 
@@ -503,22 +511,19 @@ export const useDataStore = defineStore('data', {
             })
         },
 
-        // APPEND FOLDER //
-        appendFolder([name, parent, theme, id]) {
-            this.folders.unshift({
-                name: name,
-                parent: parent,
-                theme: theme,
-                id: id,
-                updatedAt: new Date().getTime()
-            })
-
-            this.saveFolders();
-        },
-
         // DELETE FOLDER //
         async deleteFolder(folderId) {
-            return await request({ id: folderId }, '/folder/delete').then(res => {
+            if (this.getDescendants(folderId, false).length > 0) {
+                console.error("Cannot delete folder with descendants");
+                return false;
+            }
+
+            if (this.getCardsByFolder(folderId).length > 0) {
+                console.error("Cannot delete folder with cards");
+                return false;
+            }
+
+            return await request({ folder: folderId }, '/folder/delete').then(res => {
                 if (!res.failed) {
                     this.folders = this.folders.filter(folder => folder.id != folderId);
                     this.saveFolders();
@@ -545,7 +550,7 @@ export const useDataStore = defineStore('data', {
 
                 folder = res.data;
 
-                this.appendFolder([folder.name, folder.parent, folder.theme, folder.id]);
+                this.appendFolder([folder.id, folder.name, folder.parent, folder.theme]);
 
                 return this.deepClone(folder);
             });
@@ -553,9 +558,9 @@ export const useDataStore = defineStore('data', {
 
         // UPDATE FOLDER THEME //
         async updateFolderTheme(id, theme) {
-            return await request({ id: id, theme: theme }, '/folder/update').then(res => {
+            return await request({ folder: id, theme: theme }, '/folder/update').then(res => {
                 if (!res.failed) {
-                    this.folders = this.folders.find(f => f.id == id).theme = theme;
+                    this.folders.find(f => f.id == id).theme = theme;
                     this.saveFolders();
 
                     return true;
@@ -567,9 +572,9 @@ export const useDataStore = defineStore('data', {
 
         // UPDATE FOLDER NAME //
         async updateFolderName(id, name) {
-            return await request({ id: id, name: name }, '/folder/update').then(res => {
+            return await request({ folder: id, name: name }, '/folder/update').then(res => {
                 if (!res.failed) {
-                    this.folders = this.folders.find(f => f.id == id).name = name;
+                    this.folders.find(f => f.id == id).name = name;
                     this.saveFolders();
 
                     return true;
@@ -581,9 +586,9 @@ export const useDataStore = defineStore('data', {
 
         // UPDATE FOLDER PARENT //
         async updateFolderParent(id, parent) {
-            return await request({ id: id, parent: parent }, '/folder/update').then(res => {
+            return await request({ folder: id, parent: parent }, '/folder/update').then(res => {
                 if (!res.failed) {
-                    this.folders = this.folders.find(f => f.id == id).parent = parent;
+                    this.folders.find(f => f.id == id).parent = parent;
                     this.saveFolders();
 
                     return true;

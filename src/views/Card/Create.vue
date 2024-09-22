@@ -242,20 +242,28 @@ import { useResponseStore } from '@/stores/response';
 
 import { useDataStore } from '@/stores/data';
 
+import { text } from "@/utils/text";
+
 export default {
     methods: {
         // UPDATE SEPARATORS //
         updateSeparators() {
-            if (this.sep_cd.trim().length == 0 || this.sep_qa.trim().length == 0) {
+            let sep_cd = text.cleanup(this.sep_cd, true);
+            let sep_qa = text.cleanup(this.sep_qa, true);
+
+            if (sep_cd.length == 0 || sep_qa.length == 0) {
                 return;
             }
 
-            this.ds.updateCardSeparators(this.sep_qa.trim(), this.sep_cd.trim());
+            this.ds.updateCardSeparators(sep_cd, sep_qa);
         },
 
         // FORMAT CARDS //
         formatCards() {
-            let cs = this.cards2.split(this.sep_cd.trim());
+            let sep_cd = text.cleanup(this.sep_cd, true);
+            let sep_qa = text.cleanup(this.sep_qa, true);
+
+            let cs = this.cards2.split(sep_cd);
 
             let str = "";
 
@@ -263,19 +271,19 @@ export default {
                 let c = cs[i];
 
                 c = c.replace(/(\\r\\n|\\n|\\r)/gm, '');
-                c = c.trim();
+                c = text.cleanup(c, false);
 
-                if (c.trim().length == 0) {
+                if (c.length == 0) {
                     continue;
                 }
 
-                if (c.split(this.sep_qa.trim()).length != 2) {
+                if (c.split(sep_qa).length != 2) {
                     str = str + "\n" + c + "\n";
                     continue;
                 }
 
-                let q = c.split(this.sep_qa.trim())[0].trim();
-                let a = c.split(this.sep_qa.trim())[1].trim();
+                let q = text.cleanup(c.split(sep_qa)[0]);
+                let a = text.cleanup(c.split(sep_qa)[1]);
 
                 if (q.length == 0 || a.length == 0) {
                     str = str + "\n" + c + "\n";
@@ -284,9 +292,9 @@ export default {
 
                 str = str + "\n";
                 str = str + q + "\n";
-                str = str + this.sep_qa.trim() + "\n";
+                str = str + sep_qa + "\n";
                 str = str + a + "\n";
-                str = str + this.sep_cd.trim() + "\n";
+                str = str + sep_cd + "\n";
 
             }
 
@@ -330,8 +338,8 @@ export default {
 
             // Trim & check if any cards are empty or too long
             this.cards.forEach((card, i) => {
-                let q = card.q.trim();
-                let a = card.a.trim();
+                let q = text.cleanup(card.q);
+                let a = text.cleanup(card.a);
 
                 if (q.length == 0 || a.length == 0) {
                     empty = true;
@@ -341,8 +349,8 @@ export default {
                     exceedLimit = true;
                 }
 
-                card.q = card.q.trim();
-                card.a = card.a.trim();
+                card.q = q;
+                card.a = a;
             });
 
             // If any cards are empty or too long, return
@@ -391,7 +399,7 @@ export default {
             try {
 
                 // Trim text
-                let str = this.cards2.trim();
+                let str = text.cleanup(this.cards2);
 
                 // If text is empty, return
                 if (str.length == 0) {
@@ -426,7 +434,7 @@ export default {
 
                 for (let i = 0; i < cds.length; i++) {
                     // Trim card
-                    let c = cds[i].trim();
+                    let c = text.cleanup(cds[i]);
 
                     // If card is empty, continue to next iteration
                     if (c.length == 0) {
@@ -438,8 +446,8 @@ export default {
                     let a = c.split(this.sep_qa)[1] || '';
 
                     // Trim q & a
-                    q = q.trim();
-                    a = a.trim();
+                    q = text.cleanup(q);
+                    a = text.cleanup(a);
 
                     // If q or a is empty, set empty_cards to true and continue to next iteration
                     if (q.length == 0 || a.length == 0) {
@@ -529,7 +537,13 @@ export default {
             });
         },
         deleteCard(index) {
-            this.cards.splice(index, 1);
+            this.ds.deleteCard([this.cards[index].id]).then(r => {
+                if (r) {
+                    useResponseStore().updateResponse("Card deleted successfully.", "succ");
+                } else {
+                    useResponseStore().updateResponse("Failed to delete card.", "err");
+                }
+            })
         },
 
         // SET FOLDER //
@@ -586,11 +600,14 @@ export default {
             let count = 0;
 
             for (let i = 0; i < cs.length; i++) {
-                let c = cs[i].trim();
+                let c = text.cleanup(cs[i]);
 
                 if (c.split(this.sep_qa).length == 2) {
-                    let q = c.split(this.sep_qa)[0].trim();
-                    let a = c.split(this.sep_qa)[1].trim();
+                    let q = c.split(this.sep_qa)[0];
+                    let a = c.split(this.sep_qa)[1];
+
+                    q = text.cleanup(q);
+                    a = text.cleanup(a);
 
                     if (q.length > 0 && a.length > 0) {
                         count = count + 1;
@@ -618,7 +635,9 @@ export default {
             cards2: "",
 
             sep_qa: "",
-            sep_cd: ""
+            sep_cd: "",
+
+            text: text
         }
     },
 

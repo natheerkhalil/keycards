@@ -8,6 +8,8 @@
             <component :is="Component" />
         <!--</keep-alive>-->
     </router-view>
+    {{ ds.getFolders() }}
+    {{ ds.getCards() }}
     <ResponseMsg></ResponseMsg>
   </div>
   <Footer></Footer>

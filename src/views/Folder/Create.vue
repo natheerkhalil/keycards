@@ -6,7 +6,7 @@
 
         <div class="__b _flex _jc-en">
             <div @click="createFolder"
-                class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 __bd-4 __bod _fd-ro __bg-none __po">
+                :class="`create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 __bd-4 __bod _fd-ro __bg-none __po ${processing ? 'processing' : ''}`">
                 <p class="__txt-3">Create Folder</p>
             </div>
         </div>
@@ -20,13 +20,14 @@
             <br>
             <p class="__tmd __tle __txt-grey-4 __padxs"
                 style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); "><span class="__bo"
-                    v-html="hierarchy"></span><span class="__bo" :style="`color: var(--${folder.theme}2)`">{{ folder.name }}</span>
+                    v-html="hierarchy"></span><span class="__bo" :style="`color: var(--${folder.theme}2)`">{{
+                    folder.name }}</span>
             </p>
             <br>
 
             <p class="__tmd __tle __txt-grey-4 __padxs"
                 style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); ">Theme - <strong
-                :style="`color: var(--${folder.theme}2)`">{{ toSentenceCase(folder.theme) }}</strong></p>
+                    :style="`color: var(--${folder.theme}2)`">{{ toSentenceCase(folder.theme) }}</strong></p>
 
             <br>
 
@@ -48,7 +49,7 @@
 
             <div class="__b _flex _jc-en">
                 <div @click="createFolder"
-                    class="create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 __bd-4 __bod _fd-ro __bg-none __po">
+                    :class="`create-btn _m-xs-b _m-xs-cc __padxs _flex __hv __hv-4 __bd-4 __bod _fd-ro __bg-none __po ${processing ? 'processing' : ''}`">
                     <p class="__txt-3">Create Folder</p>
                 </div>
             </div>
@@ -60,6 +61,8 @@
 <script>
 import { useResponseStore } from '@/stores/response';
 import { useDataStore } from '@/stores/data';
+
+import { text } from '@/main';
 
 export default {
     methods: {
@@ -76,17 +79,25 @@ export default {
         },
 
         createFolder() {
-            if (this.folder.name.trim().length == 0 || this.folder.name.trim() > 150) {
+            if (this.processing) return;
+
+            this.processing = true;
+
+            let name = text.cleanup(this.folder.name);
+
+            if (name.length == 0 || name > 150) {
+                this.processing = false;
                 useResponseStore().updateResponse("Folder name must be between 1 and 150 characters long", "warn");
                 return;
             }
 
             if (!this.ds.getFolder(this.folder.parent) && this.folder.parent) {
+                this.processing = false;
                 useResponseStore().updateResponse("Parent folder does not exist", "warn");
                 return;
             }
 
-            this.folder.name = this.folder.name.trim();
+            this.folder.name = name;
 
             let data = [this.folder.name, this.folder.parent, this.folder.theme];
 
@@ -96,6 +107,7 @@ export default {
 
                     this.$router.push("/folder/" + res);
                 } else {
+                    this.processing = false;
                     useResponseStore().updateResponse("Failed to create folder", "err");
 
                     return false;
@@ -171,7 +183,11 @@ export default {
                 parent: null,
             },
 
-            hierarchy: "Root &rarr; "
+            text: text,
+
+            hierarchy: "Root &rarr; ",
+
+            processing: false
         }
     }
 }
@@ -188,5 +204,15 @@ export default {
 
 .create-btn:hover p {
     color: var(--grey_10);
+}
+
+.processing {
+    background: var(--grey_10);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.processing p {
+    color: var(--grey_2) !important;
 }
 </style>

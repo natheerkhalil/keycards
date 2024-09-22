@@ -84,13 +84,13 @@
 
                 <br>
 
-                <!-- FOLDER HERITAGE -->
+                <!-- FOLDER HIERARCHY -->
                 <div class="__b _fw-wr _flex _cc _fd-ro">
                     <div class="_flex _fd-ro _cc" v-for="v, i in folderAncestors">
                         <router-link class="__nun" :to="`/folder/${v.id}`">
                             <p class="__tmd" :style="`color: var(--${v.theme}4)`">{{ v.name }}</p>
                         </router-link>
-                        &nbsp;&nbsp;
+                        <span v-if="i != folderAncestors.length - 1">&nbsp;&nbsp;</span>
                         <svg :fill="`var(--${v.theme})4`" v-if="(i + 1) != folderAncestors.length" width="24"
                             height="24" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
                             stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -99,6 +99,14 @@
                                 fill-rule="nonzero" />
                         </svg>&nbsp;&nbsp;
                     </div>
+                </div>
+
+                <br>
+
+                <div class="__b _flex _cc">
+                    <router-link class="__nun" :to="`/folder/${folder.id}`">
+                        <p :style="`color: var(--${folder.theme}4); font-size: 30px`" class="__bo">{{ folder.name }}</p>
+                    </router-link>
                 </div>
 
                 <br>
@@ -149,7 +157,8 @@
 
             <!-- CARD Q / A -->
             <div class="cwidth _flex _cc">
-                <div ref="container" style="transition: 0.25s; height: 300px; max-height: 300px; overflow-y: auto"
+                <div id="container" ref="container"
+                    style="transition: 0.25s; height: 300px; max-height: 300px; overflow-y: auto"
                     class="__hv __b __padsm __bo-grey-7 __bo-2 _flex">
                     <p class="__tmd __b __tal __mauto">{{ transitioning ? '' : !this.show ? q : a }}</p>
                 </div>
@@ -306,12 +315,12 @@
                 class="__custscroll __b _flex _fd-co">
 
                 <!-- MOVE FOLDER -->
-                <Folder @select-folder="selectFolderToMove" v-if="!moveFoldersSearch.trim()"
+                <Folder @select-folder="selectFolderToMove" v-if="!text.cleanup(moveFoldersSearch)"
                     v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="ds.getFolders()" :level="0"
                     :tab="false" />
 
-                <FolderTab @select-folder="selectFolderToMove" v-if="moveFoldersSearch.trim().length > 0"
-                    v-for="f in ds.getFolders().filter(f => f.name.trim().toLowerCase().includes(moveFoldersSearch.trim().toLowerCase()))"
+                <FolderTab @select-folder="selectFolderToMove" v-if="!text.cleanup(moveFoldersSearch)"
+                    v-for="f in ds.getFolders().filter(f => text.cleanup(f.name, true).includes(text.cleanup(moveFoldersSearch, true)))"
                     :key="f.id" :folder="f" />
             </div>
         </div>
@@ -355,6 +364,8 @@ import { useResponseStore } from '@/stores/response';
 import Folder from '@/components/Folder/Folder.vue';
 import FolderTab from '@/components/Folder/FolderTab.vue';
 
+import { text } from '@/main';
+
 export default {
     components: {
         Folder, FolderTab
@@ -385,7 +396,7 @@ export default {
             return this.ds.getCards(this.folder.id);
         },
         folderAncestors() {
-            return this.ds.getAncestors(this.folder.id, false);
+            return this.ds.getAncestors(this.folder.id, true);
         },
 
         // DATA STORE //
@@ -427,6 +438,8 @@ export default {
 
         // TOGGLE SHOW //
         toggle() {
+            document.getElementById("container").scrollIntoView({ behavior: 'smooth' });
+
             if (!this.transitioning) {
                 this.transitioning = true;
 
@@ -477,9 +490,15 @@ export default {
         deleteCard() {
             if (window.confirm("Are you sure you want to delete this card?")) {
                 let folderId = this.card.folder;
-                useDataStore().deleteCard(this.card.id);
-
-                this.$router.push("/folder/" + folderId);
+                useDataStore().deleteCard([this.card.id]).then(r => {
+                    if (r) {
+                        useResponseStore().updateResponse("Card deleted successfully", "succ");
+                        this.$router.push("/folder/" + folderId);
+                    } else {
+                        useResponseStore().updateResponse("Failed to delete card", "err");
+                        return;
+                    }
+                });
             }
         },
 
@@ -488,21 +507,27 @@ export default {
             this.editingCard = true;
         },
         confirmEdit() {
-            if (this.editData.q.trim() === "" || this.editData.a.trim() === "") {
+            let q = text.cleanup(this.editData.q);
+            let a = text.cleanup(this.editData.a);
+
+            let id = this.card.id;
+
+            if (q === "" || a === "") {
                 useResponseStore().updateResponse("Question and answer cannot be empty", "warn");
                 return;
             }
 
-            if (this.editData.q.trim().length > 9999 || this.editData.a.trim().length > 9999) {
+            if (q.length > 9999 || a.length > 9999) {
                 useResponseStore().updateResponse("Question and answer cannot exceed 10,000 characters", "warn");
                 return;
             }
 
-            useDataStore().updateCard(this.card.id, this.editData.q.trim(), this.editData.a.trim());
+            useDataStore().updateCard(id, q, a);
+
             this.editingCard = false;
 
-            this.editData.q = this.card.q;
-            this.editData.a = this.card.a;
+            this.editData.q = q;
+            this.editData.a = a;
 
             useResponseStore().updateResponse("Card updated successfully", "succ");
         },
@@ -538,11 +563,15 @@ export default {
 
         // NEXT & PREV CARDS //
         next() {
+            document.getElementById("container").scrollIntoView({ behavior: 'smooth' });
+
             if (!this.transitioning) {
                 this.$router.push("/card/" + this.folderCards[this.cardIndex + 1].id);
             }
         },
         prev() {
+            document.getElementById("container").scrollIntoView({ behavior: 'smooth' });
+
             if (!this.transitioning) {
                 this.$router.push("/card/" + this.folderCards[this.cardIndex - 1].id);
             }
@@ -561,17 +590,14 @@ export default {
             });
         });
 
-        setInterval(() => {
-            console.log("card", this.card);
-            console.log("folder", this.folder)
-        }, 500);
-
         this.editData.q = this.card.q;
         this.editData.a = this.card.a;
     },
 
     data() {
         return {
+            text: text,
+
             showIcons: false,
 
             show: false,
