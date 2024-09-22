@@ -612,7 +612,7 @@ export default {
             id = Number(id);
 
             if (window.confirm("Are you sure you want to delete this card?")) {
-                this.ds.deleteCard([id]).then(r => {
+                this.ds.deleteCards(this.cards.map(c => c.id == id)).then(r => {
                     if (r) {
                         useResponseStore().updateResponse("Card deleted successfully", "succ");
                         this.cards = this.cards.filter(card => card.id !== id);
@@ -672,19 +672,23 @@ export default {
                 return;
             }
 
-            if (window.confirm("Are you sure you want to move the card(s) to the folder: " + this.globalFolders.find(f => f.id === id).name + "?")) {
+            if (window.confirm("Are you sure you want to move " + this.cardsToBeMoved.length + " card(s) to the folder: " + this.globalFolders.find(f => f.id === id).name + "?")) {
 
-                this.cards.filter(c => this.cardsToBeMoved.includes(c.id)).forEach(c => {
-                    this.ds.moveCard(c.id, id);
-                });
+                this.ds.moveCards(this.cardsToBeMoved, id).then(r => {
+                    if (!r) {
+                        useResponseStore().updateResponse("Failed to move cards", "err");
+                        return;
+                    } else {
+                        useResponseStore().updateResponse("Cards moved successfully", "succ");
 
-                this.cards.filter(c => this.cardsToBeMoved.includes(c.id)).forEach(card => card.folder = id);
+                        this.cards.filter(c => this.cardsToBeMoved.includes(c.id)).forEach(card => card.folder = id);
 
-                this.cardsToBeMoved = [];
-                this.showmoveFolders = false;
+                        this.cardsToBeMoved = [];
+                        this.showmoveFolders = false;
 
-                this.cards = this.cards.filter(c => c.folder == this.folder.id);
-
+                        this.cards = this.cards.filter(c => c.folder == this.folder.id);
+                    }
+                })
             }
         },
 
@@ -708,7 +712,7 @@ export default {
 
                 try {
 
-                    this.ds.deleteCard(this.cards.filter(c => c.selected == true).map(id => id)).then(r => {
+                    this.ds.deleteCards(this.cards.filter(c => c.selected == true)).then(r => {
                         if (!r) {
                             useResponseStore().updateResponse("Failed to delete selected cards", "err");
                             return;
@@ -758,16 +762,20 @@ export default {
 
             if (window.confirm(`Are you sure you want to mark the selected cards as ${msg}?`)) {
 
-                this.cards.forEach(c => {
-                    if (c.selected) {
-                        this.ds.markCard(c.id, status);
-                        this.cards.find(card => card.id === c.id).status = status;
+                this.ds.markCards(this.cards.filter(c => c.selected == true).map(id => id), status).then(r => {
+                    if (r) {
+                        useResponseStore().updateResponse("Selected cards marked successfully", "succ");
+
+                        this.cards.filter(card => card.selected == true).forEach(card => card.status = status);
+
+                        this.cards.forEach(c => c.selected = false);
+
+                        return;
+                    } else {
+                        useResponseStore().updateResponse("Failed to mark selected cards", "err");
+                        return;
                     }
-                });
-
-                this.cards.filter(card => card.selected == true).forEach(card => card.status = status);
-
-                this.cards.forEach(c => c.selected = false);
+                })
             }
         },
 

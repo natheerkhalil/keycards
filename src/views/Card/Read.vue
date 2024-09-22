@@ -315,11 +315,11 @@
                 class="__custscroll __b _flex _fd-co">
 
                 <!-- MOVE FOLDER -->
-                <Folder @select-folder="selectFolderToMove" v-if="!text.cleanup(moveFoldersSearch)"
+                <Folder @select-folder="selectFolderToMove" v-if="text.cleanup(moveFoldersSearch).length == 0"
                     v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="ds.getFolders()" :level="0"
                     :tab="false" />
 
-                <FolderTab @select-folder="selectFolderToMove" v-if="!text.cleanup(moveFoldersSearch)"
+                <FolderTab @select-folder="selectFolderToMove" v-if="text.cleanup(moveFoldersSearch).length > 0"
                     v-for="f in ds.getFolders().filter(f => text.cleanup(f.name, true).includes(text.cleanup(moveFoldersSearch, true)))"
                     :key="f.id" :folder="f" />
             </div>
@@ -393,7 +393,7 @@ export default {
 
         // FOLDER & RELATIONSHIPS //
         folderCards() {
-            return this.ds.getCards(this.folder.id);
+            return this.ds.getCardsByFolder(this.folder.id);
         },
         folderAncestors() {
             return this.ds.getAncestors(this.folder.id, true);
@@ -490,7 +490,7 @@ export default {
         deleteCard() {
             if (window.confirm("Are you sure you want to delete this card?")) {
                 let folderId = this.card.folder;
-                useDataStore().deleteCard([this.card.id]).then(r => {
+                useDataStore().deleteCards(this.card).then(r => {
                     if (r) {
                         useResponseStore().updateResponse("Card deleted successfully", "succ");
                         this.$router.push("/folder/" + folderId);
@@ -552,13 +552,18 @@ export default {
             }
         },
         selectFolderToMove(folderId) {
-            useDataStore().moveCard(this.card.id, folderId);
+            this.ds.moveCards([this.card.id], folderId).then(r => {
+                if (!r) {
+                    useResponseStore().updateResponse("Failed to move card", "err");
+                    return;
+                }
 
-            this.showMoveFolders = false;
-            this.moveFoldersLimit = 10;
-            this.moveFoldersSearch = '';
+                this.showMoveFolders = false;
+                this.moveFoldersLimit = 10;
+                this.moveFoldersSearch = '';
 
-            useResponseStore().updateResponse("Card moved successfully", "succ");
+                useResponseStore().updateResponse("Card moved successfully", "succ");
+            });
         },
 
         // NEXT & PREV CARDS //
@@ -585,13 +590,13 @@ export default {
             if (this.card)
                 this.cardExists = true;
 
+            this.editData.q = this.card.q;
+            this.editData.a = this.card.a;
+
             this.ds.getFolder(this.card.folder).then(folder => {
                 this.folder = folder;
             });
         });
-
-        this.editData.q = this.card.q;
-        this.editData.a = this.card.a;
     },
 
     data() {

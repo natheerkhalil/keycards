@@ -113,32 +113,6 @@ export const useDataStore = defineStore('data', {
                     this.cards.find(c => c.id === id).a = null;
                     this.cards.find(c => c.id === id).cleared = true;
                 }
-
-                /* // Sort cards by `updatedAt` (oldest first)
-                 let sortedCards = Object.values(this.cards).sort((a, b) => a.updatedAt - b.updatedAt);
- 
-                 // While size is greater than limit, delete oldest card
-                 while (this.totalSize > this.limit && sortedCards.length > 0) {
-                     const oldestCard = sortedCards.shift();
- 
-                     if (!this.removed.includes({ card: oldestCard.id, folder: oldestCard.folder.id }))
-                         this.removed.push({ card: oldestCard.id, folder: oldestCard.folder.id }); this.saveRemoved();
- 
-                     this.deleteCard(oldestCard.id);
-                 }
- 
-                 let sortedFolders = Object.values(this.folders).sort((a, b) => a.updatedAt - b.updatedAt);
- 
-                 // While size is greater than limit, delete oldest folder
-                 while (this.totalSize > this.limit && sortedFolders.length > 0 && sortedCards.length == 0) {
-                     let descendants = this.getDescendants(sortedFolders.shift().id);
- 
-                     for (let d of descendants) {
-                         this.deleteFolder(d);
-                     }
- 
-                     this.deleteFolder(sortedFolders.shift().id);
-                 }*/
             }
         },
 
@@ -376,17 +350,17 @@ export const useDataStore = defineStore('data', {
             this.saveCards();
         },
 
-        // CREATE CARD //
-        async createCard([q, a, folder]) {
-            return await request({ q: q, a: a, folder: folder }, '/card/create').then(res => {
+        // CREATE CARDS //
+        async createCards(cards, folder) {
+            return await request({ cards: cards, folder: folder }, '/card/create-many').then(res => {
                 if (!res.failed) {
-                    let id = res.data.id;
+                    let cards = res.data.cards;
 
-                    this.appendCard([id, q, a, folder]);
+                    this.cards = this.cards.concat(cards);
 
                     this.saveCards();
 
-                    return id;
+                    return true;
                 } else {
                     return false;
                 }
@@ -394,10 +368,18 @@ export const useDataStore = defineStore('data', {
         },
 
         // DELETE CARD //
-        async deleteCard(cards) {
+        async deleteCards(cards) {
+            // extract IDs from cards array
+            try {
+                cards = cards.map(card => card.id);
+            } catch (err) {
+                cards = [cards];
+
+                cards = cards.map(card => card.id);
+            }
+
             return await request({ cards: cards }, '/card/delete').then(res => {
                 if (!res.failed) {
-                    cards = cards.map(card => card.id);
                     this.cards = this.cards.filter(card => !cards.includes(card.id));
 
                     console.log('Deleted cards:', cards);
@@ -434,10 +416,13 @@ export const useDataStore = defineStore('data', {
         },
 
         // MARK CARD //
-        async markCard(cardId, mark) {
-            return await request({ id: cardId, status: Number(mark) }, '/card/mark').then(res => {
+        async markCards(cards, mark) {
+            // extract ID from cards array
+            cards = cards.map(card => card.id);
+
+            return await request({ cards: cards, status: Number(mark) }, '/card/mark').then(res => {
                 if (!res.failed) {
-                    this.cards.find(c => c.id == cardId)["status"] = mark;
+
                     this.saveCards();
 
                     return true;
@@ -449,8 +434,16 @@ export const useDataStore = defineStore('data', {
         },
 
         // MOVE CARD //
-        async moveCard(cardId, folderId) {
-            return await request({ id: cardId, folder: folderId }, '/card/move').then(res => {
+        async moveCard(cards, folderId) {
+            // extract ID from cards array
+            try {
+                cards = cards.map(card => card.id);
+            } catch (err) {
+                cards = [cards];
+                cards = cards.map(card => card.id);
+            }
+
+            return await request({ cards: cards, folder: folderId }, '/card/move').then(res => {
                 if (!res.failed) {
                     let id = res.data.id;
 
@@ -678,3 +671,52 @@ export const useDataStore = defineStore('data', {
         },
     },
 });
+
+
+
+/* // Sort cards by `updatedAt` (oldest first)
+ let sortedCards = Object.values(this.cards).sort((a, b) => a.updatedAt - b.updatedAt);
+ 
+ // While size is greater than limit, delete oldest card
+ while (this.totalSize > this.limit && sortedCards.length > 0) {
+     const oldestCard = sortedCards.shift();
+ 
+     if (!this.removed.includes({ card: oldestCard.id, folder: oldestCard.folder.id }))
+         this.removed.push({ card: oldestCard.id, folder: oldestCard.folder.id }); this.saveRemoved();
+ 
+     this.deleteCard(oldestCard.id);
+ }
+ 
+ let sortedFolders = Object.values(this.folders).sort((a, b) => a.updatedAt - b.updatedAt);
+ 
+ // While size is greater than limit, delete oldest folder
+ while (this.totalSize > this.limit && sortedFolders.length > 0 && sortedCards.length == 0) {
+     let descendants = this.getDescendants(sortedFolders.shift().id);
+ 
+     for (let d of descendants) {
+         this.deleteFolder(d);
+     }
+ 
+     this.deleteFolder(sortedFolders.shift().id);
+ }*/
+
+
+
+/*
+ 
+async createCard([q, a, folder]) {
+return await request({ q: q, a: a, folder: folder }, '/card/create').then(res => {
+if (!res.failed) {
+let id = res.data.id;
+
+this.appendCard([id, q, a, folder]);
+
+this.saveCards();
+
+return id;
+} else {
+return false;
+}
+})
+},
+*/

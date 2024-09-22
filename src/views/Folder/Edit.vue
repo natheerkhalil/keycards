@@ -166,8 +166,6 @@ export default {
             } else {
                 let parents = this.ds.getAncestors(this.folder.id, true);
 
-                console.log(parents);
-
                 let str = "Root";
 
                 parents.forEach(p => {

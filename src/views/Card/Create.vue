@@ -110,8 +110,13 @@
         <br>
 
         <div class="__b _flex">
-            <p><strong :class="[noOfCards > 100 ? '__txt-err-4' : '']">{{ noOfCards }}</strong> / <span
-                    class="__txt-grey-3">100 cards</span></p>
+            <p v-if="method == 's'"><strong :class="[noOfCards > 500 ? '__txt-err-4' : '']">{{ noOfCards }}</strong> /
+                <span class="__txt-grey-3">500 cards</span></p>
+        </div>
+
+        <div class="__b _flex">
+            <p v-if="method == 'm'"><strong :class="[cards.length > 500 ? '__txt-err-4' : '']">{{ cards.length
+                    }}</strong> / <span class="__txt-grey-3">500 cards</span></p>
         </div>
 
         <br>
@@ -153,8 +158,8 @@
         </form>
 
         <form v-if="method == 's'" @submit.prevent="create" class="__b _flex __mlauto __mrauto _fd-co">
-            <textarea maxlength="9999" v-model="cards2"
-                style="height: 400px; max-height: 500px; overflow-y: auto; resize: none;"
+            <textarea :placeholder="`Question\n${this.sep_qa}\nAnswer\n${this.sep_cd}`" maxlength="9999"
+                v-model="cards2" style="height: 400px; max-height: 500px; overflow-y: auto; resize: none;"
                 class="outline-focus __padsm __bo-grey-7 __bo-2 __b __bdsm"></textarea>
             <br>
             <div class="__b _flex _jc-be _ai-ce">
@@ -255,7 +260,7 @@ export default {
                 return;
             }
 
-            this.ds.updateCardSeparators(sep_cd, sep_qa);
+            this.ds.updateCardSeparators(sep_qa, sep_cd);
         },
 
         // FORMAT CARDS //
@@ -329,10 +334,10 @@ export default {
                 return;
             }
 
-            // If cards array has more than 100 cards, return
-            if (this.cards.length > 100) {
+            // If cards array has more than 500 cards, return
+            if (this.cards.length > 500) {
                 this.processing = false;
-                useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
+                useResponseStore().updateResponse("You can't create more than 500 cards.", "warn");
                 return;
             }
 
@@ -367,29 +372,18 @@ export default {
 
             let failed = [];
 
-            // Create cards individually
-            Promise.all(this.cards.map((card, i) => {
-                return this.ds.createCard([card.q, card.a, this.folder.id]).then(res => {
-                    if (!res) {
-                        failed.push({
-                            q: card.q,
-                            a: card.a
-                        });
-                    }
-                });
-            })).then(() => {
-                if (failed.length > 0) {
-                    this.processing = false;
+            // Create cards
+            this.ds.createCards(this.cards, this.folderId).then(r => {
+                if (r.status) {
                     useResponseStore().updateResponse("Some cards failed to create", "warn");
-                    this.cards = failed;
+                    failed = r.failed;
                     return;
+                } else {
+                    useResponseStore().updateResponse("Cards created successfully.", "succ");
+                    // Relocate to folder page
+                    this.$router.push({ path: `/folder/${this.folder.id}` });
                 }
-
-                useResponseStore().updateResponse("Cards created successfully.", "succ");
-
-                // Relocate to folder page
-                this.$router.push({ path: `/folder/${this.folder.id}` });
-            });
+            })
         },
 
         // CREATE METHOD S //
@@ -418,8 +412,259 @@ export default {
                     return;
                 }
 
+                // If array has more than 500 cards, return
+                if (cds.length > 500) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("You can't create more than 500 cards.", "warn");
+                    return;
+                }
+
+                let empty_cards = false;
+                let too_long = false;
+
+                let arr = [];
+
+                // Run through each card
+
+                for (let i = 0; i < cds.length; i++) {
+                    // Trim card
+                    let c = text.cleanup(cds[i]);
+
+                    // If card is empty, continue to next iteration
+                    if (c.length == 0) {
+                        continue;
+                    }
+
+                    // Get q & a based on separators from card
+                    let q = c.split(this.sep_qa)[0] || '';
+                    let a = c.split(this.sep_qa)[1] || '';
+
+                    // Trim q & a
+                    q = text.cleanup(q);
+                    a = text.cleanup(a);
+
+                    // If q or a is empty, set empty_cards to true and continue to next iteration
+                    if (q.length == 0 || a.length == 0) {
+                        empty_cards = true;
+                        continue;
+                    }
+
+                    // If q or a is too long, set too_long to true and continue to next iteration
+                    if (q.length > 9999 || a.length > 9999) {
+                        too_long = true;
+                        continue;
+                    }
+
+                    // Add card to array
+                    arr.push({
+                        q: q,
+                        a: a
+                    });
+                }
+
+                // If any cards are empty or too long, return
+                if (empty_cards) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("Some of the cards are empty.", "warn");
+                    return;
+                }
+                if (too_long) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("Some of the cards exceed the limit of 10,000 characters.", "warn");
+                    return;
+                }
+
+                // If array is empty, return
+                if (arr.length == 0) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("No cards found.", "warn");
+                    return;
+                }
+
+                let failed = [];
+
+                // Create cards
+                this.ds.createCards(arr, this.folderId).then(r => {
+                    if (!r) {
+                        useResponseStore().updateResponse("Failed to create cards.", "err");
+
+                        return;
+                    } else {
+                        useResponseStore().updateResponse("Cards created successfully.", "succ");
+
+                        this.$router.push({ path: `/folder/${this.folder.id}` });
+                    }
+                })
+            } catch (err) {
+                this.processing = false;
+                useResponseStore().updateResponse("An error occurred while creating cards.", "err");
+                console.error(err);
+            }
+        },
+
+
+        // ADD & DELETE CARDS //
+        addCard() {
+            this.cards.push({
+                q: "",
+                a: ""
+            });
+        },
+        deleteCard(index) {
+            this.ds.deleteCards([this.cards[index]]).then(r => {
+                if (r) {
+                    useResponseStore().updateResponse("Card deleted successfully.", "succ");
+                } else {
+                    useResponseStore().updateResponse("Failed to delete card.", "err");
+                }
+            })
+        },
+
+        // SET FOLDER //
+        setFolder() {
+            let folder = this.folderId;
+
+            if (!folder) {
+                this.$router.push({ name: '404' });
+                return;
+            }
+
+            if (!this.folders.find(f => f.id == folder)) {
+                this.$router.push({ name: '404' });
+                return;
+            }
+
+            this.folder = this.folders.find(f => f.id == folder);
+        },
+    },
+
+    created() {
+        this.setFolder();
+
+        this.sep_qa = this.ds.getSeparators()['qa'];
+        this.sep_cd = this.ds.getSeparators()['cd'];
+    },
+
+    computed: {
+        // GET CREATION METHOD //
+        method() {
+            return this.ds.getMethod();
+        },
+
+        // FOLDERS //
+        folders() {
+            return this.ds.getFolders();
+        },
+        folderAncestors() {
+            return this.ds.getAncestors(this.folder.id, true);
+        },
+
+        // FOLDER ID //
+        folderId() {
+            return this.$route.query.f || null;
+        },
+
+        // DATA STORE //
+        ds() {
+            return useDataStore();
+        },
+
+        noOfCards() {
+            let cs = this.cards2.split(this.sep_cd);
+            let count = 0;
+
+            for (let i = 0; i < cs.length; i++) {
+                let c = text.cleanup(cs[i]);
+
+                if (c.split(this.sep_qa).length == 2) {
+                    let q = c.split(this.sep_qa)[0];
+                    let a = c.split(this.sep_qa)[1];
+
+                    q = text.cleanup(q);
+                    a = text.cleanup(a);
+
+                    if (q.length > 0 && a.length > 0) {
+                        count = count + 1;
+                    }
+                }
+            }
+
+            return count;
+        }
+    },
+
+    data() {
+        return {
+            processing: false,
+
+            folder: null,
+
+            cards: [
+                {
+                    q: "q",
+                    a: "a"
+                }
+            ],
+
+            cards2: "",
+
+            sep_qa: "",
+            sep_cd: "",
+
+            text: text,
+        }
+    },
+
+    watch: {
+        sep_cd(val) {
+            this.updateSeparators();
+        },
+        sep_qa(val) {
+            this.updateSeparators();
+        },
+
+        cards2(val) {
+            let cds = val.split(this.sep_cd);
+
+            if (cds.length > 500) {
+                this.processing = true;
+            } else {
+                this.processing = false;
+            }
+        }
+    }
+}
+</script>
+
+<!--
+        // CREATE METHOD S //
+        createS() {
+            this.processing = true;
+
+            try {
+
+                // Trim text
+                let str = text.cleanup(this.cards2);
+
+                // If text is empty, return
+                if (str.length == 0) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("No cards found.", "warn");
+                    return;
+                }
+
+                // Split array based on separators
+                let cds = str.split(this.sep_cd);
+
+                // If array is empty, return
+                if (cds.length == 0) {
+                    this.processing = false;
+                    useResponseStore().updateResponse("No cards found.", "warn");
+                    return;
+                }
+
                 // If array has more than 100 cards, return
-                if (cds.length > 101) {
+                if (cds.length > 500) {
                     this.processing = false;
                     useResponseStore().updateResponse("You can't create more than 100 cards.", "warn");
                     return;
@@ -527,127 +772,4 @@ export default {
                 console.error(err);
             }
         },
-
-
-        // ADD & DELETE CARDS //
-        addCard() {
-            this.cards.push({
-                q: "",
-                a: ""
-            });
-        },
-        deleteCard(index) {
-            this.ds.deleteCard([this.cards[index].id]).then(r => {
-                if (r) {
-                    useResponseStore().updateResponse("Card deleted successfully.", "succ");
-                } else {
-                    useResponseStore().updateResponse("Failed to delete card.", "err");
-                }
-            })
-        },
-
-        // SET FOLDER //
-        setFolder() {
-            let folder = this.folderId;
-
-            if (!folder) {
-                this.$router.push({ name: '404' });
-                return;
-            }
-
-            if (!this.folders.find(f => f.id == folder)) {
-                this.$router.push({ name: '404' });
-                return;
-            }
-
-            this.folder = this.folders.find(f => f.id == folder);
-        },
-    },
-
-    created() {
-        this.setFolder();
-
-        this.sep_qa = this.ds.getSeparators()['qa'];
-        this.sep_cd = this.ds.getSeparators()['cd'];
-    },
-
-    computed: {
-        // GET CREATION METHOD //
-        method() {
-            return this.ds.getMethod();
-        },
-
-        // FOLDERS //
-        folders() {
-            return this.ds.getFolders();
-        },
-        folderAncestors() {
-            return this.ds.getAncestors(this.folder.id, true);
-        },
-
-        // FOLDER ID //
-        folderId() {
-            return this.$route.query.f || null;
-        },
-
-        // DATA STORE //
-        ds() {
-            return useDataStore();
-        },
-
-        noOfCards() {
-            let cs = this.cards2.split(this.sep_cd);
-            let count = 0;
-
-            for (let i = 0; i < cs.length; i++) {
-                let c = text.cleanup(cs[i]);
-
-                if (c.split(this.sep_qa).length == 2) {
-                    let q = c.split(this.sep_qa)[0];
-                    let a = c.split(this.sep_qa)[1];
-
-                    q = text.cleanup(q);
-                    a = text.cleanup(a);
-
-                    if (q.length > 0 && a.length > 0) {
-                        count = count + 1;
-                    }
-                }
-            }
-
-            return count;
-        }
-    },
-
-    data() {
-        return {
-            processing: false,
-
-            folder: null,
-
-            cards: [
-                {
-                    q: "q",
-                    a: "a"
-                }
-            ],
-
-            cards2: "",
-
-            sep_qa: "",
-            sep_cd: "",
-
-            text: text
-        }
-    },
-
-    watch: {
-        sep_cd(val) {
-            this.updateSeparators();
-        },
-        sep_qa(val) {
-            this.updateSeparators();
-        }
-    }
-}
-</script>
+-->
