@@ -91,10 +91,8 @@ export default {
                 return;
             }
 
-            if (!this.ds.getFolders().find(f => f.id == this.folder.parent)) {
-                this.processing = false;
-                useResponseStore().updateResponse("Parent folder does not exist", "warn");
-                return;
+            if (this.folder.parent && !this.ds.getFolders().find(f => f.id == this.folder.parent)) {
+                this.folder.parent = null;
             }
 
             this.folder.name = name;
