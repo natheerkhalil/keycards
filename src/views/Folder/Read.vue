@@ -674,6 +674,8 @@ export default {
 
             if (window.confirm("Are you sure you want to move " + this.cardsToBeMoved.length + " card(s) to the folder: " + this.globalFolders.find(f => f.id === id).name + "?")) {
 
+                console.log(this.cardsToBeMoved);
+
                 this.ds.moveCards(this.cardsToBeMoved, id).then(r => {
                     if (!r) {
                         useResponseStore().updateResponse("Failed to move cards", "err");

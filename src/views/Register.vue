@@ -57,6 +57,7 @@ div#app {
     background-image: url('/bg.webp');
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center;
 }
 
 input {

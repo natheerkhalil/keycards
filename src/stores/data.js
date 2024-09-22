@@ -60,19 +60,22 @@ export const useDataStore = defineStore('data', {
                     let folders = res.data.folders;
                     let cards = res.data.cards;
 
-                    for (let i = 0; i < folders.length; i++) {
+                    /*for (let i = 0; i < folders.length; i++) {
                         let f = folders[i];
 
                         this.appendFolder([f.id, f.name, f.parent, f.theme]);
-                    }
+                    }*/
+
+                    this.folders = folders;
+                    this.cards = cards;
 
                     this.saveFolders();
 
-                    for (let i = 0; i < cards.length; i++) {
+                    /*for (let i = 0; i < cards.length; i++) {
                         let c = cards[i];
 
                         this.appendCard([c.id, c.q, c.a, c.folder]);
-                    }
+                    }*/
 
                     this.saveCards();
 
@@ -156,6 +159,20 @@ export const useDataStore = defineStore('data', {
 
                 return arr;
             });
+        },
+
+        // EXTRACT ID FROM CARDS // 
+        extractIdFromCards(cards) {
+            try {
+                if (cards.length > 0 && typeof cards[0] === 'object' && 'id' in cards[0]) {
+                    cards = cards.map(card => card.id);
+                }
+            } catch (err) {
+                cards = [cards];
+                cards = cards.map(card => card.id);
+            }
+
+            return cards;
         },
 
         // SAVING TO LOCAL STORAGE //
@@ -370,13 +387,7 @@ export const useDataStore = defineStore('data', {
         // DELETE CARD //
         async deleteCards(cards) {
             // extract IDs from cards array
-            try {
-                cards = cards.map(card => card.id);
-            } catch (err) {
-                cards = [cards];
-
-                cards = cards.map(card => card.id);
-            }
+            cards = this.extractIdFromCards(cards);
 
             return await request({ cards: cards }, '/card/delete').then(res => {
                 if (!res.failed) {
@@ -418,10 +429,16 @@ export const useDataStore = defineStore('data', {
         // MARK CARD //
         async markCards(cards, mark) {
             // extract ID from cards array
-            cards = cards.map(card => card.id);
+            cards = this.extractIdFromCards(cards);
 
             return await request({ cards: cards, status: Number(mark) }, '/card/mark').then(res => {
                 if (!res.failed) {
+
+                    this.cards.forEach(card => {
+                        if (cards.includes(card.id)) {
+                            card.status = mark;
+                        }
+                    });
 
                     this.saveCards();
 
@@ -434,31 +451,28 @@ export const useDataStore = defineStore('data', {
         },
 
         // MOVE CARD //
-        async moveCard(cards, folderId) {
+        async moveCards(cards, folderId) {
+
             // extract ID from cards array
-            try {
-                cards = cards.map(card => card.id);
-            } catch (err) {
-                cards = [cards];
-                cards = cards.map(card => card.id);
-            }
+            cards = this.extractIdFromCards(cards);
 
             return await request({ cards: cards, folder: folderId }, '/card/move').then(res => {
                 if (!res.failed) {
-                    let id = res.data.id;
+                    this.cards.forEach(card => {
+                        if (cards.includes(card.id)) {
+                            card.folder = folderId;
+                            console.log('Moved card:', card.id, 'to folder:', folderId);
+                        } else {
+                            console.log('Card:', card.id, 'not found in provided cards array');
+                        }
+                    });
 
-                    let card = this.cards.find(card => card.id == cardId);
-
-                    if (!card) {
-                        this.cards.unshift({ id: id, q: card.q, a: card.a, folder: folderId, status: card.status, updatedAt: new Date().getTime() });
-                    } else {
-                        card["folder"] = folderId;
-                        card["updatedAt"] = new Date().getTime();
-                    }
+                    console.log("Cards to be moved:", cards);
 
                     this.saveCards();
+
+                    return true;
                 } else {
-                    useResponseStore().updateResponse("Failed to move card", "err");
 
                     return false;
                 }
