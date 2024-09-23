@@ -473,13 +473,13 @@ export default {
         mark(v) {
             switch (v) {
                 case 2:
-                    useDataStore().markCard(this.card.id, 2);
+                    this.ds.markCards([this.card.id], 2);
                     break;
                 case 1:
-                    useDataStore().markCard(this.card.id, 1);
+                    this.ds.markCard([this.card.id], 1);
                     break;
                 case 0:
-                    useDataStore().markCard(this.card.id, 0);
+                    this.ds.markCard([this.card.id], 0);
                     break;
             }
 
