@@ -764,7 +764,7 @@ export default {
 
             if (window.confirm(`Are you sure you want to mark the selected cards as ${msg}?`)) {
 
-                this.ds.markCards(this.cards.filter(c => c.selected == true).map(id => id), status).then(r => {
+                this.ds.markCards([this.cards.filter(c => c.selected == true)], status).then(r => {
                     if (r) {
                         useResponseStore().updateResponse("Selected cards marked successfully", "succ");
 
