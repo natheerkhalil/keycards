@@ -109,9 +109,9 @@ export default {
             errors: "",
 
             formData: {
-                username: 'nka',
-                email: 'natheerkhalil@outlook.com',
-                password: 'password123',
+                username: '',
+                email: '',
+                password: '',
             },
             loading: false,
 

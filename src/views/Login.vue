@@ -96,8 +96,8 @@ export default {
     data() {
         return {
             formData: {
-                username: 'nka',
-                password: 'posnajem',
+                username: '',
+                password: '',
                 token: ''
             },
 
