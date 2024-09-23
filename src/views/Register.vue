@@ -104,7 +104,7 @@ import { PLACEHOLDER_CAPTCHA_TOKEN } from "../../config";
 export default {
     data() {
         return {
-            ready: true,
+            ready: false,
 
             errors: "",
 
