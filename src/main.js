@@ -64,19 +64,8 @@ function checkMaintenanceMode() {
     }
 }
 
-function checkLoadq() {
-    if (localStorage.getItem("load_data")) {
-        useDataStore().getAllData();
-
-        console.log("Data loaded from server");
-    }
-}
-
 // Check mode every second
 setInterval(checkMaintenanceMode, 2000);
-if (localStorage.getItem("load_data")) {
-    setInterval(checkLoadq, 100);
-}
 
 export {
     request, text

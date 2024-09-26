@@ -28,7 +28,7 @@ export const useResponseStore = defineStore('response', {
             });
         },
         clearResponse() {
-            this.msgs = {};
+            this.msgs = [];
         },
     },
 });

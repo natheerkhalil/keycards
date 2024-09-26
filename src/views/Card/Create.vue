@@ -134,7 +134,7 @@
                 </div>
                 <br>
                 <div style="margin-bottom: 7.5px;" class="__b _flex _jc-en">
-                    <svg v-if="cards.length > 1" @click="deleteCard(i)" class="__po __fi-err-5 __hfi-err-6" width="24"
+                    <svg v-if="cards.length > 1" @click="deleteCard(c.id)" class="__po __fi-err-5 __hfi-err-6" width="24"
                         height="24" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
                         stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -505,19 +505,24 @@ export default {
 
         // ADD & DELETE CARDS //
         addCard() {
+            let id;
+
+            // generate random id
+            id = Math.floor(Math.random() * 1000000000000000);
+
+            // if id exists in cards array, generate new id
+            while (this.cards.some(c => c.id === id)) {
+                id = Math.floor(Math.random() * 1000000000000000);
+            }
+
             this.cards.push({
                 q: "",
-                a: ""
+                a: "",
+                id: id
             });
         },
-        deleteCard(index) {
-            this.ds.deleteCards([this.cards[index]]).then(r => {
-                if (r) {
-                    useResponseStore().updateResponse("Card deleted successfully.", "succ");
-                } else {
-                    useResponseStore().updateResponse("Failed to delete card.", "err");
-                }
-            })
+        deleteCard(id) {
+            this.cards = this.cards.filter(c => c.id!== id);
         },
 
         // SET FOLDER //
@@ -602,7 +607,8 @@ export default {
             cards: [
                 {
                     q: "q",
-                    a: "a"
+                    a: "a",
+                    id: 1
                 }
             ],
 

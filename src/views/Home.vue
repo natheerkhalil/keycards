@@ -32,7 +32,7 @@
                   v.name }}</p>
 
               <!-- CHILDREN COUNT -->
-              <p :style="`color: var(--${v.theme}4)`">{{ ds.getChildren(v.id).length }} folders</p>
+              <p :style="`color: var(--${v.theme}4)`">{{ ds.getDescendants(v.id, false).length }} folders</p>
             </div>
 
             <div class="_flex _fd-co _cc">

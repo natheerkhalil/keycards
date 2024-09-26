@@ -4,6 +4,8 @@ import Home from '../views/Home.vue';
 import { useResponseStore } from "@/stores/response";
 import { uauth } from "@/stores/auth";
 
+import { useDataStore } from '@/stores/data';
+
 var HomeRoute = {
   path: "/",
   name: 'home',
@@ -158,6 +160,8 @@ const router = createRouter({
 
 // Add the router guard
 router.beforeEach((to, from, next) => {
+  useDataStore().getAllData();
+  
   if (to.matched.some(record => record.meta.requiresGuest) && isAuthenticated) {
     useResponseStore().updateResponse("You're already logged in", "warn", false);
     next({ name: 'home' });

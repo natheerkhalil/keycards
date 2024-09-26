@@ -51,47 +51,45 @@ export const useDataStore = defineStore('data', {
 
     actions: {
         // FETCH ALL DATA FROM SERVER //
-        getAllData() {
+        async getAllData() {
 
+            if (!this.checkForq()) {
+                console.log("Data already fetched");
+                return false;
+            }
+            
             this.clearq();
-
-            request({}, '/all').then(res => {
+        
+            return await request({}, '/all').then(res => {
                 if (!res.failed) {
                     let folders = res.data.folders;
                     let cards = res.data.cards;
-
-                    /*for (let i = 0; i < folders.length; i++) {
-                        let f = folders[i];
-
-                        this.appendFolder([f.id, f.name, f.parent, f.theme]);
-                    }*/
-
+        
                     this.folders = folders;
                     this.cards = cards;
-
+        
                     this.saveFolders();
-
-                    /*for (let i = 0; i < cards.length; i++) {
-                        let c = cards[i];
-
-                        this.appendCard([c.id, c.q, c.a, c.folder]);
-                    }*/
-
                     this.saveCards();
 
+                    this.clearq();
+        
                     return true;
                 } else {
                     useResponseStore().updateResponse("Failed to fetch data from server", "err");
-
-                    return null;
+        
+                    return false;
                 }
-            })
+            });
         },
+
         addLoadq() {
             localStorage.setItem("load_data", true);
         },
         clearq() {
             localStorage.removeItem("load_data");
+        },
+        checkForq() {
+            return localStorage.getItem("load_data");
         },
 
         // CHECK DATA SIZE & REMOVE CACHED DATA //

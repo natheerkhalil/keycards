@@ -120,9 +120,13 @@ export default {
 
                         useDataStore().addLoadq();
 
-                        useResponseStore().updateResponse("Logged in successfully. Redirecting...", "succ");
+                        useDataStore().getAllData().then(() => {
 
-                        window.location.href = "/";
+                            useResponseStore().updateResponse("Logged in successfully. Redirecting...", "succ");
+
+                            window.location.href = "/";
+
+                        })
 
                     } else {
 

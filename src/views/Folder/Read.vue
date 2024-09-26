@@ -82,7 +82,7 @@
                     <p :class="`__b __tal __txl __bo`" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
                     <p :style="`color: var(--${folder.theme}4)`"><strong>{{ ds.getDescendantCards(folder.id).length
                             }}</strong> cards / <strong>{{
-                                childrenFolders.length }}</strong> folders</p>
+                                ds.getDescendants(folder.id, false).length }}</strong> folders</p>
                 </div>
 
                 <!-- CREATE BUTTONS -->
@@ -192,7 +192,7 @@
                                     <p :style="`min-width: max-content; color: var(--${v.theme}4)`"><strong>{{
                                         ds.getDescendantCards(v.id).length }}</strong> cards</p>
                                     <p :style="`min-width: max-content; color: var(--${v.theme}4)`"><strong>{{
-                                        ds.getChildren(v.id).length }}</strong> folders</p>
+                                        ds.getDescendants(v.id, false).length }}</strong> folders</p>
                                 </div>
                             </div>
 
@@ -544,7 +544,11 @@ export default {
                 } else {
                     useResponseStore().updateResponse("Folder deleted successfully", "succ");
 
-                    this.$router.push("/");
+                    if (this.folder.parent) {
+                        this.$router.push(`/folder/${this.folder.parent}`);
+                    } else {
+                        this.$router.push(`/`);
+                    }
                 }
             })
         },
@@ -712,6 +716,8 @@ export default {
         deleteSelected() {
             if (window.confirm("Are you sure you want to delete the selected cards?")) {
 
+                useResponseStore().updateResponse("Deleting selected cards...", "info");
+
                 try {
 
                     this.ds.deleteCards(this.cards.filter(c => c.selected == true)).then(r => {
@@ -720,7 +726,7 @@ export default {
                             return;
                         }
 
-                        this.cards = this.cards.filter(card => !card.selected);
+                        this.cards = this.ds.getCardsByFolder(this.folderId);
 
                         useResponseStore().updateResponse("Selected cards deleted successfully", "succ");
                         return;
@@ -734,6 +740,7 @@ export default {
 
             }
         },
+
 
         // ADD SELECTED CARDS TO MOVE ARRAY //
         moveSelected() {
