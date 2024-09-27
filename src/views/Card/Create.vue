@@ -544,7 +544,12 @@ export default {
     },
 
     created() {
-        this.setFolder();
+        // set all folders
+        this.ds.getAllFolders().then(res => {
+            this.folders = res;
+            
+            this.setFolder();
+        })
 
         this.sep_qa = this.ds.getSeparators()['qa'];
         this.sep_cd = this.ds.getSeparators()['cd'];
@@ -554,11 +559,6 @@ export default {
         // GET CREATION METHOD //
         method() {
             return this.ds.getMethod();
-        },
-
-        // FOLDERS //
-        folders() {
-            return this.ds.getFolders();
         },
         folderAncestors() {
             return this.ds.getAncestors(this.folder.id, true);
@@ -618,6 +618,8 @@ export default {
             sep_cd: "",
 
             text: text,
+
+            folders: []
         }
     },
 

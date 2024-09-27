@@ -316,11 +316,11 @@
 
                 <!-- MOVE FOLDER -->
                 <Folder @select-folder="selectFolderToMove" v-if="text.cleanup(moveFoldersSearch).length == 0"
-                    v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="ds.getFolders()" :level="0"
+                    v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="allFolders" :level="0"
                     :tab="false" />
 
                 <FolderTab @select-folder="selectFolderToMove" v-if="text.cleanup(moveFoldersSearch).length > 0"
-                    v-for="f in ds.getFolders().filter(f => text.cleanup(f.name, true).includes(text.cleanup(moveFoldersSearch, true)))"
+                    v-for="f in allFolders.filter(f => text.cleanup(f.name, true).includes(text.cleanup(moveFoldersSearch, true)))"
                     :key="f.id" :folder="f" />
             </div>
         </div>
@@ -372,12 +372,9 @@ export default {
     },
 
     computed: {
-        // CARD ID & DATA //
+        // CARD ID //
         cardId() {
             return Number(this.$route.params.id) || null;
-        },
-        cardIndex() {
-            return Number(this.folderCards.findIndex(card => card.id === this.cardId));
         },
 
         // CARD Q, A, STATUS //
@@ -391,13 +388,6 @@ export default {
             return this.card.status == 0 ? "grey" : this.card.status == 1 ? "err" : "succ";
         },
 
-        // FOLDER & RELATIONSHIPS //
-        folderCards() {
-            return this.ds.getCardsByFolder(this.folder.id);
-        },
-        folderAncestors() {
-            return this.ds.getAncestors(this.folder.id, true);
-        },
 
         // DATA STORE //
         ds() {
@@ -593,7 +583,7 @@ export default {
             this.editData.q = this.card.q;
             this.editData.a = this.card.a;
 
-            this.ds.getFolder(this.card.folder).then(folder => {
+            this.ds.getFolderById(this.card.folder).then(folder => {
                 this.folder = folder;
             });
         });
@@ -625,6 +615,21 @@ export default {
             showMoveFolders: false,
             moveFoldersSearch: "",
             moveFoldersLimit: 10,
+
+            // FOLDER DATA //
+            folderCards: [],
+            folderAncestors: []
+            
+        cardIndex() {
+            return Number(this.folderCards.findIndex(card => card.id === this.cardId));
+        },
+        // FOLDER & RELATIONSHIPS //
+        folderCards() {
+            return this.ds.getCardsByFolder(this.folder.id);
+        },
+        folderAncestors() {
+            return this.ds.getAncestors(this.folder.id, true);
+        },
         }
     },
 
@@ -650,7 +655,7 @@ export default {
                 if (!this.card)
                     this.cardExists = false; return;
 
-                this.ds.getFolder(this.card.folder).then(folder => {
+                this.ds.getFolderById(this.card.folder).then(folder => {
                     this.folder = folder;
                 });
             });

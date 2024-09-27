@@ -146,8 +146,8 @@ export default {
             });
         },
 
-        getFolder() {
-            this.ds.getFolder(this.folderId).then(f => {
+        getFolderById() {
+            this.ds.getFolderById(this.folderId).then(f => {
                 if (f) {
                     this.folder = f;
 
@@ -170,7 +170,7 @@ export default {
 
                 parents.forEach(p => {
                     let theme;
-                    this.ds.getFolder(p.id).then((f) => {
+                    this.ds.getFolderById(p.id).then((f) => {
                         theme = f.theme; str = `${str} &rarr; <span style='color: var(--${theme}2)'>${p.name}</span>`;
 
                         str = `${str} &rarr; `;
@@ -201,7 +201,7 @@ export default {
     },
 
     created() {
-        this.getFolder();
+        this.getFolderById();
     },
 
     data() {
@@ -221,7 +221,7 @@ export default {
     watch: {
         folderId(newVal, oldVal) {
             // get folder data when id changes
-            this.getFolder();
+            this.getFolderById();
         }
     }
 }

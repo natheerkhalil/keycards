@@ -21,7 +21,7 @@
             <p class="__tmd __tle __txt-grey-4 __padxs"
                 style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); "><span class="__bo"
                     v-html="hierarchy"></span><span class="__bo" :style="`color: var(--${folder.theme}2)`">{{
-                    folder.name }}</span>
+                        folder.name }}</span>
             </p>
             <br>
 
@@ -127,14 +127,6 @@ export default {
     },
 
     computed: {
-        parentFolder() {
-            if (this.folder.parent) {
-                return this.folders.find(f => f.id == this.folder.parent);
-            } else {
-                return null;
-            }
-        },
-
         ds() {
             return useDataStore();
         },
@@ -142,34 +134,33 @@ export default {
         themes() {
             return this.ds.getThemes();
         },
-
-        folders() {
-            return this.ds.getFolders();
-        }
     },
 
     created() {
         this.checkForParent();
 
+        this.ds.getAllFolders().then(res => {
+            this.folders = res;
+        });
+
 
         if (!this.folder.parent) {
             this.hierarchy = `Root &rarr; <span style='color: var(--${this.folder.theme}2)'>${this.folder.name}</span>`;
-        }
+        } else {
+            
+            let parents;
 
-        let parents = this.ds.getAncestors(this.folder.parent, false);
+            this.ds.getAncestors(this.folder.parent, false).then(res => {
+                console.log(res);
+                parents = res;
+            })
 
-        let str = "Root";
+            let str = "Root";
 
-        parents.forEach(p => {
-            let theme;
-            this.ds.getFolder(p.id).then((f) => {
-                theme = f.theme; str = `${str} &rarr; <span style='color: var(--${theme}2)'>${p.name}</span>`;
-
-                str = `${str} &rarr; `;
-
-                this.hierarchy = str;
+            parents.forEach(p => {
+                str += ` &rarr; <span style='color: var(--${p.theme}2)'>${p.name}</span>`;
             });
-        })
+        }
     },
 
     data() {
@@ -180,6 +171,9 @@ export default {
                 insideFolder: 232,
                 parent: null,
             },
+
+            parentFolder: null,
+            folders: [],
 
             text: text,
 

@@ -804,7 +804,7 @@ export default {
 
     created() {
         // UPDATE FOLDER EXISTS VARIABLE
-        this.ds.getFolder(this.folderId).then(r => {
+        this.ds.getFolderById(this.folderId).then(r => {
             if (r) {
                 this.folder = r;
 
@@ -850,7 +850,7 @@ export default {
             })
             this.allCards = this.cards;
 
-            this.ds.getFolder(newVal).then(folder => {
+            this.ds.getFolderById(newVal).then(folder => {
                 this.folder = folder;
             });
         },

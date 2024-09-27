@@ -123,6 +123,14 @@ if (MAINTENANCE_MODE !== "true" && MAINTENANCE_MODE !== "1") {
       component: function () {
         return import("@/views/404.vue");
       },
+    },
+
+    {
+      path: "/test",
+      name: "Test",
+      component: function () {
+        return import("@/views/Test.vue");
+      },
     }
   ];
 } else {
