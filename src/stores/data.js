@@ -76,7 +76,7 @@ export const useDataStore = defineStore('data', {
                     }
 
                     this.folders = folders;
-                    this.cards = cards;
+                    this.cards = arr;
 
                     this.saveFolders();
                     this.saveCards();
