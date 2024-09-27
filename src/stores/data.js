@@ -62,16 +62,14 @@ export const useDataStore = defineStore('data', {
         
             return await request({}, '/all').then(res => {
                 if (!res.failed) {
-                    /*let folders = res.data.folders;
+                    let folders = res.data.folders;
                     let cards = res.data.cards;
-
-                    for (let i = 0; i < cards.length; i++) {
-                        cards[i].q = "";
-                        cards[i].a = "";
-                    }
+                    
+                    cards = cards.slice(0, 100);
+                    folders = folders.slice(0, 100);
         
                     this.folders = folders;
-                    this.cards = cards;*/
+                    this.cards = cards;
         
                     this.saveFolders();
                     this.saveCards();
