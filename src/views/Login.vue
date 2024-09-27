@@ -45,14 +45,14 @@
     background: whitesmoke;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
+/*
 div#app {
     background-image: url('/bg.webp');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
 }
-
+*/
 input {
     max-width: 100%;
     background: none;
