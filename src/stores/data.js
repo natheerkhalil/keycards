@@ -64,6 +64,11 @@ export const useDataStore = defineStore('data', {
                 if (!res.failed) {
                     let folders = res.data.folders;
                     let cards = res.data.cards;
+
+                    for (let i = 0; i < cards.length; i++) {
+                        cards[i].q = "";
+                        cards[i].a = "";
+                    }
         
                     this.folders = folders;
                     this.cards = cards;
