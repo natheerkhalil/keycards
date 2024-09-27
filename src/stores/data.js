@@ -57,29 +57,36 @@ export const useDataStore = defineStore('data', {
                 console.log("Data already fetched");
                 return false;
             }
-            
+
             this.clearq();
-        
+
             return await request({}, '/all').then(res => {
                 if (!res.failed) {
                     let folders = res.data.folders;
                     let cards = res.data.cards;
-                    
-                    cards = cards.slice(0, 100);
-                    folders = folders.slice(0, 100);
-        
+
+                    let arr = [];
+
+                    for (let i = 0; i < cards.length; i++) {
+                        arr.push({
+                            status: cards[i].status,
+                            folder: cards[i].folder,
+                        }
+                        )
+                    }
+
                     this.folders = folders;
                     this.cards = cards;
-        
+
                     this.saveFolders();
                     this.saveCards();
 
                     this.clearq();
-        
+
                     return true;
                 } else {
                     useResponseStore().updateResponse("Failed to fetch data from server", "err");
-        
+
                     return false;
                 }
             });
