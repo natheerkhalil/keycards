@@ -80,9 +80,9 @@
                 <!-- FOLDER TITLE -->
                 <div class="__b _flex _cc _fd-co">
                     <p :class="`__b __tal __txl __bo`" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
-                    <p :style="`color: var(--${folder.theme}4)`"><strong>{{ ds.getDescendantCards(folder.id).length
+                    <p :style="`color: var(--${folder.theme}4)`"><strong>{{ cardCount
                             }}</strong> cards / <strong>{{
-                                ds.getDescendants(folder.id, false).length }}</strong> folders</p>
+                                folderCount }}</strong> folders</p>
                 </div>
 
                 <!-- CREATE BUTTONS -->
@@ -147,7 +147,7 @@
             </div>
         </div>
 
-        <div v-if="showChildrenFolders" class="__b _flex _fd-co">
+        <div v-if="childrenFolders.length > 0" class="__b _flex _fd-co">
 
             <br>
 
@@ -164,7 +164,8 @@
                 class="__b _flex _ai-ce _fd-ro __w __custscroll">
 
                 <!-- CHILDREN FOLDERS -->
-                <router-link style="margin-bottom: 10px; " v-for="v in childrenFolders.slice(0, folderLimit)"
+                <router-link style="margin-bottom: 10px; "
+                    v-for="v in childrenFolders.slice(0, folderLimit).filter(f => f.name.toLowerCase().includes(searchChildrenFolders.toLowerCase()))"
                     class="__nun" :to="`${v.id}`">
 
                     <div :id="`child-folder_${v.id}`"
@@ -190,36 +191,21 @@
                                 <!-- CHILD FOLDER CARDS -->
                                 <div class="_flex _fd-co">
                                     <p :style="`min-width: max-content; color: var(--${v.theme}4)`"><strong>{{
-                                        ds.getDescendantCards(v.id).length }}</strong> cards</p>
+                                        v.cardCount || 0 }}</strong> cards</p>
+
                                     <p :style="`min-width: max-content; color: var(--${v.theme}4)`"><strong>{{
-                                        ds.getDescendants(v.id, false).length }}</strong> folders</p>
+                                        v.folderCount || 0 }}</strong> folders</p>
                                 </div>
                             </div>
 
                             <br>
 
                             <!-- CHILD FOLDER PROGRESS -->
-                            <div :style="`background: linear-gradient(to right, ${ds.getFolderCardProgress(v.id)});`"
-                                class="progress">
-                                <div class="progress-overlay">
-                                    <span class="__bo __txt-err-4">{{ ds.getFolderCardStatus(v.id, 1) }}</span>
-
-                                    &nbsp;
-
-                                    <span class="__txt-grey-10">/</span>
-
-                                    &nbsp;
-
-                                    <span class="__bo __txt-succ-2">{{ ds.getFolderCardStatus(v.id, 2) }}</span>
-
-                                    &nbsp;
-
-                                    <span class="__txt-grey-10">/</span>
-
-                                    &nbsp;
-
-                                    <span class="__bo __txt-grey-3">{{ ds.getFolderCardStatus(v.id, 0) }}</span>
+                            <div :style="`background: linear-gradient(to right, ${v.progress});`" class="progress">
+                                <!-- FOLDER CARD PROGRESS -->
+                                <div v-html="v.overlay ? v.overlay : defaultOverlay" class="progress-overlay">
                                 </div>
+                                <!-- FOLDER CARD PROGRESS -->
                             </div>
                             <br>
                         </div>
@@ -232,160 +218,169 @@
 
         <br>
 
-        <div class="__b _flex _jc-be _ai-ce _m-sm-fd-co">
-            <div class="_flex _fd-ro _cc">
-                <!-- SELECT -->
-                <svg v-if="cards.length > 0" @click="selectAll"
-                    :class="[this.cards.filter(c => c.selected == true).length === this.cards.length ? ['__fill-1',] : ['__fi-grey-1'], '__po']"
-                    xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24">
-                    <path
-                        d="M8 10v4h4l-6 7-6-7h4v-4h-4l6-7 6 7h-4zm16 5h-10v2h10v-2zm0 6h-10v-2h10v2zm0-8h-10v-2h10v2zm0-4h-10v-2h10v2zm0-4h-10v-2h10v2z" />
-                </svg> &nbsp; &nbsp; &nbsp; &nbsp;
-
-                <div v-if="cards.filter(c => c.selected == true).length > 0" class="_flex _fd-ro">
-                    <!-- DELETE -->
-                    <svg @click="deleteSelected" width="27" height="27" class="__po __fi-grey-3 __hfi-5"
-                        clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
-                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="m4.015 5.494h-.253c-.413 0-.747-.335-.747-.747s.334-.747.747-.747h5.253v-1c0-.535.474-1 1-1h4c.526 0 1 .465 1 1v1h5.254c.412 0 .746.335.746.747s-.334.747-.746.747h-.254v15.435c0 .591-.448 1.071-1 1.071-2.873 0-11.127 0-14 0-.552 0-1-.48-1-1.071zm14.5 0h-13v15.006h13zm-4.25 2.506c-.414 0-.75.336-.75.75v8.5c0 .414.336.75.75.75s.75-.336.75-.75v-8.5c0-.414-.336-.75-.75-.75zm-4.5 0c-.414 0-.75.336-.75.75v8.5c0 .414.336.75.75.75s.75-.336.75-.75v-8.5c0-.414-.336-.75-.75-.75zm3.75-4v-.5h-3v.5z"
-                            fill-rule="nonzero" />
-                    </svg> &nbsp; &nbsp;
-
-                    <!-- MOVE -->
-                    <svg @click="moveSelected" width="27" height="27" class="__po __fi-grey-3 __hfi-5"
-                        clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
-                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 9v-7h6c1.695 1.942 2.371 3 4 3h12v4h-22zm-1 2l2 11h20l2-11h-24z" />
-                    </svg> &nbsp; &nbsp;
-
-                    <!-- MARK -->
-                    <svg class="__po" @click="markSelected(2)"
-                        style="margin-right: 5px; margin-left: 5px; fill: var(--succ_6); " width="27" height="27"
-                        clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
-                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
-                    </svg>
-
-                    <svg class="__po" @click="markSelected(1)"
-                        style="margin-right: 5px; margin-left: 5px; fill: var(--err_6); " width="27" height="27"
-                        clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
-                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
-                    </svg>
-
-                    <svg class="__po" @click="markSelected(0)"
-                        style="margin-right: 5px; margin-left: 5px; fill: var(--grey_6); " width="27" height="27"
-                        clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
-                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
-                    </svg>
-                </div>
+        <div style="position: relative; padding: 15px;" class="__b _flex _fd-co _cc">
+            <!-- PROCESSING OVERLAY -->
+            <div v-if="processingCards" class="_flex _jc-ce __bdxs"
+                style="position: absolute; height: 100%; z-index: 999; width: 100%; background: rgba(0,0,0,0.7); top: 0; right: 0;">
+                <div style="margin-top: 50px; width: 30px; height: 30px;" class="__loader"></div>
             </div>
 
-            <br class="_hide _m-sm-flex">
+            <div style="z-index: 0" class="__b _flex _jc-be _ai-ce _m-sm-fd-co">
+                <div class="_flex _fd-ro _cc">
+                    <!-- SELECT -->
+                    <svg v-if="cards.length > 0" @click="selectAll"
+                        :class="[this.cards.filter(c => c.selected == true).length === this.cards.length ? ['__fill-1',] : ['__fi-grey-1'], '__po']"
+                        xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24">
+                        <path
+                            d="M8 10v4h4l-6 7-6-7h4v-4h-4l6-7 6 7h-4zm16 5h-10v2h10v-2zm0 6h-10v-2h10v2zm0-8h-10v-2h10v2zm0-4h-10v-2h10v2zm0-4h-10v-2h10v2z" />
+                    </svg> &nbsp; &nbsp; &nbsp; &nbsp;
 
-            <!-- SEARCH CARDS -->
-            <input v-model="search" @input="searchCards" style="border: none; border-bottom: 1px solid var(--grey_7);"
-                type="text" placeholder="Search cards..."
-                class="__w __padxs __bg-grey-10 __txt-grey-1 __bod __bo-grey-7">
-        </div>
-
-        <br>
-
-        <div class="__b _fw-wr _flex _cc _fd-ro">
-            <!-- CARDS -->
-            <div style="flex-grow: 1;" v-if="searchResults.length == 0" v-for="v in cards.slice(0, cardLimit)"
-                :class='[["__bg-grey-6", "__bg-err-6", "__bg-succ-6"][Number(v.status)], "card", "__custscroll"]'>
-
-                <div @click="toggleSelected(v.id)" class="__po __b _flex _cc">
-                    <input v-model="v.selected" type="checkbox" class="custcheck">
-                </div>
-
-
-                <router-link class="__nun _flex __b _fd-co _ai-be __hack" :to="`/card/${v.id}`">
-
-                    <!-- CARD Q -->
-                    <p class="__txt-grey-10 __mauto __nosel" style="margin-top: 15px; max-width: 100%">{{ v.q }}</p>
-
-                    <div style="align-self: flex-end; margin-top: auto;" v-if="!v.showOptions" class="__b _flex _jc-en">
-                        <svg class="__hfi-grey-9 __fi-grey-10 __po" :id="`show-opts_${v.id}`" @click="options"
-                            width="20" height="20" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
-                            stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="m12.002 2c5.518 0 9.998 4.48 9.998 9.998 0 5.517-4.48 9.997-9.998 9.997-5.517 0-9.997-4.48-9.997-9.997 0-5.518 4.48-9.998 9.997-9.998zm2.498 9.995c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25zm-3.75 0c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25zm-3.75 0c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25z" />
-                        </svg>
-                    </div>
-
-                    <div v-if="v.showOptions" style="margin-top: 5px; " class="__b _flex _ai-ce _fw-wr _jc-ar">
+                    <div v-if="cards.filter(c => c.selected == true).length > 0" class="_flex _fd-ro">
                         <!-- DELETE -->
-                        <svg :id="`delete-card_${v.id}`" @click="deleteCard" width="20" height="20"
-                            class="__po __fi-grey-10 __hfi-grey-9" clip-rule="evenodd" fill-rule="evenodd"
-                            stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
+                        <svg @click="deleteSelected" width="27" height="27" class="__po __fi-grey-3 __hfi-5"
+                            clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="m4.015 5.494h-.253c-.413 0-.747-.335-.747-.747s.334-.747.747-.747h5.253v-1c0-.535.474-1 1-1h4c.526 0 1 .465 1 1v1h5.254c.412 0 .746.335.746.747s-.334.747-.746.747h-.254v15.435c0 .591-.448 1.071-1 1.071-2.873 0-11.127 0-14 0-.552 0-1-.48-1-1.071zm14.5 0h-13v15.006h13zm-4.25 2.506c-.414 0-.75.336-.75.75v8.5c0 .414.336.75.75.75s.75-.336.75-.75v-8.5c0-.414-.336-.75-.75-.75zm-4.5 0c-.414 0-.75.336-.75.75v8.5c0 .414.336.75.75.75s.75-.336.75-.75v-8.5c0-.414-.336-.75-.75-.75zm3.75-4v-.5h-3v.5z"
                                 fill-rule="nonzero" />
-                        </svg>
-
-                        <!-- EDIT -->
-                        <svg :id="`edit-card_${v.id}`" @click="editCard" width="20" height="20"
-                            class="__po __fi-grey-10 __hfi-grey-9" clip-rule="evenodd" fill-rule="evenodd"
-                            stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="m4.481 15.659c-1.334 3.916-1.48 4.232-1.48 4.587 0 .528.46.749.749.749.352 0 .668-.137 4.574-1.492zm1.06-1.061 3.846 3.846 11.321-11.311c.195-.195.293-.45.293-.707 0-.255-.098-.51-.293-.706-.692-.691-1.742-1.74-2.435-2.432-.195-.195-.451-.293-.707-.293-.254 0-.51.098-.706.293z"
-                                fill-rule="nonzero" />
-                        </svg>
+                        </svg> &nbsp; &nbsp;
 
                         <!-- MOVE -->
-                        <svg :id="`move-card_${v.id}`" @click="moveCard" width="20" height="20"
-                            class="__po __fi-grey-10 __hfi-grey-9" clip-rule="evenodd" fill-rule="evenodd"
-                            stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
+                        <svg @click="moveSelected" width="27" height="27" class="__po __fi-grey-3 __hfi-5"
+                            clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M1 9v-7h6c1.695 1.942 2.371 3 4 3h12v4h-22zm-1 2l2 11h20l2-11h-24z" />
-                        </svg>
+                        </svg> &nbsp; &nbsp;
 
                         <!-- MARK -->
-                        <svg :id="`mark-card_${v.id}`" @click="markCard" class="__po __fi-grey-10 __hfi-grey-9"
-                            xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                            <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
-                        </svg>
-
-                        <!-- HIDE OPTIONS -->
-                        <svg :id="`hide-opts_${v.id}`" @click="options" width="20" height="20"
-                            class="__po __fi-grey-10 __hfi-grey-9" clip-rule="evenodd" fill-rule="evenodd"
-                            stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm0 10.293l5.293-5.293.707.707-5.293 5.293 5.293 5.293-.707.707-5.293-5.293-5.293 5.293-.707-.707 5.293-5.293-5.293-5.293.707-.707 5.293 5.293z" />
-                        </svg>
-                    </div>
-
-                    <!-- UPDATE CARD STATUS -->
-                    <div v-if="v.showMark && v.showOptions" style="margin-top: 15px;" class="__b _flex _cc _fd-ro">
-                        <svg @click="updateCardStatus" :id="`status-2_${v.id}`" v-if="v.status != 2"
-                            style="margin-right: 5px; margin-left: 5px; fill: var(--succ_6); " width="20" height="20"
+                        <svg class="__po" @click="markSelected(2)"
+                            style="margin-right: 5px; margin-left: 5px; fill: var(--succ_6); " width="27" height="27"
                             clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
                         </svg>
-                        <svg @click="updateCardStatus" :id="`status-1_${v.id}`" v-if="v.status != 1"
-                            style="margin-right: 5px; margin-left: 5px; fill: var(--err_6); " width="20" height="20"
+
+                        <svg class="__po" @click="markSelected(1)"
+                            style="margin-right: 5px; margin-left: 5px; fill: var(--err_6); " width="27" height="27"
                             clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
                         </svg>
-                        <svg @click="updateCardStatus" :id="`status-0_${v.id}`" v-if="v.status != 0"
-                            style="margin-right: 5px; margin-left: 5px; fill: var(--grey_6); " width="20" height="20"
+
+                        <svg class="__po" @click="markSelected(0)"
+                            style="margin-right: 5px; margin-left: 5px; fill: var(--grey_6); " width="27" height="27"
                             clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
                         </svg>
                     </div>
+                </div>
 
-                </router-link>
+                <br class="_hide _m-sm-flex">
 
+                <!-- SEARCH CARDS -->
+                <input v-model="search" @input="searchCards"
+                    style="border: none; border-bottom: 1px solid var(--grey_7);" type="text"
+                    placeholder="Search cards..." class="__w __padxs __bg-grey-10 __txt-grey-1 __bod __bo-grey-7">
+            </div>
+
+            <br>
+
+            <div style="z-index: 0" class="__b _fw-wr _flex _cc _fd-ro">
+                <!-- CARDS -->
+                <div style="flex-grow: 1;" v-if="searchResults.length == 0" v-for="v in cards.slice(0, cardLimit)"
+                    :class='[["__bg-grey-6", "__bg-err-6", "__bg-succ-6"][Number(v.status)], "card", "__custscroll"]'>
+
+                    <div @click="toggleSelected(v.id)" class="__po __b _flex _cc">
+                        <input v-model="v.selected" type="checkbox" class="custcheck">
+                    </div>
+
+
+                    <router-link class="__nun _flex __b _fd-co _ai-be __hack" :to="`/card/${v.id}`">
+
+                        <!-- CARD Q -->
+                        <p class="__txt-grey-10 __mauto __nosel" style="margin-top: 15px; max-width: 100%">{{ v.q }}</p>
+
+                        <div style="align-self: flex-end; margin-top: auto;" v-if="!v.showOptions"
+                            class="__b _flex _jc-en">
+                            <svg class="__hfi-grey-9 __fi-grey-10 __po" :id="`show-opts_${v.id}`" @click="options"
+                                width="20" height="20" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
+                                stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="m12.002 2c5.518 0 9.998 4.48 9.998 9.998 0 5.517-4.48 9.997-9.998 9.997-5.517 0-9.997-4.48-9.997-9.997 0-5.518 4.48-9.998 9.997-9.998zm2.498 9.995c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25zm-3.75 0c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25zm-3.75 0c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25z" />
+                            </svg>
+                        </div>
+
+                        <div v-if="v.showOptions" style="margin-top: 5px; " class="__b _flex _ai-ce _fw-wr _jc-ar">
+                            <!-- DELETE -->
+                            <svg :id="`delete-card_${v.id}`" @click="deleteCard" width="20" height="20"
+                                class="__po __fi-grey-10 __hfi-grey-9" clip-rule="evenodd" fill-rule="evenodd"
+                                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="m4.015 5.494h-.253c-.413 0-.747-.335-.747-.747s.334-.747.747-.747h5.253v-1c0-.535.474-1 1-1h4c.526 0 1 .465 1 1v1h5.254c.412 0 .746.335.746.747s-.334.747-.746.747h-.254v15.435c0 .591-.448 1.071-1 1.071-2.873 0-11.127 0-14 0-.552 0-1-.48-1-1.071zm14.5 0h-13v15.006h13zm-4.25 2.506c-.414 0-.75.336-.75.75v8.5c0 .414.336.75.75.75s.75-.336.75-.75v-8.5c0-.414-.336-.75-.75-.75zm-4.5 0c-.414 0-.75.336-.75.75v8.5c0 .414.336.75.75.75s.75-.336.75-.75v-8.5c0-.414-.336-.75-.75-.75zm3.75-4v-.5h-3v.5z"
+                                    fill-rule="nonzero" />
+                            </svg>
+
+                            <!-- EDIT -->
+                            <svg :id="`edit-card_${v.id}`" @click="editCard" width="20" height="20"
+                                class="__po __fi-grey-10 __hfi-grey-9" clip-rule="evenodd" fill-rule="evenodd"
+                                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="m4.481 15.659c-1.334 3.916-1.48 4.232-1.48 4.587 0 .528.46.749.749.749.352 0 .668-.137 4.574-1.492zm1.06-1.061 3.846 3.846 11.321-11.311c.195-.195.293-.45.293-.707 0-.255-.098-.51-.293-.706-.692-.691-1.742-1.74-2.435-2.432-.195-.195-.451-.293-.707-.293-.254 0-.51.098-.706.293z"
+                                    fill-rule="nonzero" />
+                            </svg>
+
+                            <!-- MOVE -->
+                            <svg :id="`move-card_${v.id}`" @click="moveCard" width="20" height="20"
+                                class="__po __fi-grey-10 __hfi-grey-9" clip-rule="evenodd" fill-rule="evenodd"
+                                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 9v-7h6c1.695 1.942 2.371 3 4 3h12v4h-22zm-1 2l2 11h20l2-11h-24z" />
+                            </svg>
+
+                            <!-- MARK -->
+                            <svg :id="`mark-card_${v.id}`" @click="markCard" class="__po __fi-grey-10 __hfi-grey-9"
+                                xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                                <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
+                            </svg>
+
+                            <!-- HIDE OPTIONS -->
+                            <svg :id="`hide-opts_${v.id}`" @click="options" width="20" height="20"
+                                class="__po __fi-grey-10 __hfi-grey-9" clip-rule="evenodd" fill-rule="evenodd"
+                                stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm0 10.293l5.293-5.293.707.707-5.293 5.293 5.293 5.293-.707.707-5.293-5.293-5.293 5.293-.707-.707 5.293-5.293-5.293-5.293.707-.707 5.293 5.293z" />
+                            </svg>
+                        </div>
+
+                        <!-- UPDATE CARD STATUS -->
+                        <div v-if="v.showMark && v.showOptions" style="margin-top: 15px;" class="__b _flex _cc _fd-ro">
+                            <svg @click="updateCardStatus" :id="`status-2_${v.id}`" v-if="v.status != 2"
+                                style="margin-right: 5px; margin-left: 5px; fill: var(--succ_6); " width="20"
+                                height="20" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
+                                stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
+                            </svg>
+                            <svg @click="updateCardStatus" :id="`status-1_${v.id}`" v-if="v.status != 1"
+                                style="margin-right: 5px; margin-left: 5px; fill: var(--err_6); " width="20" height="20"
+                                clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
+                            </svg>
+                            <svg @click="updateCardStatus" :id="`status-0_${v.id}`" v-if="v.status != 0"
+                                style="margin-right: 5px; margin-left: 5px; fill: var(--grey_6); " width="20"
+                                height="20" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
+                                stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="11.998" cy="11.998" fill-rule="nonzero" r="9.998" />
+                            </svg>
+                        </div>
+
+                    </router-link>
+
+                </div>
             </div>
         </div>
     </div>
@@ -408,11 +403,11 @@
 
                 <!-- MOVE FOLDER -->
                 <Folder @select-folder="selectFolderToMove" v-if="!text.cleanup(moveFoldersSearch)"
-                    v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="ds.getFolders()"
-                    :omit="[this.folderId]" :level="0" :tab="false" />
+                    v-for="f in orphanFolders" :key="f.id" :folder="f" :allFolders="allFolders" :omit="[this.folderId]"
+                    :level="0" :tab="false" />
 
                 <FolderTab @select-folder="selectFolderToMove" v-if="text.cleanup(moveFoldersSearch).length > 0"
-                    v-for="f in ds.getFolders().filter(f => text.cleanup(f.name, true).includes(text.cleanup(moveFoldersSearch, true)))"
+                    v-for="f in allFolders.filter(f => text.cleanup(f.name, true).includes(text.cleanup(moveFoldersSearch, true)))"
                     :key="f.id" :omit="[this.folderId]" :folder="f" />
             </div>
         </div>
@@ -444,27 +439,13 @@ export default {
     },
 
     computed: {
-        // GLOBAL FOLDERS //
-        globalFolders() {
-            return this.ds.getFolders();
-        },
-
-        // FOLDER ANCESTORS //
-        folderAncestors() {
-            return this.ds.getAncestors(this.folder.id);
-        },
-
-        // FOLDER PROPERTIES //
+        // FOLDER ID // 
         folderId() {
             return this.$route.params.id || null;
         },
-        childrenFolders() {
-            return this.ds.getChildren(this.folderId).filter(f => text.cleanup(f.name, true).includes(this.searchChildrenFolders));
-        },
-
         // CHECK IF CHILDREN FOLDERS LENGTH > 0 //
         showChildrenFolders() {
-            return this.ds.getChildren(this.folderId).length > 0;
+            return this.childrenFolders.length > 0;
         },
 
         // GET ALL THEMES //
@@ -480,12 +461,30 @@ export default {
 
     data() {
         return {
+            processingCards: false,
+
             // FOLDER EXISTS
             folderExists: false,
 
             // FOLDER
             folder: null,
             folderCards: [],
+
+            // COUNT //
+            cardCount: 0,
+            folderCount: 0,
+
+            // GLOBAL FOLDERS //
+            globalFolders: [],
+            allFolders: [],
+            orphanFolders: [],
+
+            // FOLDER ANCESTORS //
+            folderAncestors: [],
+
+            // CHILDREN FOLDERS //
+            childrenFolders: [],
+            descendantFolders: [],
 
             // FOLDERS TO MOVE CARDS INTO
             moveFoldersSearch: "",
@@ -506,11 +505,30 @@ export default {
             searchResults: [],
 
             // CARD DATA
+            descendantCards: [],
             allCards: [],
             cards: [],
 
             // SEARCH CHILDREN FOLDERS
             searchChildrenFolders: "",
+
+            // DEFAULTS
+            defaultOverlay: `<span class="__bo __txt-err-4">0</span>
+&nbsp;
+
+<span class="__txt-grey-10">/</span>
+
+&nbsp;
+
+<span class="__bo __txt-succ-2">0</span>
+
+&nbsp;
+
+<span class="__txt-grey-10">/</span>
+
+&nbsp;
+
+<span class="__bo __txt-grey-3">0</span>`,
 
             // TEXT UTILITIES
             text: text,
@@ -518,20 +536,93 @@ export default {
     },
 
 
+    created() {
+        this.initialiseFolder();
+    },
+
+
     methods: {
+        // INITIALISE FOLDER DATA //
+        initialiseFolder() {
+
+            // UPDATE FOLDER EXISTS VARIABLE
+            this.ds.getFolderById(this.folderId).then(folder => {
+                this.folder = folder;
+                this.folderExists = !!folder;
+            });
+
+            // SET FOLDER RELATIONS
+            this.ds.getAllFolders().then(folders => {
+                this.globalFolders = folders;
+                this.allFolders = folders;
+            });
+            this.ds.getOrphanFolders(this.folderId).then(folders => {
+                this.orphanFolders = folders;
+            });
+            this.ds.getAncestors(this.folderId).then(ancestors => {
+                this.folderAncestors = ancestors.reverse();
+            });
+            this.ds.getChildren(this.folderId).then(descendants => {
+                this.folderDescendants = descendants;
+            });
+
+            // SET CARDS
+            this.ds.getCardsByFolder(this.folderId).then(cards => {
+                this.cards = cards;
+                this.allCards = cards;
+            });
+
+            // SET DESCENDANT CARDS 
+            this.ds.getDescendantCards(this.folderId).then(descendantCards => {
+                this.descendantCards = descendantCards;
+            });
+
+            // SET DESCENDANTS & CHILDREN
+            this.ds.getDescendants(this.folderId, true).then(descendants => {
+                this.descendantFolders = descendants;
+            });
+            this.ds.getChildren(this.folderId, false).then(children => {
+                for (let i = 0; i < children.length; i++) {
+                    let c = children[i];
+
+                    // card count
+                    this.ds.getDescendantCards(c.id).then(descendantCards => {
+                        children[i]["cardCount"] = descendantCards.length;
+                    });
+                    // folder count
+                    this.ds.getDescendants(c.id, true).then(descendants => {
+                        children[i]["folderCount"] = descendants.length;
+                    });
+
+
+                    // progress overlay
+                    this.ds.getFolderProgressOverlay(c.id).then(overlay => {
+                        children[i]["overlay"] = overlay;
+                    })
+                    // card progress
+                    this.ds.getFolderCardProgress(c.id).then(progress => {
+                        children[i]["progress"] = progress;
+                    })
+                }
+
+                this.childrenFolders = children;
+            });
+
+            this.debounceUpdateFolderLimit = debounce(this.updateFolderLimit, 200);
+        },
         // DELETE FOLDER //
         deleteFolder() {
             if (!window.confirm("Are you sure you want to delete this folder?")) {
                 return;
             }
 
-            if (this.ds.getDescendants(this.folderId, false).length > 0) {
+            if (this.childrenFolders.length > 0) {
                 useResponseStore().updateResponse("This folder contains folders. Move these to another folder or delete these first to continue.", "warn");
 
                 return;
             }
 
-            if (this.ds.getCardsByFolder(this.folderId).length > 0) {
+            if (this.cards.length > 0) {
                 useResponseStore().updateResponse("This folder contains cards. Move these cards to another folder or delete them first to continue.", "warn");
 
                 return;
@@ -647,9 +738,18 @@ export default {
             let status = e.target.id.split("_")[0] || e.target.parentElement.id.split("_")[0]
             status = status.split("-")[1];
 
-            this.ds.markCard(id, status);
+            let old_status = this.cards.find(card => card.id === id).status;
 
             this.cards.find(card => card.id === id).status = status;
+            this.cards.find(card => card.id === id).showOptions = false;
+
+            this.ds.markCards([id], status).then(r => {
+                if (!r) {
+                    useResponseStore().updateResponse("Failed to mark card", "err");
+                    this.cards.find(card => card.id === id).status = old_status;
+                    return;
+                }
+            })
         },
 
         // MOVING CARD //
@@ -678,8 +778,6 @@ export default {
 
             if (window.confirm("Are you sure you want to move " + this.cardsToBeMoved.length + " card(s) to the folder: " + this.globalFolders.find(f => f.id === id).name + "?")) {
 
-                console.log(this.cardsToBeMoved);
-
                 this.ds.moveCards(this.cardsToBeMoved, id).then(r => {
                     if (!r) {
                         useResponseStore().updateResponse("Failed to move cards", "err");
@@ -687,12 +785,10 @@ export default {
                     } else {
                         useResponseStore().updateResponse("Cards moved successfully", "succ");
 
-                        this.cards.filter(c => this.cardsToBeMoved.includes(c.id)).forEach(card => card.folder = id);
-
                         this.cardsToBeMoved = [];
                         this.showmoveFolders = false;
 
-                        this.cards = this.cards.filter(c => c.folder == this.folder.id);
+                        this.initialiseFolder();
                     }
                 })
             }
@@ -716,19 +812,25 @@ export default {
         deleteSelected() {
             if (window.confirm("Are you sure you want to delete the selected cards?")) {
 
-                useResponseStore().updateResponse("Deleting selected cards...", "info");
+                this.processingCards = true;
+
+                let cardsToDelete = this.cards.filter(c => c.selected == true).map(c => Number(c.id));
 
                 try {
 
-                    this.ds.deleteCards(this.cards.filter(c => c.selected == true)).then(r => {
+                    this.ds.deleteCards(cardsToDelete).then(r => {
                         if (!r) {
                             useResponseStore().updateResponse("Failed to delete selected cards", "err");
+                            this.processingCards = false;
                             return;
                         }
 
-                        this.cards = this.ds.getCardsByFolder(this.folderId);
+                        this.ds.getCardsByFolder().then(cards => {
+                            this.cards = cards;
+                        });
 
                         useResponseStore().updateResponse("Selected cards deleted successfully", "succ");
+                        this.processingCards = false;
                         return;
                     })
 
@@ -746,7 +848,7 @@ export default {
         moveSelected() {
             this.cards.forEach(c => {
                 if (c.selected) {
-                    this.cardsToBeMoved.push(c.id);
+                    if (!this.cardsToBeMoved.includes(c.id)) this.cardsToBeMoved.push(c.id);
                 };
             });
 
@@ -771,7 +873,9 @@ export default {
 
             if (window.confirm(`Are you sure you want to mark the selected cards as ${msg}?`)) {
 
-                this.ds.markCards([this.cards.filter(c => c.selected == true)], status).then(r => {
+                this.processingCards = true;
+
+                this.ds.markCards(this.cards.filter(c => c.selected == true).map(c => c.id), status).then(r => {
                     if (r) {
                         useResponseStore().updateResponse("Selected cards marked successfully", "succ");
 
@@ -779,9 +883,12 @@ export default {
 
                         this.cards.forEach(c => c.selected = false);
 
+                        this.processingCards = false;
+
                         return;
                     } else {
                         useResponseStore().updateResponse("Failed to mark selected cards", "err");
+                        this.processingCards = false;
                         return;
                     }
                 })
@@ -800,24 +907,6 @@ export default {
                 this.folderLimit += 25;
             }
         }
-    },
-
-    created() {
-        // UPDATE FOLDER EXISTS VARIABLE
-        this.ds.getFolderById(this.folderId).then(r => {
-            if (r) {
-                this.folder = r;
-
-                this.folderExists = true;
-            } else {
-                this.folderExists = false;
-            }
-        })
-
-        this.cards = this.ds.getCards(this.folderId);
-        this.allCards = this.cards;
-
-        this.debounceUpdateFolderLimit = debounce(this.updateFolderLimit, 200);
     },
 
     mounted() {
@@ -845,20 +934,16 @@ export default {
 
     watch: {
         folderId(newVal, oldVal) {
-            this.ds.verifyCards(this.ds.getCards(newVal)).then(r => {
-                this.cards = r;
-            })
-            this.allCards = this.cards;
-
-            this.ds.getFolderById(newVal).then(folder => {
-                this.folder = folder;
-            });
+            this.initialiseFolder();
         },
 
-        /*folderCards(newVal, oldVal) {
-            this.cards = this.ds.getCardsByFolder(this.folderId);
-            this.allCards = this.cards;
-        }*/
+        descendantCards(newVal, oldVal) {
+            this.cardCount = newVal.length;
+        },
+
+        descendantFolders(newVal, oldVal) {
+            this.folderCount = newVal.length;
+        },
     }
 }
 </script>

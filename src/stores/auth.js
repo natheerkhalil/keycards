@@ -85,8 +85,15 @@ export const uauth = defineStore('auth', {
 
         // LOGOUT //
         async logout() {
-            // clear local storage and axios headers
-            localStorage.clear();
+            // clear indexed db
+            useDataStore().clearData();
+
+            // clear session data
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_username');
+            localStorage.removeItem('auth_email');
+
+            // clear axios header
             delete axios.defaults.headers.common['Authorization'];
 
             // delete session from server

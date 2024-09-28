@@ -19,8 +19,7 @@
                     <p class="__bo __tmd __tle" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
 
                     <!-- MOVE FOLDER CARD COUNT -->
-                    <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; <strong>{{ ds.getDescendantCards(folder.id).length
-                            }}</strong> cards</p>
+                    <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; <strong>{{ cardCount.find(c => c.id == folder.id)?.count || "0" }}&nbsp;</strong>cards</p>
                 </div>
             </div>
 
@@ -33,8 +32,8 @@
         </div>
 
         <div v-if="!collapsed" class="_flex _fd-co">
-            <Folder @select-folder="selectFolder(child.id)" v-for="child in children" :key="child.id" :folder="child" :allFolders="allFolders"
-                :level="level + 1" />
+            <Folder @select-folder="selectFolder(child.id)" v-for="child in children" :key="child.id" :folder="child"
+                :allFolders="allFolders" :level="level + 1" />
         </div>
     </div>
 
@@ -47,7 +46,10 @@ import { useResponseStore } from '@/stores/response';
 export default {
     data() {
         return {
-            folders: useDataStore().getFolders(),
+            folders: [],
+            cards: [],
+
+            cardCount: [],
 
             ds: useDataStore(),
 
@@ -73,6 +75,25 @@ export default {
                 width: `calc(100% - ${this.level * 15}px)`
             };
         }
+    },
+
+    created() {
+        this.ds.getAllCards().then(cards => {
+            this.cards = cards;
+
+            this.ds.getAllFolders().then(folders => {
+                this.folders = folders;
+
+                for (let f of folders) {
+                    this.ds.getDescendantCards(f.id).then(cards => {
+                        this.cardCount.push({
+                            id: f.id,
+                            count: cards.length
+                        })
+                    })
+                }
+            });
+        });
     },
 
     methods: {

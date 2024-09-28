@@ -234,9 +234,9 @@
 
 /* Loader */
 .__loader {
-  border: 10px solid var(--grey_9);
+  border: 10px solid var(--grey_10);
   border-radius: 50%;
-  border-top: 10px solid var(--theme3);
+  border-top: 10px solid var(--theme4);
   min-width: 120px;
   min-height: 120px;
   -webkit-animation: spin 2s linear infinite;

@@ -66,15 +66,38 @@ import { text } from '@/main';
 
 export default {
     methods: {
-        checkForParent() {
-            let parent = this.$route.query.p;
+        initialiseFolder() {
+            this.ds.getAllFolders().then(res => {
+                this.folders = res;
+            });
 
-            if (parent) {
-                parent = this.folders.find(f => f.id == parent);
+            this.hierarchy = `Root &rarr; <span style='color: var(--${this.folder.theme}2)'>${this.folder.name}</span>`;
 
-                if (parent) {
-                    this.folder.parent = parent.id;
-                }
+            if (this.parent) {
+                parent = this.ds.getFolderById(this.parent).then(folder => {
+                    console.log("Parent folder: ", folder);
+                    if (folder) {
+                        this.folder.parent = folder.id;
+
+                        let parents;
+
+                        this.ds.getAncestors(this.parent, false).then(res => {
+                            parents = res;
+
+                            console.log(res);
+
+                            let str = "Root";
+
+                            parents.forEach(p => {
+                                str += ` &rarr; <span style='color: var(--${p.theme}2)'>${p.name}</span>`;
+                            });
+
+                            str += ` &rarr; <span style='color: var(--${this.folder.theme}2)'>${this.folder.name}</span>`;
+
+                            this.hierarchy = str;
+                        })
+                    }
+                })
             }
         },
 
@@ -84,20 +107,20 @@ export default {
             this.processing = true;
 
             let name = text.cleanup(this.folder.name);
+            let theme = this.folder.theme;
+            let parent = null;
 
-            if (name.length == 0 || name > 150) {
+            if (name.length == 0 || name.length > 150) {
                 this.processing = false;
                 useResponseStore().updateResponse("Folder name must be between 1 and 150 characters long", "warn");
                 return;
             }
 
-            if (this.folder.parent && !this.ds.getFolders().find(f => f.id == this.folder.parent)) {
-                this.folder.parent = null;
+            if (this.ds.getFolderById(this.folder.parent)) {
+                parent = this.folder.parent;
             }
 
-            this.folder.name = name;
-
-            let data = [this.folder.name, this.folder.parent, this.folder.theme];
+            let data = [name, parent, theme];
 
             this.ds.createFolder(data).then(res => {
                 if (res) {
@@ -127,6 +150,10 @@ export default {
     },
 
     computed: {
+        parent() {
+            return this.$route.query.p;
+        },
+
         ds() {
             return useDataStore();
         },
@@ -137,30 +164,7 @@ export default {
     },
 
     created() {
-        this.checkForParent();
-
-        this.ds.getAllFolders().then(res => {
-            this.folders = res;
-        });
-
-
-        if (!this.folder.parent) {
-            this.hierarchy = `Root &rarr; <span style='color: var(--${this.folder.theme}2)'>${this.folder.name}</span>`;
-        } else {
-            
-            let parents;
-
-            this.ds.getAncestors(this.folder.parent, false).then(res => {
-                console.log(res);
-                parents = res;
-            })
-
-            let str = "Root";
-
-            parents.forEach(p => {
-                str += ` &rarr; <span style='color: var(--${p.theme}2)'>${p.name}</span>`;
-            });
-        }
+        this.initialiseFolder();
     },
 
     data() {
@@ -168,7 +172,6 @@ export default {
             folder: {
                 name: "",
                 theme: useDataStore().getThemes()[Math.floor(Math.random() * useDataStore().getThemes().length)],
-                insideFolder: 232,
                 parent: null,
             },
 

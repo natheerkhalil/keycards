@@ -466,10 +466,10 @@ export default {
                     this.ds.markCards([this.card.id], 2);
                     break;
                 case 1:
-                    this.ds.markCard([this.card.id], 1);
+                    this.ds.markCards([this.card.id], 1);
                     break;
                 case 0:
-                    this.ds.markCard([this.card.id], 0);
+                    this.ds.markCards([this.card.id], 0);
                     break;
             }
 
@@ -574,6 +574,7 @@ export default {
     },
 
     created() {
+        // SET CARD DATA //
         this.ds.getCard(this.cardId).then(card => {
             this.card = card;
 
@@ -584,7 +585,16 @@ export default {
             this.editData.a = this.card.a;
 
             this.ds.getFolderById(this.card.folder).then(folder => {
+                // SET FOLDER //    
                 this.folder = folder;
+
+                // SET FOLDER RELATIONS //
+                this.ds.getCardsByFolder(this.folder.id).then(cards => {
+                    this.folderCards = cards;
+                });
+                this.ds.getAncestors(this.folder.id).then(ancestors => {
+                    this.folderAncestors = ancestors;
+                });
             });
         });
     },
@@ -616,20 +626,18 @@ export default {
             moveFoldersSearch: "",
             moveFoldersLimit: 10,
 
-            // FOLDER DATA //
+            // IDB DATA //
             folderCards: [],
-            folderAncestors: []
-            
-        cardIndex() {
-            return Number(this.folderCards.findIndex(card => card.id === this.cardId));
-        },
-        // FOLDER & RELATIONSHIPS //
-        folderCards() {
-            return this.ds.getCardsByFolder(this.folder.id);
-        },
-        folderAncestors() {
-            return this.ds.getAncestors(this.folder.id, true);
-        },
+            folderAncestors: [],
+
+
+            // FOLDER & RELATIONSHIPS //
+            folderCards() {
+                return this.ds.getCardsByFolder(this.folder.id);
+            },
+            folderAncestors() {
+                return this.ds.getAncestors(this.folder.id, true);
+            },
         }
     },
 

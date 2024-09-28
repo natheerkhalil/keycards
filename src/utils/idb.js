@@ -19,8 +19,10 @@ export const getAllFolders = async () => {
 };
 
 export const getFolderById = async (id) => {
+  id = Number(id);
   const db = await dbPromise;
-  return db.get('folders', id);
+  const result = await db.get('folders', Number(id));
+  return result;
 };
 
 export const saveFolder = async (folder) => {
@@ -29,6 +31,7 @@ export const saveFolder = async (folder) => {
 };
 
 export const deleteFolderById = async (id) => {
+  id = Number(id);
   const db = await dbPromise;
   return db.delete('folders', id);
 };
@@ -40,6 +43,7 @@ export const getAllCards = async () => {
 };
 
 export const getCardById = async (id) => {
+  id = Number(id);
   const db = await dbPromise;
   return db.get('cards', id);
 };
@@ -50,17 +54,24 @@ export const saveCard = async (card) => {
 };
 
 export const deleteCardById = async (id) => {
+  id = Number(id);
   const db = await dbPromise;
   return db.delete('cards', id);
 };
 
 // Utility functions to get by folder or update multiple records
 export const getCardsByFolder = async (folderId) => {
-  const db = await dbPromise;
-  return db.getAllFromIndex('cards', 'folder', folderId);
+  const cards = await getAllCards();
+  const results = cards.filter((card) => card.folder == folderId);
+  return results;
 };
 
 export const updateCard = async (card) => {
   const db = await dbPromise;
   return db.put('cards', card);
+};
+
+export const updateFolder = async (folder) => {
+  const db = await dbPromise;
+  return db.put('folders', folder);
 };

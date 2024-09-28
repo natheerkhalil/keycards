@@ -1,5 +1,20 @@
 <template>
-    <div class="__15 __w __mlauto __mrauto _flex _fd-co">
+    <div v-if="!folderExists" class="__b _flex _cc _fd-co">
+        <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24">
+            <path
+                d="M12 1c-6.338 0-12 4.226-12 10.007 0 2.05.738 4.063 2.047 5.625.055 1.83-1.023 4.456-1.993 6.368 2.602-.47 6.301-1.508 7.978-2.536 9.236 2.247 15.968-3.405 15.968-9.457 0-5.812-5.701-10.007-12-10.007zm0 15c-.565 0-1.024-.459-1.024-1.025 0-.565.459-1.024 1.024-1.024.566 0 1.024.459 1.024 1.024 0 .566-.458 1.025-1.024 1.025zm1.606-4.858c-.74.799-.775 1.241-.766 1.785h-1.643c-.006-1.208.016-1.742 1.173-2.842.469-.446.84-.799.788-1.493-.047-.66-.599-1.004-1.117-1.004-.581 0-1.261.432-1.261 1.649h-1.646c0-1.966 1.155-3.237 2.941-3.237.849 0 1.592.278 2.09.783.468.473.709 1.125.7 1.883-.013 1.134-.704 1.878-1.259 2.476z" />
+        </svg>
+
+        <br>
+
+        <p class="__b __tal __tgl">Whoops!</p>
+
+        <br>
+
+        <p class="__b __tal __tm">We couldn't seem to find this folder</p>
+    </div>
+
+    <div v-if="folderExists" class="__15 __w __mlauto __mrauto _flex _fd-co">
 
         <div :style="`background-image: url('/themes/${folder.theme}.png'); position: relative; background-position: center; background-size: cover; `"
             class="__b _flex _fd-co">
@@ -111,7 +126,8 @@
 
         <div class="__b _flex">
             <p v-if="method == 's'"><strong :class="[noOfCards > 500 ? '__txt-err-4' : '']">{{ noOfCards }}</strong> /
-                <span class="__txt-grey-3">500 cards</span></p>
+                <span class="__txt-grey-3">500 cards</span>
+            </p>
         </div>
 
         <div class="__b _flex">
@@ -134,8 +150,8 @@
                 </div>
                 <br>
                 <div style="margin-bottom: 7.5px;" class="__b _flex _jc-en">
-                    <svg v-if="cards.length > 1" @click="deleteCard(c.id)" class="__po __fi-err-5 __hfi-err-6" width="24"
-                        height="24" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
+                    <svg v-if="cards.length > 1" @click="deleteCard(c.id)" class="__po __fi-err-5 __hfi-err-6"
+                        width="24" height="24" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
                         stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="m20.015 6.506h-16v14.423c0 .591.448 1.071 1 1.071h14c.552 0 1-.48 1-1.071 0-3.905 0-14.423 0-14.423zm-5.75 2.494c.414 0 .75.336.75.75v8.5c0 .414-.336.75-.75.75s-.75-.336-.75-.75v-8.5c0-.414.336-.75.75-.75zm-4.5 0c.414 0 .75.336.75.75v8.5c0 .414-.336.75-.75.75s-.75-.336-.75-.75v-8.5c0-.414.336-.75.75-.75zm-.75-5v-1c0-.535.474-1 1-1h4c.526 0 1 .465 1 1v1h5.254c.412 0 .746.335.746.747s-.334.747-.746.747h-16.507c-.413 0-.747-.335-.747-.747s.334-.747.747-.747zm4.5 0v-.5h-3v.5z"
@@ -158,7 +174,7 @@
         </form>
 
         <form v-if="method == 's'" @submit.prevent="create" class="__b _flex __mlauto __mrauto _fd-co">
-            <textarea :placeholder="`Question\n${this.sep_qa}\nAnswer\n${this.sep_cd}`" maxlength="9999"
+            <textarea :placeholder="`Question\n${this.sep_qa}\nAnswer\n${this.sep_cd}`" 
                 v-model="cards2" style="height: 400px; max-height: 500px; overflow-y: auto; resize: none;"
                 class="outline-focus __padsm __bo-grey-7 __bo-2 __b __bdsm"></textarea>
             <br>
@@ -413,7 +429,7 @@ export default {
                 }
 
                 // If array has more than 500 cards, return
-                if (cds.length > 500) {
+                if (this.noOfCards.length > 500) {
                     this.processing = false;
                     useResponseStore().updateResponse("You can't create more than 500 cards.", "warn");
                     return;
@@ -486,7 +502,10 @@ export default {
                 // Create cards
                 this.ds.createCards(arr, this.folderId).then(r => {
                     if (!r) {
+                        console.log("cards", arr);
                         useResponseStore().updateResponse("Failed to create cards.", "err");
+
+                        this.processing = false;
 
                         return;
                     } else {
@@ -522,24 +541,28 @@ export default {
             });
         },
         deleteCard(id) {
-            this.cards = this.cards.filter(c => c.id!== id);
+            this.cards = this.cards.filter(c => c.id !== id);
         },
 
         // SET FOLDER //
         setFolder() {
-            let folder = this.folderId;
-
-            if (!folder) {
-                this.$router.push({ name: '404' });
+            if (!this.folderId) {
                 return;
             }
 
-            if (!this.folders.find(f => f.id == folder)) {
-                this.$router.push({ name: '404' });
-                return;
-            }
+            this.ds.getFolderById(this.folderId).then(t => {
+                if (!t) {
+                    return;
+                }
 
-            this.folder = this.folders.find(f => f.id == folder);
+                this.folder = t;
+
+                this.folderExists = true;
+
+                this.ds.getAncestors(this.folderId).then(ancestors => {
+                    this.folderAncestors = ancestors;
+                });
+            });
         },
     },
 
@@ -547,7 +570,7 @@ export default {
         // set all folders
         this.ds.getAllFolders().then(res => {
             this.folders = res;
-            
+
             this.setFolder();
         })
 
@@ -558,10 +581,7 @@ export default {
     computed: {
         // GET CREATION METHOD //
         method() {
-            return this.ds.getMethod();
-        },
-        folderAncestors() {
-            return this.ds.getAncestors(this.folder.id, true);
+            return this.ds.method;
         },
 
         // FOLDER ID //
@@ -603,11 +623,12 @@ export default {
             processing: false,
 
             folder: null,
+            folderExists: false,
 
             cards: [
                 {
-                    q: "q",
-                    a: "a",
+                    q: "",
+                    a: "",
                     id: 1
                 }
             ],
@@ -619,7 +640,8 @@ export default {
 
             text: text,
 
-            folders: []
+            folders: [],
+            folderAncestors: []
         }
     },
 
@@ -632,9 +654,7 @@ export default {
         },
 
         cards2(val) {
-            let cds = val.split(this.sep_cd);
-
-            if (cds.length > 500) {
+            if (this.noOfCards > 500) {
                 this.processing = true;
             } else {
                 this.processing = false;

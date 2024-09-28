@@ -1,12 +1,20 @@
 <template>
   <div style="flex: 1;" class="_flex _fd-co">
     <AuthenticatedHeader v-if="authenticated" />
-    <UnauthenticatedHeader v-if="!authenticated" />
+    <UnauthenticatedHeader v-if="!authenticated" /><!--
     <br>
+    <h1>Folders:</h1>
+    <br>
+    <div style="margin-bottom: 20px;" class="_flex _fd-co _cc" v-for="f in allFolders">
+      <p><strong>name</strong>: {{f.name}}</p>
+      <p><strong>parent</strong>: {{ f.parent }}</p>
+    </div>
+    <br>
+    {{ "cards:" + allCards.length }}-->
     <router-view v-slot="{ Component }">
-        <!--<keep-alive>-->
-            <component :is="Component" />
-        <!--</keep-alive>-->
+      <!--<keep-alive>-->
+      <component :is="Component" />
+      <!--</keep-alive>-->
     </router-view>
     <ResponseMsg></ResponseMsg>
   </div>
@@ -39,9 +47,22 @@ export default {
       uauth: uauth(),
       authenticated: uauth().token,
 
-      ds: useDataStore()
+      ds: useDataStore(),
+
+      allFolders: [],
+      allCards: []
     }
   },
+
+  created() {
+    this.ds.getAllFolders().then(folders => {
+      this.allFolders = folders;
+    });
+
+    this.ds.getAllCards().then(cards => {
+      this.allCards = cards;
+    });
+  }
 }
 </script>
 

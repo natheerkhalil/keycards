@@ -120,7 +120,7 @@ export default {
 
                     if (localStorage.getItem("auth_token")) {
 
-                        useDataStore().addLoadq();
+                        useDataStore().createq();
 
                         useDataStore().getAllData().then(() => {
 

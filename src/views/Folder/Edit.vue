@@ -15,6 +15,7 @@
         <p class="__b __tal __tm">We couldn't seem to find this folder</p>
     </div>
 
+    <br>
 
     <div v-if="folderExists" class="__15 __w __mlauto __mrauto _flex _fd-co">
         <p class="__b __tal __txl">Edit Folder</p>
@@ -44,7 +45,7 @@
 
             <p class="__tmd __tle __txt-grey-4 __padxs"
                 style="width: 750px; max-width: 100%; border-bottom: 1px solid var(--grey_7); ">Theme - <strong
-                    :style="`color: var(--${folder.theme}2)`">{{ toSentenceCase(folder.theme) }}</strong></p>
+                    :style="`color: var(--${folder.theme}2)`">{{ text.toSentenceCase(folder.theme) }}</strong></p>
 
             <br>
 
@@ -56,7 +57,7 @@
                     <div @click="changeTheme(v)"
                         style="position: absolute; top: 0; left: 0; background: rgba(0, 0, 0, 0.5);"
                         :class="[['_flex', '__b', '__hack', '_cc', '__po', '__bo-5'], v == this.folder.theme ? [`__bd-${v}`] : ['__bo-grey-10'],]">
-                        <p class="__txt-grey-10 __tmd">{{ toSentenceCase(v) }}</p>
+                        <p class="__txt-grey-10 __tmd">{{ text.toSentenceCase(v) }}</p>
                     </div>
                 </div>
 
@@ -82,13 +83,64 @@ import { useDataStore } from '@/stores/data';
 import { text } from '@/main';
 
 export default {
+    data() {
+        return {
+            folder: [],
+
+            folderExists: true,
+
+            hierarchy: "Root &rarr; ",
+
+            processing: false,
+
+            text: text,
+        }
+    },
+
     methods: {
+        initialiseFolder() {
+            this.ds.getFolderById(this.folderId).then(folder => {
+                if (!folder) {
+                    this.folderExists = false;
+                    return;
+                }
+
+                this.folderExists = true;
+                this.folder = folder;
+
+
+                if (!this.folder.parent) {
+                    this.hierarchy = `Root &rarr; `;
+                } else {
+                    this.ds.getAncestors(this.folder.id, true).then(ps => {
+                        let parents = ps;
+
+                        let str = "Root";
+
+                        parents.forEach(p => {
+                            let theme;
+
+                            this.ds.getFolderById(p.id).then(f => {
+                                theme = f.theme; str = `${str} &rarr; <span style='color: var(--${theme}2)'>${p.name}</span>`;
+
+                                str = `${str} &rarr; `;
+
+                                this.hierarchy = str;
+                            });
+                        })
+                    })
+                }
+            })
+        },
+
         confirmEdit() {
             if (this.processing) return;
 
             this.processing = true;
 
             let name = text.cleanup(this.folder.name);
+            let theme = this.folder.theme;
+            let parent = this.folder.parent;
 
             if (name.length == 0) {
                 useResponseStore().updateResponse('Folder name cannot be empty', 'warn');
@@ -108,76 +160,22 @@ export default {
                 return;
             }
 
-            let failed = false;
-
-            this.ds.updateFolderName(this.folderId, name).then(r => {
+            this.ds.updateFolder(this.folderId, name, parent, theme).then(r => {
                 if (!r) {
-                    useResponseStore().updateResponse('Failed to update folder name', 'error');
-
-                    failed = true;
-                }
-
-                this.ds.updateFolderTheme(this.folderId, this.folder.theme).then(r => {
-                    if (!r) {
-                        useResponseStore().updateResponse('Failed to update folder theme', 'error');
-
-                        failed = true;
-                    }
-
-                    if (!failed) {
-                        useResponseStore().updateResponse('Folder edited successfully', 'succ');
-                        this.$router.push({ path: `/folder/${this.folderId}` });
-                    }
-
+                    useResponseStore().updateResponse('Failed to update folder', 'err');
                     this.processing = false;
-                })
+                    return;
+                } else {
+                    useResponseStore().updateResponse('Folder updated successfully', 'succ');
+                    this.$router.push({ path: `/folder/${this.folderId}` });
+                    return;
+                }
             });
         },
 
         changeTheme(v) {
             if (this.folder.theme != v) {
                 this.folder.theme = v;
-            }
-        },
-
-        toSentenceCase(text) {
-            return text.replace(/\w\S*/g, function (txt) {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            });
-        },
-
-        getFolderById() {
-            this.ds.getFolderById(this.folderId).then(f => {
-                if (f) {
-                    this.folder = f;
-
-                    this.folderExists = true;
-
-                    this.getHierarchy();
-                } else {
-                    this.folderExists = false;
-                }
-            })
-        },
-
-        getHierarchy() {
-            if (!this.folder.parent) {
-                this.hierarchy = `Root &rarr; `;
-            } else {
-                let parents = this.ds.getAncestors(this.folder.id, true);
-
-                let str = "Root";
-
-                parents.forEach(p => {
-                    let theme;
-                    this.ds.getFolderById(p.id).then((f) => {
-                        theme = f.theme; str = `${str} &rarr; <span style='color: var(--${theme}2)'>${p.name}</span>`;
-
-                        str = `${str} &rarr; `;
-
-                        this.hierarchy = str;
-                    });
-                })
             }
         },
     },
@@ -194,34 +192,15 @@ export default {
         themes() {
             return this.ds.getThemes();
         },
-
-        folders() {
-            return this.ds.getFolders();
-        }
     },
 
     created() {
-        this.getFolderById();
-    },
-
-    data() {
-        return {
-            folder: [],
-
-            folderExists: false,
-
-            hierarchy: "Root &rarr; ",
-
-            processing: false,
-
-            text: text,
-        }
+        this.initialiseFolder();
     },
 
     watch: {
         folderId(newVal, oldVal) {
-            // get folder data when id changes
-            this.getFolderById();
+            this.initialiseFolder();
         }
     }
 }
