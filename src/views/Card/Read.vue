@@ -576,6 +576,11 @@ export default {
             }
         },
         selectFolderToMove(folderId) {
+            if (folderId == this.card.folder) {
+                useResponseStore().updateResponse("Cannot move card to the same folder", "warn");
+                return;
+            }
+
             this.ds.moveCards([this.card.id], folderId).then(r => {
                 if (!r) {
                     useResponseStore().updateResponse("Failed to move card", "err");
@@ -583,12 +588,12 @@ export default {
                 }
 
                 this.showMoveFolders = false;
+                useResponseStore().updateResponse("Card moved successfully", "succ");
+
                 this.moveFoldersLimit = 10;
                 this.moveFoldersSearch = '';
 
                 this.initialiseCard();
-
-                useResponseStore().updateResponse("Card moved successfully", "succ");
             });
         },
 
