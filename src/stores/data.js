@@ -12,6 +12,9 @@ export const useDataStore = defineStore({
         folders: [],
         cards: [],
 
+        minimalCards: localStorage.getItem("min_cards") || [],
+        minimalFolders: localStorage.getItem("min_folders") || [],
+
         method: localStorage.getItem('method') || 'm',
         sep_qa: localStorage.getItem('sep_qa') || ']',
         sep_cd: localStorage.getItem('sep_cd') || '=',
@@ -61,14 +64,10 @@ export const useDataStore = defineStore({
                     this.folders.push(folder); // Update in-memory state
                 }
 
+                await this.setMinimal();
+
                 // Clear queue
                 this.clearq();
-
-                const orphans = await this.getOrphanFolders();
-
-                for (o in orphans) {
-                    await this.updateFolderCards(o.id);
-                }
 
                 console.log('Data successfully fetched and stored in IndexedDB');
             } catch (error) {
@@ -108,6 +107,25 @@ export const useDataStore = defineStore({
             // Clear in-memory state
             this.folders = [];
             this.cards = [];
+        },
+
+        // SET UP MINIMAL CARDS & FOLDERS //
+        async setMinimal() {
+            var cards = await this.getAllCards();
+            var folders = await this.getAllFolders();
+
+            cards = cards.map(card => ({ s: card.status, f: card.folder }));
+            folders = folders.map(folder => ({ p: folder.parent, i: folder.id }));
+
+            localStorage.setItem("min_cards", JSON.stringify(cards));
+            localStorage.setItem("min_folders", JSON.stringify(folders));
+        },
+
+        getMinimalCards() {
+            return JSON.parse(localStorage.getItem("min_cards"));
+        },
+        getMinimalFolders() {
+            return JSON.parse(localStorage.getItem("min_folders"));
         },
 
         // --- Modifying Data (Cards) ---
@@ -173,7 +191,7 @@ export const useDataStore = defineStore({
 
             const result = await request({ cards: cardIds, folder: folderId }, '/cards/move');
             if (result.failed) return false;
-            
+
             for (const cardId of cardIds) {
                 const card = await getCardById(cardId);
                 if (card) {
@@ -204,7 +222,7 @@ export const useDataStore = defineStore({
 
         // --- Modifying Data (Folders) ---
         async updateFolderCards(folderId) {
-            const cards = await this.getDescendantCards(folderId);
+            /*const cards = await this.getDescendantCards(folderId);
 
             let count = cards.length;
             let status = {
@@ -220,16 +238,56 @@ export const useDataStore = defineStore({
             localStorage.setItem(`folder_card_count_${folderId}`, JSON.stringify(count));
             localStorage.setItem(`folder_card_status_${folderId}`, JSON.stringify(status));
 
-            console.log("Cards of folder:", folderId, "have been updated with card count and status");
+            console.log("Cards of folder:", folderId, "have been updated with card count and status");*/
         },
 
-        getFolderCards(folderId) {
+        /*getFolderCards(folderId) {
             if (!localStorage.getItem(`folder_card_count_${folderId}`)) {
                 this.updateFolderCards(folderId);
             }
 
             const count = Number(localStorage.getItem(`folder_card_count_${folderId}`));
             const status = JSON.parse(localStorage.getItem(`folder_card_status_${folderId}`));
+
+            return { count: count, status: status };
+        },*/
+        getFolderCards(folderId) {
+            let folders = this.getMinimalFolders();
+            let cards = this.getMinimalCards();
+
+            let startId = folderId;
+            let removeSelf = false;
+            let result = [];
+
+            function traverse(currentId) {
+                // Find the folder with the given currentId
+                const currentFolder = folders.find(folder => folder.i === currentId);
+                if (!currentFolder) return;
+        
+                // Add the current folder's id to the result array
+                result.push(currentFolder.i);
+        
+                // Find all folders whose parentId is the current folder's id and recurse for each
+                const childFolders = folders.filter(folder => folder.p == currentFolder.i);
+                childFolders.forEach(childFolder => traverse(childFolder.i));
+            }
+        
+            // Start traversing from the given startId
+            traverse(startId);
+        
+            // If removeSelf is true, we remove the starting folder (i.e., folder A's id)
+            if (removeSelf) {
+                result.shift();  // Removes the first element (A's id) from the result array
+            }
+        
+            // Find all cards whose folderId is in the result array
+            const filteredCards = cards.filter(card => result.includes(card.f));
+
+            let status = filteredCards.reduce((acc, card) => {
+                acc[card.status] = (acc[card.status] || 0) + 1;
+                return acc;
+            }, { "0": 0, "1": 0, "2": 0 });
+            let count = filteredCards.length;
 
             return { count: count, status: status };
         },
