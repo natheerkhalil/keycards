@@ -165,7 +165,8 @@ export default {
     },
 
     initialised() {
-      return this.allFolders[0].progress && this.allFolders[0].overlay;
+     // return this.allFolders[0].progress && this.allFolders[0].overlay;
+     return true;
     }
   },
 

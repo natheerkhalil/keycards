@@ -464,11 +464,12 @@ export default {
 
         // INITIALISED  
         initialised() {
-            return this.folder &&
+           /* return this.folder &&
                 (this.cards.length === 0 || this.cards &&
                 this.cardCount) &&
                 (this.childrenFolders.length === 0 || this.folderCount &&
-                    (this.childrenFolders[0]?.cardCount && this.childrenFolders[0]?.overlay));
+                    (this.childrenFolders[0]?.cardCount && this.childrenFolders[0]?.overlay));*/
+                    return true;
         }
     },
 

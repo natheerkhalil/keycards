@@ -12,6 +12,9 @@ export const useDataStore = defineStore({
         folders: [],
         cards: [],
 
+        folderCards: [],
+        folderStatuses: [],
+
         method: localStorage.getItem('method') || 'm',
         sep_qa: localStorage.getItem('sep_qa') || ']',
         sep_cd: localStorage.getItem('sep_cd') || '=',
