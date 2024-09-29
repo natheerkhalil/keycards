@@ -38,6 +38,8 @@ export const useDataStore = defineStore({
                 // Clear IndexedDB before fetching new data to avoid duplicates
                 await this.clearData();
 */
+
+                console.log(this.minimalCards);
                 // If there's no queue to fetch data, return
                 if (!this.existsq()) {
                     return;
@@ -114,8 +116,8 @@ export const useDataStore = defineStore({
             var cards = await this.getAllCards();
             var folders = await this.getAllFolders();
 
-            cards = cards.map(card => ({ s: card.status, f: card.folder }));
-            folders = folders.map(folder => ({ p: folder.parent, i: folder.id }));
+            cards = cards.map(card => ({ s: card.status, f: Number(card.folder) }));
+            folders = folders.map(folder => ({ p: Number(folder.parent), i: Number(folder.id) }));
 
             localStorage.setItem("min_cards", JSON.stringify(cards));
             localStorage.setItem("min_folders", JSON.stringify(folders));
@@ -259,7 +261,7 @@ export const useDataStore = defineStore({
         },*/
         minimalFolderData(folderId) {
             folderId = Number(folderId);
-            
+
             let folders = this.getMinimalFolders();
             let cards = this.getMinimalCards();
 
@@ -268,26 +270,28 @@ export const useDataStore = defineStore({
             let result = [];
 
             function traverse(currentId) {
+                currentId = Number(currentId);
+
                 // Find the folder with the given currentId
                 const currentFolder = folders.find(folder => folder.i === currentId);
                 if (!currentFolder) return;
-        
+
                 // Add the current folder's id to the result array
                 result.push(currentFolder.i);
-        
+
                 // Find all folders whose parentId is the current folder's id and recurse for each
                 const childFolders = folders.filter(folder => folder.p == currentFolder.i);
                 childFolders.forEach(childFolder => traverse(childFolder.i));
             }
-        
+
             // Start traversing from the given startId
             traverse(startId);
-        
+
             // If removeSelf is true, we remove the starting folder (i.e., folder A's id)
             if (removeSelf) {
                 result.shift();  // Removes the first element (A's id) from the result array
             }
-        
+
             // Find all cards whose folderId is in the result array
             const filteredCards = cards.filter(card => result.includes(card.f));
 
@@ -314,7 +318,7 @@ export const useDataStore = defineStore({
 
             const folder = { id: Number(result.data.id), name, parent, theme };
             await saveFolder(folder);
-            
+
             this.folders.push(folder);
 
             await this.setMinimal();
