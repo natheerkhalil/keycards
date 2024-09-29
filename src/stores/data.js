@@ -520,8 +520,8 @@ export const useDataStore = defineStore({
         },
         getFolderProgressOverlay(id, noDescendants = false) {
             let st_0 = this.minimalFolderData(id).status["0"];
-            let st_1 = this.minimalFolderData(id).status["2"];
-            let st_2 = this.minimalFolderData(id).status["1"];
+            let st_1 = this.minimalFolderData(id).status["1"];
+            let st_2 = this.minimalFolderData(id).status["2"];
 
             return `<span class="__bo __txt-err-4">${st_1}</span>
 
