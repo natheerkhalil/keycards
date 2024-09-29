@@ -232,12 +232,15 @@
             <div style="z-index: 0" class="__b _flex _jc-be _ai-ce _m-sm-fd-co">
                 <div class="_flex _fd-ro _cc">
                     <!-- SELECT -->
-                    <svg v-if="cards.length > 0" @click="selectAll"
-                        :class="[this.cards.filter(c => c.selected == true).length === this.cards.length ? ['__fill-1',] : ['__fi-grey-1'], '__po']"
-                        xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24">
-                        <path
-                            d="M8 10v4h4l-6 7-6-7h4v-4h-4l6-7 6 7h-4zm16 5h-10v2h10v-2zm0 6h-10v-2h10v2zm0-8h-10v-2h10v2zm0-4h-10v-2h10v2zm0-4h-10v-2h10v2z" />
-                    </svg> &nbsp; &nbsp; &nbsp; &nbsp;
+                    <div class="_flex _fd-ro _cc">
+                        <svg style="margin-right: 10px;" v-if="cards.length > 0" @click="selectAll"
+                            :class="[this.cards.filter(c => c.selected == true).length === this.cards.length ? ['__fill-1',] : ['__fi-grey-1'], '__po']"
+                            xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24">
+                            <path
+                                d="M8 10v4h4l-6 7-6-7h4v-4h-4l6-7 6 7h-4zm16 5h-10v2h10v-2zm0 6h-10v-2h10v2zm0-8h-10v-2h10v2zm0-4h-10v-2h10v2zm0-4h-10v-2h10v2z" />
+                        </svg>
+                        <p><strong style="color: var(--theme1)">{{ cards.filter(c => c.selected).length }}</strong> / {{ cards.length }}</p>
+                    </div> &nbsp; &nbsp; &nbsp; &nbsp;
 
                     <div v-if="cards.filter(c => c.selected == true).length > 0" class="_flex _fd-ro">
                         <!-- DELETE -->
@@ -461,16 +464,6 @@ export default {
         ds() {
             return useDataStore();
         },
-
-        // INITIALISED  
-        initialised() {
-           /* return this.folder &&
-                (this.cards.length === 0 || this.cards &&
-                this.cardCount) &&
-                (this.childrenFolders.length === 0 || this.folderCount &&
-                    (this.childrenFolders[0]?.cardCount && this.childrenFolders[0]?.overlay));*/
-                    return true;
-        }
     },
 
     data() {
@@ -478,6 +471,8 @@ export default {
             processingCards: false,
 
             minimalData: [],
+
+            initialised: false,
 
             // FOLDER EXISTS
             folderExists: true,
@@ -609,12 +604,14 @@ export default {
 
                         // progress overlay
                         children[i]["overlay"] = this.ds.getFolderProgressOverlay(c.id);
-                        
+
                         // card progress
                         children[i]["progress"] = this.ds.getFolderCardProgress(c.id);
 
                         console.log(children[i]);
                     }
+
+                    this.initialised = true;
 
                     this.childrenFolders = children;
                 });
@@ -784,30 +781,28 @@ export default {
 
             if (id == this.folder.id) {
                 this.showmoveFolders = false;
-                useResponseStore().updateResponse("You can't move cards to the same folder.", "err");
+                useResponseStore().updateResponse("You can't move cards to the same folder.", "warn");
                 return;
             }
 
-            if (window.confirm("Are you sure you want to move " + this.cardsToBeMoved.length + " card(s) to the folder: " + this.globalFolders.find(f => f.id === id).name + "?")) {
-                this.showmoveFolders = false;
-                this.processingCards = true;
+            this.showmoveFolders = false;
+            this.processingCards = true;
 
-                this.ds.moveCards(this.cardsToBeMoved, id).then(r => {
-                    if (!r) {
-                        useResponseStore().updateResponse("Failed to move cards", "err");
-                        this.processingCards = false;
-                        return;
-                    } else {
-                        useResponseStore().updateResponse("Cards moved successfully", "succ");
-                        this.processingCards = false;
+            this.ds.moveCards(this.cardsToBeMoved, id).then(r => {
+                if (!r) {
+                    useResponseStore().updateResponse("Failed to move cards", "err");
+                    this.processingCards = false;
+                    return;
+                } else {
+                    useResponseStore().updateResponse("Cards moved successfully", "succ");
+                    this.processingCards = false;
 
-                        this.cardsToBeMoved = [];
-                        this.showmoveFolders = false;
+                    this.cardsToBeMoved = [];
+                    this.showmoveFolders = false;
 
-                        this.initialiseFolder();
-                    }
-                })
-            }
+                    this.initialiseFolder();
+                }
+            })
         },
 
         // HIDE MOVE FOLDERS //
@@ -841,12 +836,11 @@ export default {
                             return;
                         }
 
-                        this.ds.getCardsByFolder().then(cards => {
-                            this.cards = cards;
-                        });
-
                         useResponseStore().updateResponse("Selected cards deleted successfully", "succ");
+
                         this.processingCards = false;
+
+                        this.initialiseFolder();
                         return;
                     })
 

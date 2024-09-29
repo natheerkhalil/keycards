@@ -225,6 +225,7 @@ export const useDataStore = defineStore({
             }
 
             await this.setMinimal();
+            
             return result;
         },
 
