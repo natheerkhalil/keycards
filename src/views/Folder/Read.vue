@@ -84,9 +84,9 @@
                 <!-- FOLDER TITLE -->
                 <div class="__b _flex _cc _fd-co">
                     <p :class="`__b __tal __txl __bo`" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
-                    <p :style="`color: var(--${folder.theme}4)`"><strong>{{ folderCardCount
+                    <p :style="`color: var(--${folder.theme}4)`"><strong>{{ minimalData.count
                             }}</strong> cards / <strong>{{
-                                folderCount }}</strong> folders</p>
+                                minimalData.folderCount }}</strong> folders</p>
                 </div>
 
                 <!-- CREATE BUTTONS -->
@@ -462,14 +462,6 @@ export default {
             return useDataStore();
         },
 
-        // CARD COUNT & STATUS //
-        folderCardCount() {
-            return this.ds.getFolderCards(this.folderId).count;
-        },
-        folderCardStatus() {
-            return this.ds.getFolderCards(this.folderId).status;
-        },
-
         // INITIALISED  
         initialised() {
            /* return this.folder &&
@@ -485,16 +477,14 @@ export default {
         return {
             processingCards: false,
 
+            minimalData: [],
+
             // FOLDER EXISTS
             folderExists: true,
 
             // FOLDER
             folder: null,
             folderCards: [],
-
-            // COUNT //
-            cardCount: 0,
-            folderCount: 0,
 
             // GLOBAL FOLDERS //
             globalFolders: [],
@@ -572,6 +562,8 @@ export default {
                 this.folder = folder;
                 this.folderExists = !!folder;
 
+                // SET MINIMAL DATA
+                this.minimalData = this.ds.minimalFolderData(this.folderId);
 
                 // SET FOLDER RELATIONS
                 this.ds.getAllFolders().then(folders => {
@@ -588,13 +580,11 @@ export default {
                     this.folderDescendants = descendants;
                 });
 
-
                 // SET CARDS
                 this.ds.getCardsByFolder(this.folderId).then(cards => {
                     this.cards = cards;
                     this.allCards = cards;
                 });
-
 
                 // SET DESCENDANT CARDS 
                 this.ds.getDescendantCards(this.folderId).then(descendantCards => {
@@ -610,7 +600,7 @@ export default {
                         let c = children[i];
 
                         // card count
-                        children[i]["cardCount"] = this.ds.getFolderCards(c.id).count;
+                        children[i]["cardCount"] = this.ds.minimalFolderData(c.id).count;
 
                         // folder count
                         this.ds.getDescendants(c.id, true).then(descendants => {
@@ -622,6 +612,8 @@ export default {
                         
                         // card progress
                         children[i]["progress"] = this.ds.getFolderCardProgress(c.id);
+
+                        console.log(children[i]);
                     }
 
                     this.childrenFolders = children;
@@ -797,13 +789,17 @@ export default {
             }
 
             if (window.confirm("Are you sure you want to move " + this.cardsToBeMoved.length + " card(s) to the folder: " + this.globalFolders.find(f => f.id === id).name + "?")) {
+                this.showmoveFolders = false;
+                this.processingCards = true;
 
                 this.ds.moveCards(this.cardsToBeMoved, id).then(r => {
                     if (!r) {
                         useResponseStore().updateResponse("Failed to move cards", "err");
+                        this.processingCards = false;
                         return;
                     } else {
                         useResponseStore().updateResponse("Cards moved successfully", "succ");
+                        this.processingCards = false;
 
                         this.cardsToBeMoved = [];
                         this.showmoveFolders = false;
@@ -955,14 +951,6 @@ export default {
     watch: {
         folderId(newVal, oldVal) {
             this.initialiseFolder();
-        },
-
-        descendantCards(newVal, oldVal) {
-            this.cardCount = newVal.length;
-        },
-
-        descendantFolders(newVal, oldVal) {
-            this.folderCount = newVal.length;
         },
     }
 }

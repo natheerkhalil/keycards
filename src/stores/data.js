@@ -150,6 +150,8 @@ export const useDataStore = defineStore({
                 this.cards.push(newCard);
             }
 
+            await this.setMinimal();
+
             return result;
         },
 
@@ -163,6 +165,7 @@ export const useDataStore = defineStore({
             if (card) {
                 card.q = q;
                 card.a = a;
+                await this.setMinimal();
                 return await updateCard(card);
             }
         },
@@ -182,6 +185,7 @@ export const useDataStore = defineStore({
                 }
             }
 
+            await this.setMinimal();
             return result;
         },
 
@@ -200,6 +204,7 @@ export const useDataStore = defineStore({
                 }
             }
 
+            await this.setMinimal();
             return result;
         },
 
@@ -217,6 +222,7 @@ export const useDataStore = defineStore({
                 }
             }
 
+            await this.setMinimal();
             return result;
         },
 
@@ -241,7 +247,7 @@ export const useDataStore = defineStore({
             console.log("Cards of folder:", folderId, "have been updated with card count and status");*/
         },
 
-        /*getFolderCards(folderId) {
+        /*minimalFolderData(folderId) {
             if (!localStorage.getItem(`folder_card_count_${folderId}`)) {
                 this.updateFolderCards(folderId);
             }
@@ -251,7 +257,9 @@ export const useDataStore = defineStore({
 
             return { count: count, status: status };
         },*/
-        getFolderCards(folderId) {
+        minimalFolderData(folderId) {
+            folderId = Number(folderId);
+            
             let folders = this.getMinimalFolders();
             let cards = this.getMinimalCards();
 
@@ -284,12 +292,12 @@ export const useDataStore = defineStore({
             const filteredCards = cards.filter(card => result.includes(card.f));
 
             let status = filteredCards.reduce((acc, card) => {
-                acc[card.status] = (acc[card.status] || 0) + 1;
+                acc[card.s] = (acc[card.s] || 0) + 1;
                 return acc;
             }, { "0": 0, "1": 0, "2": 0 });
             let count = filteredCards.length;
 
-            return { count: count, status: status };
+            return { count: count, status: status, folders: result, folderCount: (result.length - 1) };
         },
 
         async appendFolder([id, name, parent, theme]) {
@@ -306,7 +314,11 @@ export const useDataStore = defineStore({
 
             const folder = { id: Number(result.data.id), name, parent, theme };
             await saveFolder(folder);
+            
             this.folders.push(folder);
+
+            await this.setMinimal();
+
             return result.data.id;
         },
 
@@ -348,6 +360,7 @@ export const useDataStore = defineStore({
             await deleteFolderById(folderId);
             this.folders = this.folders.filter(f => f.id !== folderId);
 
+            await this.setMinimal();
             return result;
         },
 
@@ -469,8 +482,8 @@ export const useDataStore = defineStore({
 
         // CARD PROGRESS //
         getFolderCardProgress(id, noDescendants = false) {
-            let count = this.getFolderCards(id).count;
-            let status = this.getFolderCards(id).status;
+            let count = this.minimalFolderData(id).count;
+            let status = this.minimalFolderData(id).status;
 
             let col = {
                 0: "var(--grey_5)",
@@ -495,7 +508,7 @@ export const useDataStore = defineStore({
 
             return str;
         },
-        async getFolderCardStatus(id, status, noDescendants = false) {
+        async minimalFolderDatatatus(id, status, noDescendants = false) {
             let cards;
 
             if (noDescendants)
@@ -506,9 +519,9 @@ export const useDataStore = defineStore({
             return cards.filter(c => c.status == status).length;
         },
         getFolderProgressOverlay(id, noDescendants = false) {
-            let st_0 = this.getFolderCards(id).status["0"];
-            let st_1 = this.getFolderCards(id).status["2"];
-            let st_2 = this.getFolderCards(id).status["1"];
+            let st_0 = this.minimalFolderData(id).status["0"];
+            let st_1 = this.minimalFolderData(id).status["2"];
+            let st_2 = this.minimalFolderData(id).status["1"];
 
             return `<span class="__bo __txt-err-4">${st_1}</span>
 

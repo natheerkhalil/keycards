@@ -51,8 +51,9 @@ export default {
             this.$router.push('/folder/create');
         },
 
-        logout() {
-            uauth().logout();
+        async logout() {
+            await uauth().logout();
+            
             this.$router.push('/');
         },
     }

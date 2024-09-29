@@ -19,7 +19,7 @@
                     <p class="__bo __tmd __tle" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
 
                     <!-- MOVE FOLDER CARD COUNT -->
-                    <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; <strong>{{ ds.cards.filter(c => c.folder == folder.id).length }}&nbsp;</strong>cards</p>
+                    <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; <strong>{{ ds.minimalFolderData(folder.id).count }}&nbsp;</strong>cards</p>
                 </div>
             </div>
 

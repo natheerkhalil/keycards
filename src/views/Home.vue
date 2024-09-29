@@ -194,7 +194,7 @@ export default {
           let id = f.id;
 
           // card count
-          folders[i]["cardCount"] = this.ds.getFolderCards(id).count;
+          folders[i]["cardCount"] = this.ds.minimalFolderData(id).count;
           
           // folder count
           this.ds.getDescendants(id).then(descendants => {
