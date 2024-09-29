@@ -1,7 +1,7 @@
 <template>
     <div style="position: relative; " class="_flex __b _fd-co" :style="marginLeftStyle">
 
-        <div @click="selectFolder(folder.id)" style="margin-bottom: 10px;" :id="`fmsearch_${folder.id}`"
+        <div v-if="this.initialised" @click="selectFolder(folder.id, $event)" style="margin-bottom: 10px;" :id="`fmsearch_${folder.id}`"
             class="fmsearch __b _flex _fd-ro">
             <div :style="`position: relative; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${folder.theme}.png')`"
                 class="folder-content __po __b _flex _fd-ro __bdxs __padsm">
@@ -19,7 +19,7 @@
                     <p class="__bo __tmd __tle" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
 
                     <!-- MOVE FOLDER CARD COUNT -->
-                    <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; <strong>{{ cardCount.find(c => c.id == folder.id)?.count || "0" }}&nbsp;</strong>cards</p>
+                    <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; <strong>{{ ds.cards.filter(c => c.folder == folder.id).length }}&nbsp;</strong>cards</p>
                 </div>
             </div>
 
@@ -31,8 +31,8 @@
             </svg>-->
         </div>
 
-        <div v-if="!collapsed" class="_flex _fd-co">
-            <Folder @select-folder="selectFolder(child.id)" v-for="child in children" :key="child.id" :folder="child"
+        <div v-if="initialised && !collapsed" class="_flex _fd-co">
+            <Folder @select-folder="(id, $event) => selectFolder(id, $event)" v-for="child in children" :key="child.id" :folder="child"
                 :allFolders="allFolders" :level="level + 1" />
         </div>
     </div>
@@ -50,8 +50,6 @@ export default {
             cards: [],
 
             cardCount: [],
-
-            ds: useDataStore(),
 
             collapsed: false
         };
@@ -74,6 +72,14 @@ export default {
                 marginLeft: `${this.level * 15}px`,
                 width: `calc(100% - ${this.level * 15}px)`
             };
+        },
+
+        ds() {
+            return useDataStore();
+        },
+
+        initialised() {
+            return true;
         }
     },
 
@@ -104,10 +110,15 @@ export default {
             this.collapsed = !this.collapsed;
         },
 
-        selectFolder(e) {
-            this.$emit("selectFolder", e);
+        selectFolder(id, event) {
+            this.$emit("selectFolder", id);
+
+            event.preventDefault();
+            event.stopPropagation();
         },
     },
+
+    watch: {},
 
     props: [
         'folder', 'allFolders', 'level', 'omit'

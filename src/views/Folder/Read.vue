@@ -14,7 +14,11 @@
         <p class="__b __tal __tm">We couldn't seem to find this folder</p>
     </div>
 
-    <div v-if="folderExists" class="__15 __mlauto __mrauto _flex _fd-co __w">
+    <div v-if="!initialised" class="__b _flex __mauto _cc">
+        <div class="__pulse-loader"></div>
+    </div>
+
+    <div v-if="folderExists && initialised" class="__15 __mlauto __mrauto _flex _fd-co __w">
 
         <br>
         <div :style="`background-image: url('/themes/${folder.theme}.png'); position: relative; background-position: center; background-size: cover; `"
@@ -456,6 +460,15 @@ export default {
         // DATA STORE
         ds() {
             return useDataStore();
+        },
+
+        // INITIALISED  
+        initialised() {
+            return this.folder &&
+                (this.cards.length === 0 || this.cards &&
+                this.cardCount) &&
+                (this.childrenFolders.length === 0 || this.folderCount &&
+                    (this.childrenFolders[0]?.cardCount && this.childrenFolders[0]?.overlay));
         }
     },
 
@@ -464,7 +477,7 @@ export default {
             processingCards: false,
 
             // FOLDER EXISTS
-            folderExists: false,
+            folderExists: true,
 
             // FOLDER
             folder: null,
@@ -549,63 +562,66 @@ export default {
             this.ds.getFolderById(this.folderId).then(folder => {
                 this.folder = folder;
                 this.folderExists = !!folder;
-            });
-
-            // SET FOLDER RELATIONS
-            this.ds.getAllFolders().then(folders => {
-                this.globalFolders = folders;
-                this.allFolders = folders;
-            });
-            this.ds.getOrphanFolders(this.folderId).then(folders => {
-                this.orphanFolders = folders;
-            });
-            this.ds.getAncestors(this.folderId).then(ancestors => {
-                this.folderAncestors = ancestors.reverse();
-            });
-            this.ds.getChildren(this.folderId).then(descendants => {
-                this.folderDescendants = descendants;
-            });
-
-            // SET CARDS
-            this.ds.getCardsByFolder(this.folderId).then(cards => {
-                this.cards = cards;
-                this.allCards = cards;
-            });
-
-            // SET DESCENDANT CARDS 
-            this.ds.getDescendantCards(this.folderId).then(descendantCards => {
-                this.descendantCards = descendantCards;
-            });
-
-            // SET DESCENDANTS & CHILDREN
-            this.ds.getDescendants(this.folderId, true).then(descendants => {
-                this.descendantFolders = descendants;
-            });
-            this.ds.getChildren(this.folderId, false).then(children => {
-                for (let i = 0; i < children.length; i++) {
-                    let c = children[i];
-
-                    // card count
-                    this.ds.getDescendantCards(c.id).then(descendantCards => {
-                        children[i]["cardCount"] = descendantCards.length;
-                    });
-                    // folder count
-                    this.ds.getDescendants(c.id, true).then(descendants => {
-                        children[i]["folderCount"] = descendants.length;
-                    });
 
 
-                    // progress overlay
-                    this.ds.getFolderProgressOverlay(c.id).then(overlay => {
-                        children[i]["overlay"] = overlay;
-                    })
-                    // card progress
-                    this.ds.getFolderCardProgress(c.id).then(progress => {
-                        children[i]["progress"] = progress;
-                    })
-                }
+                // SET FOLDER RELATIONS
+                this.ds.getAllFolders().then(folders => {
+                    this.globalFolders = folders;
+                    this.allFolders = folders;
+                });
+                this.ds.getOrphanFolders(this.folderId).then(folders => {
+                    this.orphanFolders = folders;
+                });
+                this.ds.getAncestors(this.folderId).then(ancestors => {
+                    this.folderAncestors = ancestors.reverse();
+                });
+                this.ds.getChildren(this.folderId).then(descendants => {
+                    this.folderDescendants = descendants;
+                });
 
-                this.childrenFolders = children;
+
+                // SET CARDS
+                this.ds.getCardsByFolder(this.folderId).then(cards => {
+                    this.cards = cards;
+                    this.allCards = cards;
+                });
+
+
+                // SET DESCENDANT CARDS 
+                this.ds.getDescendantCards(this.folderId).then(descendantCards => {
+                    this.descendantCards = descendantCards;
+                });
+
+                // SET DESCENDANTS & CHILDREN
+                this.ds.getDescendants(this.folderId, true).then(descendants => {
+                    this.descendantFolders = descendants;
+                });
+                this.ds.getChildren(this.folderId, false).then(children => {
+                    for (let i = 0; i < children.length; i++) {
+                        let c = children[i];
+
+                        // card count
+                        this.ds.getDescendantCards(c.id).then(descendantCards => {
+                            children[i]["cardCount"] = descendantCards.length;
+                        });
+                        // folder count
+                        this.ds.getDescendants(c.id, true).then(descendants => {
+                            children[i]["folderCount"] = descendants.length;
+                        });
+
+
+                        // progress overlay
+                        this.ds.getFolderProgressOverlay(c.id).then(overlay => {
+                            children[i]["overlay"] = overlay;
+                        })
+                        // card progress
+                        this.ds.getFolderCardProgress(c.id).then(progress => {
+                            children[i]["progress"] = progress;
+                        })
+                    }
+
+                    this.childrenFolders = children;
+                });
             });
 
             this.debounceUpdateFolderLimit = debounce(this.updateFolderLimit, 200);

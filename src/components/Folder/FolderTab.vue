@@ -10,12 +10,11 @@
 
                 <div style="z-index: 2;" class="_flex _fd-ro _ai-ce _jc-be">
                     <!-- MOVE FOLDER NAME -->
-                    <p class="__bo __tmd __tle" :style="`color: var(--${folder.theme}4)`">{{ ds.getAncestors(folder.id,
-                        false).map(a => a.name).join(" &rarr; ") }}</p>
+                    <p v-html="hierarchy.find(h => h.id ==
+                        folder.id)?.name || '. . .'" class="__bo __tmd __tle" :style="`color: var(--${folder.theme}4)`"></p>
 
                     <!-- MOVE FOLDER CARD COUNT -->
-                    <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; <strong>{{ ds.getDescendantCards(folder.id).length
-                            }}</strong> cards</p>
+                    <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; <strong>{{ ds.cards.filter(c => c.folderId == folder.id).length }}</strong> cards</p>
                 </div>
             </div>
         </div>
@@ -29,16 +28,21 @@ import { useDataStore } from '@/stores/data';
 export default {
     data() {
         return {
-            folders: useDataStore().getFolders(),
+            folders: [],
+            cards: [],
 
-            cards: useDataStore().getCards(),
-
-            ds: useDataStore(),
+            hierarchy: [],
         };
     },
 
     computed: {
+        ds() {
+            return useDataStore();
+        },
 
+        initialised() {
+            return this.hierarchy.length > 0;
+        }
     },
 
     methods: {
@@ -47,10 +51,31 @@ export default {
         },
     },
 
+    created() {
+        this.ds.getAllFolders().then(folders => {
+            this.folders = folders;
+
+            for (let f of folders) {
+                this.ds.getAncestors(f.id, false).then(ancestors => {
+                    ancestors = ancestors.map(a => a.name).join(" &rarr; ")
+
+                    this.hierarchy.push({
+                        id: f.id,
+                        name: ancestors
+                    });
+                })
+            }
+        });
+
+        this.ds.getAllCards().then(cards => {
+            this.cards = cards;
+        });
+    },
+
     props: [
         'folder', 'allFolders', 'level',
 
-        'move', 
+        'move',
 
         'cards',
 

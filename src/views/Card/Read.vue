@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!cardExists" class="__b _flex _cc _fd-co">
+    <div v-if="!cardExists" class="__b __mauto _flex _cc _fd-co">
         <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24">
             <path
                 d="M12 1c-6.338 0-12 4.226-12 10.007 0 2.05.738 4.063 2.047 5.625.055 1.83-1.023 4.456-1.993 6.368 2.602-.47 6.301-1.508 7.978-2.536 9.236 2.247 15.968-3.405 15.968-9.457 0-5.812-5.701-10.007-12-10.007zm0 15c-.565 0-1.024-.459-1.024-1.025 0-.565.459-1.024 1.024-1.024.566 0 1.024.459 1.024 1.024 0 .566-.458 1.025-1.024 1.025zm1.606-4.858c-.74.799-.775 1.241-.766 1.785h-1.643c-.006-1.208.016-1.742 1.173-2.842.469-.446.84-.799.788-1.493-.047-.66-.599-1.004-1.117-1.004-.581 0-1.261.432-1.261 1.649h-1.646c0-1.966 1.155-3.237 2.941-3.237.849 0 1.592.278 2.09.783.468.473.709 1.125.7 1.883-.013 1.134-.704 1.878-1.259 2.476z" />
@@ -14,8 +14,7 @@
         <p class="__b __tal __tm">We couldn't seem to find this card</p>
     </div>
 
-
-    <div v-if="cardExists" class="__15 __mlauto __mrauto _flex _fd-co __w">
+    <div v-if="cardExists && initialised" class="__15 __mlauto __mrauto _flex _fd-co __w">
 
         <div :style="`background-image: url('/themes/${folder.theme}.png'); position: relative; background-position: center; background-size: cover; `"
             class="__b _flex _fd-co">
@@ -316,7 +315,7 @@
 
                 <!-- MOVE FOLDER -->
                 <Folder @select-folder="selectFolderToMove" v-if="text.cleanup(moveFoldersSearch).length == 0"
-                    v-for="f in ds.getOrphanFolders()" :key="f.id" :folder="f" :allFolders="allFolders" :level="0"
+                    v-for="f in orphanFolders" :key="f.id" :folder="f" :allFolders="allFolders" :level="0"
                     :tab="false" />
 
                 <FolderTab @select-folder="selectFolderToMove" v-if="text.cleanup(moveFoldersSearch).length > 0"
@@ -377,6 +376,10 @@ export default {
             return Number(this.$route.params.id) || null;
         },
 
+        cardIndex() {
+            return this.folderCards.findIndex(c => c.id == this.cardId);
+        },
+
         // CARD Q, A, STATUS //
         q() {
             return this.card.q;
@@ -388,10 +391,14 @@ export default {
             return this.card.status == 0 ? "grey" : this.card.status == 1 ? "err" : "succ";
         },
 
-
         // DATA STORE //
         ds() {
             return useDataStore();
+        },
+
+        // INITIALISED //
+        initialised() {
+            return true;
         }
     },
 
@@ -406,23 +413,28 @@ export default {
             k = k.toLowerCase();
 
             if (k == "shift") {
+                e.preventDefault();
                 this.toggle();
             }
 
             if (k == "arrowright") {
+                e.preventDefault();
                 this.next();
             }
 
             if (k == "arrowleft") {
+                e.preventDefault();
                 this.prev();
             }
 
             if (k == "arrowup" && this.show == true && this.showIcons == true) {
+                e.preventDefault();
                 this.mark(2);
             }
 
-            if (k == "arrowdown" && this.show == true && this.showIcons == true) {
-                this.mark(1);
+            if (k == "enter" && this.show == true && this.showIcons == true) {
+                e.preventDefault();
+                this.mark(0);
             }
         },
 
@@ -463,13 +475,34 @@ export default {
         mark(v) {
             switch (v) {
                 case 2:
-                    this.ds.markCards([this.card.id], 2);
+                    this.card.status = 2;
+
+                    this.ds.markCards([this.card.id], 2).then(r => {
+                        if (!r) {
+                            useResponseStore().updateResponse("Failed to mark card", "err");
+                            return;
+                        }
+                    })
                     break;
                 case 1:
-                    this.ds.markCards([this.card.id], 1);
+                    this.card.status = 1;
+
+                    this.ds.markCards([this.card.id], 1).then(r => {
+                        if (!r) {
+                            useResponseStore().updateResponse("Failed to mark card", "err");
+                            return;
+                        }
+                    })
                     break;
                 case 0:
-                    this.ds.markCards([this.card.id], 0);
+                    this.card.status = 0;
+
+                    this.ds.markCards([this.card.id], 0).then(r => {
+                        if (!r) {
+                            useResponseStore().updateResponse("Failed to mark card", "err");
+                            return;
+                        }
+                    })
                     break;
             }
 
@@ -516,14 +549,15 @@ export default {
 
             this.editingCard = false;
 
-            this.editData.q = q;
-            this.editData.a = a;
+            this.card.q = q;
+            this.card.a = a;
 
             useResponseStore().updateResponse("Card updated successfully", "succ");
         },
         cancelEdit() {
             this.editData.q = this.card.q;
             this.editData.a = this.card.a;
+
             this.editingCard = false;
         },
 
@@ -552,6 +586,8 @@ export default {
                 this.moveFoldersLimit = 10;
                 this.moveFoldersSearch = '';
 
+                this.initialiseCard();
+
                 useResponseStore().updateResponse("Card moved successfully", "succ");
             });
         },
@@ -570,33 +606,56 @@ export default {
             if (!this.transitioning) {
                 this.$router.push("/card/" + this.folderCards[this.cardIndex - 1].id);
             }
-        }
+        },
+
+        // SET CARD DATA //
+        initialiseCard() {
+            this.ds.getCardById(this.cardId).then(card => {
+                this.cardExists = false;
+                if (!card) return;
+
+                this.card = card;
+                this.cardExists = true;
+
+                this.editData.q = this.card.q;
+                this.editData.a = this.card.a;
+
+                // reset move folders
+                this.showMoveFolders = false;
+                this.moveFoldersSearch = "";
+                this.moveFoldersLimit = 10;
+
+                // hide answer
+                this.show = false;
+                this.transitioning = false;
+                this.showIcons = false;
+
+                this.ds.getFolderById(this.card.folder).then(folder => {
+                    // SET FOLDER //    
+                    this.folder = folder;
+
+                    // SET FOLDER RELATIONS //
+                    this.ds.getCardsByFolder(this.folder.id).then(cards => {
+                        this.folderCards = cards;
+                    });
+                    this.ds.getAncestors(this.folder.id).then(ancestors => {
+                        this.folderAncestors = ancestors;
+                    });
+                });
+            });
+
+            this.ds.getAllFolders().then(folders => {
+                this.allFolders = folders;
+            });
+            this.ds.getOrphanFolders().then(folders => {
+                this.orphanFolders = folders;
+            });
+        },
     },
 
     created() {
         // SET CARD DATA //
-        this.ds.getCard(this.cardId).then(card => {
-            this.card = card;
-
-            if (this.card)
-                this.cardExists = true;
-
-            this.editData.q = this.card.q;
-            this.editData.a = this.card.a;
-
-            this.ds.getFolderById(this.card.folder).then(folder => {
-                // SET FOLDER //    
-                this.folder = folder;
-
-                // SET FOLDER RELATIONS //
-                this.ds.getCardsByFolder(this.folder.id).then(cards => {
-                    this.folderCards = cards;
-                });
-                this.ds.getAncestors(this.folder.id).then(ancestors => {
-                    this.folderAncestors = ancestors;
-                });
-            });
-        });
+        this.initialiseCard();
     },
 
     data() {
@@ -612,7 +671,7 @@ export default {
             folder: {},
             card: {},
 
-            cardExists: false,
+            cardExists: true,
 
             // EDIT CARD DATA //
             editingCard: false,
@@ -626,47 +685,24 @@ export default {
             moveFoldersSearch: "",
             moveFoldersLimit: 10,
 
+            // FOLDERS //
+            allFolders: [],
+            orphanFolders: [],
+
             // IDB DATA //
             folderCards: [],
             folderAncestors: [],
 
-
-            // FOLDER & RELATIONSHIPS //
-            folderCards() {
-                return this.ds.getCardsByFolder(this.folder.id);
-            },
-            folderAncestors() {
-                return this.ds.getAncestors(this.folder.id, true);
-            },
+            // FOLDER RELATIONSHIPS //
+            folderCards: [],
+            folderAncestors: []
         }
     },
 
     watch: {
         // UPDATE CARD DATA WHEN CARD ID CHANGES //
         cardId() {
-            this.editData.q = this.card.q;
-            this.editData.a = this.card.a;
-
-            this.showMoveFolders = false;
-            this.moveFoldersSearch = "";
-            this.moveFoldersLimit = 10;
-
-            this.show = false;
-
-            this.transitioning = false;
-
-            this.showIcons = false;
-
-            this.ds.getCard(this.cardId).then(card => {
-                this.card = card;
-
-                if (!this.card)
-                    this.cardExists = false; return;
-
-                this.ds.getFolderById(this.card.folder).then(folder => {
-                    this.folder = folder;
-                });
-            });
+            this.initialiseCard();
         }
     }
 }

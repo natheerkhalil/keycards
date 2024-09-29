@@ -9,7 +9,11 @@
 
     <br>
 
-    <router-link style="margin-bottom: 20px; " v-for="v in mainFolders" class="__nun" :to="`folder/${v.id}`">
+    <div style="margin-top: 50px;" class="__b _flex _cc __mauto" v-if="!initialised">
+      <div class="__pulse-loader"></div>
+    </div>
+
+    <router-link v-if="initialised" style="margin-bottom: 20px; " v-for="v in mainFolders" class="__nun" :to="`folder/${v.id}`">
 
       <div :id="`el-folder_${v.id}`"
         :style="`position: relative; background-size: cover; background-image: url('/themes/${v.theme}.webp'); background-position: center;`"
@@ -20,10 +24,10 @@
         </div>
 
         <div style="z-index: 999;" class="__b _flex _fd-co">
-          <div class="__b _flex _jc-be _ai-ce _m-sm-fd-co _m-sm-cc">
+          <div class="__b _flex _jc-be _ai-ce ">
 
             <!-- FOLDER NAME -->
-            <div class="_m-ms-cc _ai-st __padxs _flex _fd-co __b">
+            <div class="_ai-st __padxs _flex _fd-co __b">
               <p :id="`ftitle_${v.id}`"
                 :style="`color: var(--${v.theme}4); white-space: wrap; max-width: 100%; outline: none;`"
                 class="__un __txt-4 __tlg __bo">{{
@@ -158,6 +162,10 @@ export default {
 
     mainFolders() {
       return this.allFolders;
+    },
+
+    initialised() {
+      return this.allFolders[0].progress && this.allFolders[0].overlay;
     }
   },
 

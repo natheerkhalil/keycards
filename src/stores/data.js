@@ -172,6 +172,8 @@ export const useDataStore = defineStore({
             const result = await request({ cards: cardIds, folder: folderId }, '/cards/move');
             if (result.failed) return false;
 
+            console.log("Card has been moved to folder:", folderId);
+
             for (const cardId of cardIds) {
                 const card = await getCardById(cardId);
                 if (card) {
