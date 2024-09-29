@@ -64,8 +64,10 @@ export const useDataStore = defineStore({
                 // Clear queue
                 this.clearq();
 
-                for (const folder of folders) {
-                    await this.updateFolderCards(folder.id);
+                const orphans = await this.getOrphanFolders();
+
+                for (o in orphans) {
+                    await this.updateFolderCards(o.id);
                 }
 
                 console.log('Data successfully fetched and stored in IndexedDB');
@@ -124,8 +126,6 @@ export const useDataStore = defineStore({
 
             cards = result.data.cards;
 
-            console.log("Created cards:", cards);
-
             for (const card of cards) {
                 const newCard = { ...card, folder };
                 let result = await saveCard(newCard);
@@ -153,8 +153,6 @@ export const useDataStore = defineStore({
             cardIds = cardIds.map(Number);
             mark = Number(mark);
 
-            console.log("Card IDs:", cardIds);
-
             const result = await request({ cards: cardIds, status: mark }, '/cards/mark');
             if (result.failed) return false;
 
@@ -175,9 +173,7 @@ export const useDataStore = defineStore({
 
             const result = await request({ cards: cardIds, folder: folderId }, '/cards/move');
             if (result.failed) return false;
-
-            console.log("Card has been moved to folder:", folderId);
-
+            
             for (const cardId of cardIds) {
                 const card = await getCardById(cardId);
                 if (card) {
@@ -223,9 +219,15 @@ export const useDataStore = defineStore({
 
             localStorage.setItem(`folder_card_count_${folderId}`, JSON.stringify(count));
             localStorage.setItem(`folder_card_status_${folderId}`, JSON.stringify(status));
+
+            console.log("Cards of folder:", folderId, "have been updated with card count and status");
         },
 
         getFolderCards(folderId) {
+            if (!localStorage.getItem(`folder_card_count_${folderId}`)) {
+                this.updateFolderCards(folderId);
+            }
+
             const count = Number(localStorage.getItem(`folder_card_count_${folderId}`));
             const status = JSON.parse(localStorage.getItem(`folder_card_status_${folderId}`));
 
@@ -351,8 +353,6 @@ export const useDataStore = defineStore({
             const ancestors = [];
             let currentFolder = await getFolderById(folderId);
 
-            console.log("Getting ancestors for folder", folderId, "removeSelf", removeSelf);
-
             if (!removeSelf) {
                 ancestors.push(currentFolder);
             }
@@ -376,8 +376,6 @@ export const useDataStore = defineStore({
                 const folderCards = await getCardsByFolder(id);
                 cards.push(...folderCards);
             }
-
-            console.log("Total descendant cards:", cards.length);
 
             return cards;
         },
