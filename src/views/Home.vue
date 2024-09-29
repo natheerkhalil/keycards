@@ -194,22 +194,17 @@ export default {
           let id = f.id;
 
           // card count
-          this.ds.getDescendantCards(id).then(cards => {
-            folders[i]["cardCount"] = cards.length;
-          });
+          folders[i]["cardCount"] = this.ds.getFolderCards(id).count;
+          
           // folder count
           this.ds.getDescendants(id).then(descendants => {
-            console.log("descendants: ", descendants);
             folders[i]["folderCount"] = descendants.length;
           });
+
           // progress overlay
-          this.ds.getFolderProgressOverlay(id).then(overlay => {
-            folders[i]["overlay"] = overlay;
-          })
+          folders[i]["overlay"] = this.ds.getFolderProgressOverlay(id);
           // card progress
-          this.ds.getFolderCardProgress(id).then(progress => {
-            folders[i]["progress"] = progress;
-          })
+          folders[i]["progress"] = this.ds.getFolderCardProgress(id);
 
           this.allFolders.push(folders[i]);
         }

@@ -84,7 +84,7 @@
                 <!-- FOLDER TITLE -->
                 <div class="__b _flex _cc _fd-co">
                     <p :class="`__b __tal __txl __bo`" :style="`color: var(--${folder.theme}4)`">{{ folder.name }}</p>
-                    <p :style="`color: var(--${folder.theme}4)`"><strong>{{ cardCount
+                    <p :style="`color: var(--${folder.theme}4)`"><strong>{{ folderCardCount
                             }}</strong> cards / <strong>{{
                                 folderCount }}</strong> folders</p>
                 </div>
@@ -462,6 +462,14 @@ export default {
             return useDataStore();
         },
 
+        // CARD COUNT & STATUS //
+        folderCardCount() {
+            return this.ds.getFolderCards(this.folderId).count;
+        },
+        folderCardStatus() {
+            return this.ds.getFolderCards(this.folderId).status;
+        },
+
         // INITIALISED  
         initialised() {
            /* return this.folder &&
@@ -602,23 +610,18 @@ export default {
                         let c = children[i];
 
                         // card count
-                        this.ds.getDescendantCards(c.id).then(descendantCards => {
-                            children[i]["cardCount"] = descendantCards.length;
-                        });
+                        children[i]["cardCount"] = this.ds.getFolderCards(c.id).count;
+
                         // folder count
                         this.ds.getDescendants(c.id, true).then(descendants => {
                             children[i]["folderCount"] = descendants.length;
                         });
 
-
                         // progress overlay
-                        this.ds.getFolderProgressOverlay(c.id).then(overlay => {
-                            children[i]["overlay"] = overlay;
-                        })
+                        children[i]["overlay"] = this.ds.getFolderProgressOverlay(c.id);
+                        
                         // card progress
-                        this.ds.getFolderCardProgress(c.id).then(progress => {
-                            children[i]["progress"] = progress;
-                        })
+                        children[i]["progress"] = this.ds.getFolderCardProgress(c.id);
                     }
 
                     this.childrenFolders = children;

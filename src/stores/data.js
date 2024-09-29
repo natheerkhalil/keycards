@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import {
     getAllFolders, getAllCards, getFolderById, getCardById, getCardsByFolder,
-    saveFolder, saveCard, deleteFolderById, deleteCardById, updateCard, updateFolder
+    saveFolder, saveCard, deleteFolderById, deleteCardById, updateCard, updateFolder,
 } from '@/utils/idb';
 
 import { request } from '@/main';
@@ -11,9 +11,6 @@ export const useDataStore = defineStore({
     state: () => ({
         folders: [],
         cards: [],
-
-        folderCards: [],
-        folderStatuses: [],
 
         method: localStorage.getItem('method') || 'm',
         sep_qa: localStorage.getItem('sep_qa') || ']',
@@ -52,20 +49,24 @@ export const useDataStore = defineStore({
 
                 const { folders, cards } = res.data;
 
-                // Save folders to IndexedDB
-                for (const folder of folders) {
-                    await saveFolder(folder);
-                    this.folders.push(folder); // Update in-memory state
-                }
-
                 // Save cards to IndexedDB
                 for (const card of cards) {
                     await saveCard(card);
                     this.cards.push(card); // Update in-memory state
                 }
 
+                // Save folders to IndexedDB
+                for (const folder of folders) {
+                    await saveFolder(folder);
+                    this.folders.push(folder); // Update in-memory state
+                }
+
                 // Clear queue
                 this.clearq();
+
+                for (const folder of folders) {
+                    await this.updateFolderCards(folder.id);
+                }
 
                 console.log('Data successfully fetched and stored in IndexedDB');
             } catch (error) {
@@ -198,7 +199,7 @@ export const useDataStore = defineStore({
                 const card = await getCardById(cardId);
                 if (card) {
                     await deleteCardById(cardId);
-                    this.cards = this.cards.filter(c => c.id!== cardId);
+                    this.cards = this.cards.filter(c => c.id !== cardId);
                 }
             }
 
@@ -206,6 +207,31 @@ export const useDataStore = defineStore({
         },
 
         // --- Modifying Data (Folders) ---
+        async updateFolderCards(folderId) {
+            const cards = await this.getDescendantCards(folderId);
+
+            let count = cards.length;
+            let status = {
+                "0": 0,
+                "1": 0,
+                "2": 0
+            };
+
+            for (let c of cards) {
+                status[c.status] = status[c.status] + 1;
+            }
+
+            localStorage.setItem(`folder_card_count_${folderId}`, JSON.stringify(count));
+            localStorage.setItem(`folder_card_status_${folderId}`, JSON.stringify(status));
+        },
+
+        getFolderCards(folderId) {
+            const count = Number(localStorage.getItem(`folder_card_count_${folderId}`));
+            const status = JSON.parse(localStorage.getItem(`folder_card_status_${folderId}`));
+
+            return { count: count, status: status };
+        },
+
         async appendFolder([id, name, parent, theme]) {
             id = Number(id);
 
@@ -386,13 +412,9 @@ export const useDataStore = defineStore({
         },
 
         // CARD PROGRESS //
-        async getFolderCardProgress(id, noDescendants = false) {
-            let cards;
-
-            if (noDescendants)
-                cards = await this.getCardsByFolder(id);
-            else
-                cards = await this.getDescendantCards(id);
+        getFolderCardProgress(id, noDescendants = false) {
+            let count = this.getFolderCards(id).count;
+            let status = this.getFolderCards(id).status;
 
             let col = {
                 0: "var(--grey_5)",
@@ -400,14 +422,14 @@ export const useDataStore = defineStore({
                 2: "var(--succ_4)"
             };
 
-            if (cards.length === 0) {
+            if (count === 0) {
                 return `${col[1]} 0%, ${col[1]} 0%, ${col[2]} 0%, ${col[2]} 0%, ${col[0]} 0%, ${col[0]} 100%`;
             }
 
-            let total = cards.length;
-            let redCount = cards.filter(c => c.status == "1").length;
-            let greenCount = cards.filter(c => c.status == "2").length;
-            let greyCount = cards.filter(c => c.status == "0").length;
+            let total = count;
+            let redCount = status["1"];
+            let greenCount = status["2"];
+            let greyCount = status["0"];
 
             let redPercent = (redCount / total) * 100;
             let greenPercent = (greenCount / total) * 100;
@@ -427,10 +449,10 @@ export const useDataStore = defineStore({
 
             return cards.filter(c => c.status == status).length;
         },
-        async getFolderProgressOverlay(id, noDescendants = false) {
-            let st_0 = await this.getFolderCardStatus(id, 0);
-            let st_1 = await this.getFolderCardStatus(id, 1);
-            let st_2 = await this.getFolderCardStatus(id, 2);
+        getFolderProgressOverlay(id, noDescendants = false) {
+            let st_0 = this.getFolderCards(id).status["0"];
+            let st_1 = this.getFolderCards(id).status["2"];
+            let st_2 = this.getFolderCards(id).status["1"];
 
             return `<span class="__bo __txt-err-4">${st_1}</span>
 
@@ -493,7 +515,7 @@ export const useDataStore = defineStore({
             this.sep_cd = sep_cd;
             this.saveSeparators();
         },
-        
+
         saveMethod() {
             localStorage.setItem('method', this.method);
         },
