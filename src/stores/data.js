@@ -39,7 +39,7 @@ export const useDataStore = defineStore({
                 await this.clearData();
 */
 
-                console.log(this.minimalCards);
+await this.loadStoredData();
                 // If there's no queue to fetch data, return
                 if (!this.existsq()) {
                     return;
@@ -303,6 +303,17 @@ export const useDataStore = defineStore({
             let count = filteredCards.length;
 
             return { count: count, status: status, folders: result, folderCount: (result.length - 1) };
+        },
+
+        async updateFolderOrder(folderId, order) {
+            folderId = Number(folderId);
+            order = Number(order);
+
+            const folder = await getFolderById(folderId);
+            if (folder) {
+                folder.order = order;
+                await updateFolder(folder);
+            }
         },
 
         async appendFolder([id, name, parent, theme]) {

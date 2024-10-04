@@ -164,58 +164,70 @@
 
             <br>
 
-            <div @scroll="debounceUpdateFolderLimit" style="max-height: 700px; overflow-y: auto;"
-                class="__b _flex _fd-co _cc _fw-wr __w __custscroll">
+            <div @scroll="debounceUpdateFolderLimit" style="max-height: 700px; overflow-x: hidden; overflow-y: auto;"
+                class="__b _flex _fd-co _ai-ce _jc-ar _fw-wr __w __custscroll">
 
                 <!-- CHILDREN FOLDERS -->
-                <router-link style="margin-bottom: 10px; "
-                    v-for="v in childrenFolders.slice(0, folderLimit).filter(f => f.name.toLowerCase().includes(searchChildrenFolders.toLowerCase()))"
-                    class="__nun" :to="`${v.id}`">
+                <draggable class="__b _flex _fd-co" v-model="childrenFolders" group="childrenFolders"
+                    @start="drag = true;" @end="drag = false; updateChildrenFolderOrder();" item-key="id">
 
-                    <div :id="`child-folder_${v.id}`"
-                        :style="`margin-right: 15px; width: 500px; border-color: var(--${v.theme}3); position: relative; background-size: cover; background-image: url('/themes/${v.theme}.png'); background-position: center;`"
-                        :class="`folder __po __hv-6 __hv __13 __w _flex __mlauto __mauto _fd-co __padsm __bdxs __bo-2`">
+                    <template #item="{ element }">
+                        <router-link style="margin-bottom: 10px; " class="__nun" :to="`${element.id}`">
+
+                            <div :id="`child-folder_${element.id}`"
+                                :style="`margin-right: 15px; border-color: var(--${element.theme}3); position: relative; background-size: cover; background-image: url('/themes/${element.theme}.png'); background-position: center;`"
+                                :class="`folder __po __hv-6 __hv __13 __w _flex __mlauto __mauto _fd-co __b __padsm __bdxs __bo-2`">
 
 
-                        <div
-                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
-                        </div>
-
-                        <div style="z-index: 999;" class="__b _flex _fd-co">
-                            <div class="__b _flex _jc-be _ai-ce _m-sm-fd-co _m-sm-cc">
-
-                                <!-- CHILD FOLDER NAME -->
-                                <div class="__noscroll _flex"
-                                    style="margin-right: 15px; max-width: 90%; overflow-x: auto;">
-                                    <p :style="`color: var(--${v.theme}4); overflow-x: auto; white-space: wrap;min-width: max-content; outline: none;`"
-                                        :id="`ftitle_${v.id}`" :class="['__txt-4', '__tlg', '__bo']">{{
-                                            v.name }}</p>
+                                <div
+                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
                                 </div>
 
-                                <!-- CHILD FOLDER CARDS -->
-                                <div class="_flex _fd-co">
-                                    <p :style="`min-width: max-content; color: var(--${v.theme}4)`"><strong>{{
-                                        v.cardCount || 0 }}</strong> cards</p>
+                                <div style="z-index: 999;" class="__b _flex _fd-co">
+                                    <div class="__b _flex _jc-be _ai-ce _m-sm-fd-co _m-sm-cc">
 
-                                    <p :style="`min-width: max-content; color: var(--${v.theme}4)`"><strong>{{
-                                        v.folderCount || 0 }}</strong> folders</p>
+                                        <!-- CHILD FOLDER NAME -->
+                                        <div class="__noscroll _flex"
+                                            style="margin-right: 15px; max-width: 90%; overflow-x: auto;">
+                                            <p :style="`color: var(--${element.theme}4); overflow-x: auto; white-space: wrap;min-width: max-content; outline: none;`"
+                                                :id="`ftitle_${element.id}`" :class="['__txt-4', '__tlg', '__bo']">{{
+                                                    element.name }}</p>
+                                        </div>
+
+                                        <!-- CHILD FOLDER CARDS -->
+                                        <div class="_flex _fd-co">
+                                            <p :style="`min-width: max-content; color: var(--${element.theme}4)`">
+                                                <strong>{{
+                                                    element.cardCount || 0 }}</strong> cards
+                                            </p>
+
+                                            <p :style="`min-width: max-content; color: var(--${element.theme}4)`">
+                                                <strong>{{
+                                                    element.folderCount || 0 }}</strong> folders
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <br>
+
+                                    <!-- CHILD FOLDER PROGRESS -->
+                                    <div :style="`background: linear-gradient(to right, ${element.progress});`"
+                                        class="progress">
+                                        <!-- FOLDER CARD PROGRESS -->
+                                        <div v-html="element.overlay ? element.overlay : defaultOverlay"
+                                            class="progress-overlay">
+                                        </div>
+                                        <!-- FOLDER CARD PROGRESS -->
+                                    </div>
+                                    <br>
                                 </div>
                             </div>
 
-                            <br>
+                        </router-link>
 
-                            <!-- CHILD FOLDER PROGRESS -->
-                            <div :style="`background: linear-gradient(to right, ${v.progress});`" class="progress">
-                                <!-- FOLDER CARD PROGRESS -->
-                                <div v-html="v.overlay ? v.overlay : defaultOverlay" class="progress-overlay">
-                                </div>
-                                <!-- FOLDER CARD PROGRESS -->
-                            </div>
-                            <br>
-                        </div>
-                    </div>
+                    </template>
 
-                </router-link>
+                </draggable>
             </div>
 
         </div>
@@ -239,7 +251,8 @@
                             <path
                                 d="M8 10v4h4l-6 7-6-7h4v-4h-4l6-7 6 7h-4zm16 5h-10v2h10v-2zm0 6h-10v-2h10v2zm0-8h-10v-2h10v2zm0-4h-10v-2h10v2zm0-4h-10v-2h10v2z" />
                         </svg>
-                        <p><strong style="color: var(--theme1)">{{ cards.filter(c => c.selected).length }}</strong> / {{ cards.length }}</p>
+                        <p><strong style="color: var(--theme1)">{{ cards.filter(c => c.selected).length }}</strong> / {{
+                            cards.length }}</p>
                     </div> &nbsp; &nbsp; &nbsp; &nbsp;
 
                     <div v-if="cards.filter(c => c.selected == true).length > 0" class="_flex _fd-ro">
@@ -429,6 +442,8 @@ import { useDataStore } from '@/stores/data';
 import Folder from '@/components/Folder/Folder.vue';
 import FolderTab from '@/components/Folder/FolderTab.vue';
 
+import draggable from 'vuedraggable/src/vuedraggable'
+
 import { text } from '@/main';
 
 function debounce(fn, delay) {
@@ -442,7 +457,8 @@ function debounce(fn, delay) {
 export default {
     components: {
         Folder,
-        FolderTab
+        FolderTab,
+        draggable
     },
 
     computed: {
@@ -464,6 +480,7 @@ export default {
         ds() {
             return useDataStore();
         },
+
     },
 
     data() {
@@ -547,7 +564,6 @@ export default {
         this.initialiseFolder();
     },
 
-
     methods: {
         // INITIALISE FOLDER DATA //
         initialiseFolder() {
@@ -608,10 +624,14 @@ export default {
                         // card progress
                         children[i]["progress"] = this.ds.getFolderCardProgress(c.id);
 
-                        console.log(children[i]);
+                        // set order
+                        children[i]["order"] = children[i].order;
                     }
 
                     this.initialised = true;
+
+                    // sort children folders by order ascending
+                    children.sort((a, b) => a.order - b.order);
 
                     this.childrenFolders = children;
                 });
@@ -692,6 +712,15 @@ export default {
         updatemoveFoldersLimit(e) {
             if (e.target.scrollTop + e.target.offsetHeight >= e.target.scrollHeight) {
                 this.moveFoldersLimit += 25;
+            }
+        },
+
+        // REORDER CHILDREN FOLDERS //
+        async updateChildrenFolderOrder() {
+            for (let i = 0; i < this.childrenFolders.length; i++) {
+                this.childrenFolders[i].order = i;
+
+                await this.ds.updateFolderOrder(this.childrenFolders[i].id, i);
             }
         },
 
