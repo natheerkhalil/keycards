@@ -164,8 +164,8 @@
 
             <br>
 
-            <div @scroll="debounceUpdateFolderLimit" style="overflow-x: auto;"
-                class="__b _flex _ai-ce _fd-ro __w __custscroll">
+            <div @scroll="debounceUpdateFolderLimit" style="max-height: 700px; overflow-y: auto;"
+                class="__b _flex _fd-co _cc _fw-wr __w __custscroll">
 
                 <!-- CHILDREN FOLDERS -->
                 <router-link style="margin-bottom: 10px; "
