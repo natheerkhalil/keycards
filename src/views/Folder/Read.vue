@@ -21,7 +21,7 @@
     <div v-if="folderExists && initialised" class="__15 __mlauto __mrauto _flex _fd-co __w">
 
         <br>
-        <div :style="`background-image: url('/themes/${folder.theme}.png'); position: relative; background-position: center; background-size: cover; `"
+        <div :style="`background-image: url('/themes/${folder.theme}.webp'); position: relative; background-position: center; background-size: cover; `"
             class="__b _flex _fd-co">
 
             <div
@@ -175,7 +175,7 @@
                         <router-link style="margin-bottom: 10px; " class="__nun" :to="`${element.id}`">
 
                             <div :id="`child-folder_${element.id}`"
-                                :style="`margin-right: 15px; border-color: var(--${element.theme}3); position: relative; background-size: cover; background-image: url('/themes/${element.theme}.png'); background-position: center;`"
+                                :style="`margin-right: 15px; border-color: var(--${element.theme}3); position: relative; background-size: cover; background-image: url('/themes/${element.theme}.webp'); background-position: center;`"
                                 :class="`folder __po __hv-6 __hv __13 __w _flex __mlauto __mauto _fd-co __b __padsm __bdxs __bo-2`">
 
 

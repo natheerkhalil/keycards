@@ -36,7 +36,7 @@
 
                 <div class=" _sm-b" v-for="v in themes"
                     style="flex-grow: 1; margin: 5px; width: 200px; height: 200px; position: relative;">
-                    <img :src="`/themes/${v}.png`" style="object-fit: cover; width: 100%; height: 100%;">
+                    <img :src="`/themes/${v}.webp`" style="object-fit: cover; width: 100%; height: 100%;">
                     <div @click="changeTheme(v)"
                         style="position: absolute; top: 0; left: 0; background: rgba(0, 0, 0, 0.5);"
                         :class="[['_flex', '__b', '__hack', '_cc', '__po', '__bo-5'], v == this.folder.theme ? [`__bd-${v}`] : ['__bo-grey-10'],]">

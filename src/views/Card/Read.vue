@@ -16,7 +16,7 @@
 
     <div v-if="cardExists && initialised" class="__15 __mlauto __mrauto _flex _fd-co __w">
 
-        <div :style="`background-image: url('/themes/${folder.theme}.png'); position: relative; background-position: center; background-size: cover; `"
+        <div :style="`background-image: url('/themes/${folder.theme}.webp'); position: relative; background-position: center; background-size: cover; `"
             class="__b _flex _fd-co">
 
             <div
@@ -718,7 +718,7 @@ export default {
                 <div class="__b _flex _fd-co"
                     v-for="v in ds.getOrphanFolders().filter(f => f.name.toLowerCase().trim().includes(moveFoldersSearch)).slice(0, moveFoldersLimit).filter(f => f.id != this.folder.id)">
                     <div @click="selectFolderToMove(v.id)"
-                        :style="`position: relative; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${v.theme}.png')`"
+                        :style="`position: relative; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${v.theme}.webp')`"
                         class="__po __b _flex _fd-ro __padsm">
 
                         <div
@@ -737,7 +737,7 @@ export default {
                         </div>
                     </div>
                     <div style="margin-left: 25px" class="_fd-co _flex" v-for="x in ds.getFoldersByParent(v.id)" @click="selectFolderToMove(x.id)">
-                        <div :style="`position: relative; padding-left: 15px; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${x.theme}.png')`"
+                        <div :style="`position: relative; padding-left: 15px; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${x.theme}.webp')`"
                             class="__po __b _flex _fd-ro __padsm">
 
                             <div
@@ -755,7 +755,7 @@ export default {
                             </div>
                         </div>
                     <div style="margin-left: 25px" class="_flex" v-for="z in ds.getFoldersByParent(x.id)" @click="selectFolderToMove(z.id)">
-                        <div :style="`position: relative; padding-left: 15px; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${z.theme}.png')`"
+                        <div :style="`position: relative; padding-left: 15px; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${z.theme}.webp')`"
                             class="__po __b _flex _fd-ro __padsm">
 
                             <div

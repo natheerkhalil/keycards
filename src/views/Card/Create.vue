@@ -16,7 +16,7 @@
 
     <div v-if="folderExists" class="__15 __w __mlauto __mrauto _flex _fd-co">
 
-        <div :style="`background-image: url('/themes/${folder.theme}.png'); position: relative; background-position: center; background-size: cover; `"
+        <div :style="`background-image: url('/themes/${folder.theme}.webp'); position: relative; background-position: center; background-size: cover; `"
             class="__b _flex _fd-co">
 
             <div
