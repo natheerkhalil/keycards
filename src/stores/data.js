@@ -309,12 +309,14 @@ await this.loadStoredData();
             folderId = Number(folderId);
             order = Number(order);
 
-            const folder = await getFolderById(folderId);
-            if (folder) {
-                folder.order = order;
-                const result = await this.updateFolder(folder.id, folder.name, folder.parent, folder.theme, folder.order);
-                console.log("Folder order updated:", result);
-            }
+            const folder = await this.getFolderById(folderId);
+
+            folder.order = order;
+
+            const result = request({ folder: folderId, name: folder.name, parent: folder.parent, theme: folder.theme, order: order }, '/folder/update');
+            if (result.failed) return false;
+
+            await updateFolder(folder);
         },
 
         async appendFolder([id, name, parent, theme, order = 0]) {
