@@ -40,6 +40,15 @@
 
                     &nbsp; &nbsp;
 
+                    <!-- MOVE FOLDER -->
+                    <svg :style="`fill: var(--${folder.theme}4)`" @click="moveFolder" class="__po f-svg" width="24"
+                        height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+                        <path
+                            d="M21.669 11l-1.385 9h-16.568l-1.385-9h19.338zm-13.697-9h-6.972l.714 5h2.021l-.429-3h3.694c1.112 1.388 1.952 2 4.277 2h9.283l-.2 1h2.04l.6-3h-11.723c-1.978 0-2.041-.417-3.305-2zm16.028 7h-24l2 13h20l2-13z" />
+                    </svg>
+
+                    &nbsp; &nbsp;
+
                     <!-- DELETE FOLDER -->
                     <svg :style="`fill: var(--${folder.theme}4)`" @click="deleteFolder" class="__po f-svg" width="24"
                         height="24" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
@@ -406,7 +415,7 @@
     </div>
 
     <!-- MOVE CARD TO FOLDER-->
-    <div @click="hidemoveFolders" v-if="showmoveFolders" class="_flex modal-overlay">
+    <div @click="hideModal" v-if="showmoveFolders" class="_flex modal-overlay">
         <div style="max-width: 90%; max-height: 80vh; width: 1300px;" class="__mauto _flex _fd-co __bg-grey-10 __padsm">
             <div class="__b _flex _fd-ro _jc-be _ai-ce _m-sm-fd-co">
                 <p class="__b __tle __tlg __txt-grey-2">Move Card(s) to Folder</p>
@@ -429,6 +438,67 @@
                 <FolderTab @select-folder="selectFolderToMove" v-if="text.cleanup(moveFoldersSearch).length > 0"
                     v-for="f in allFolders.filter(f => text.cleanup(f.name, true).includes(text.cleanup(moveFoldersSearch, true)))"
                     :key="f.id" :omit="[this.folderId]" :folder="f" />
+            </div>
+        </div>
+    </div>
+
+    <!-- MOVE FOLDER TO FOLDER-->
+    <div @click="hideModal" v-if="showParentMoveFolders" class="_flex modal-overlay">
+        <div style="max-width: 90%; max-height: 80vh; width: 1300px;" class="__mauto _flex _fd-co __bg-grey-10 __padsm">
+            <div class="__b _flex _fd-ro _jc-be _ai-ce _m-sm-fd-co">
+                <p class="__b __tle __tlg __txt-grey-2">Move Folder into another Folder</p>
+
+                <!-- SEARCH MOVE FOLDERS -->
+                <input v-model="moveParentFolderSearch" type="text" placeholder="Search folder..."
+                    class="__b __bg-none __bo-none __padxs">
+            </div>
+
+            <hr style="margin: 10px 0px;" class="__b __bg-grey-2">
+
+            <div @scroll="updatemoveFoldersLimit" style="max-height: 500px; overflow-y: auto;"
+                class="__custscroll __b _flex _fd-co">
+
+                <!-- ORPHAN FOLDER -->
+                <div @click="selectParentFolderToMove('000')" class="fmsearch __b _flex _fd-ro"
+                    style="margin-bottom: 10px;">
+                    <div class="folder-content __po __b _flex _fd-ro __bdxs __padsm"
+                        style="position: relative; margin-bottom: 10px; background-size: cover; background: var(--shroud)">
+                        <div class="__bdxs"
+                            style="z-index: 1; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
+                        </div>
+                        <div class="_flex _fd-ro _ai-ce _jc-be" style="z-index: 2;"><!-- MOVE FOLDER NAME -->
+                            <p class="__bo __tmd __tle" style="color: var(--topiary4);"> [remove folder from all
+                                folders]
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MOVE FOLDER -->
+
+                <div v-if="this.initialised"
+                    v-for="folder in moveParentFolders.filter(f => text.cleanup(f.name, true).includes(text.cleanup(moveParentFolderSearch, true)))"
+                    @click="selectParentFolderToMove(folder.id)" style="margin-bottom: 10px;"
+                    class="fmsearch __b _flex _fd-ro">
+                    <div :style="`position: relative; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${folder.theme}.png')`"
+                        class="folder-content __po __b _flex _fd-ro __bdxs __padsm">
+
+                        <div class="__bdxs"
+                            style="z-index: 1; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
+                        </div>
+
+                        <div style="z-index: 2;" class="_flex _fd-ro _ai-ce _jc-be">
+                            <!-- MOVE FOLDER NAME -->
+                            <p class="__bo __tmd __tle" :style="`color: var(--${folder.theme}4)`" v-html="folder.name">
+                            </p>
+
+                            <!-- MOVE FOLDER CARD COUNT -->
+                            <p class="__txt-grey-8">&nbsp;&nbsp;&nbsp; <strong>{{ ds.minimalFolderData(folder.id).count
+                                    }}&nbsp;</strong>cards</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -490,6 +560,11 @@ export default {
             minimalData: [],
 
             initialised: false,
+
+            // FOLDERS TO MOVE INTO 
+            showParentMoveFolders: false,
+            moveParentFolderSearch: '',
+            moveParentFolders: [],
 
             // FOLDER EXISTS
             folderExists: true,
@@ -601,6 +676,23 @@ export default {
                 this.ds.getDescendantCards(this.folderId).then(descendantCards => {
                     this.descendantCards = descendantCards;
                 });
+
+                // SET FOLDRS TO MOVE INTO
+                this.moveParentFolders = [];
+
+                this.ds.getAllFolders().then(async (folders) => {
+                    folders = folders.filter(f => f.id != this.folderId);
+                    folders = folders.filter(f => !this.folderDescendants.includes(f.id));
+                    folders = folders.filter(f => f.id != this.folder.parent)
+
+                    folders.forEach(async (folder) => {
+                        folder.name = await this.ds.getAncestors(folder.id, false);
+
+                        folder.name = folder.name.reverse().map(a => a.name).join("&nbsp;&rarr;&nbsp;");
+
+                        this.moveParentFolders = folders;
+                    });
+                })
 
                 // SET DESCENDANTS & CHILDREN
                 this.ds.getDescendants(this.folderId, true).then(descendants => {
@@ -835,10 +927,60 @@ export default {
         },
 
         // HIDE MOVE FOLDERS //
-        hidemoveFolders(e) {
+        hideModal(e) {
             if (e.target.className.includes("modal-overlay")) {
                 this.showmoveFolders = false;
+                this.showParentMoveFolders = false;
             }
+        },
+
+        // MOVE FOLDER INTO ANOTHER FOLDER //
+        moveFolder() {
+            this.showParentMoveFolders = true;
+        },
+        async selectParentFolderToMove(id) {
+            if (id == '000') {
+                this.showParentMoveFolders = false;
+
+                const result = await this.ds.updateFolder(this.folder.id, this.folder.name, null, this.folder.theme);
+
+                if (!result) {
+                    useResponseStore().updateResponse("Failed to move folder", "err");
+                    return;
+                }
+
+                useResponseStore().updateResponse("Folder moved successfully", "succ");
+
+                this.showParentMoveFolders = false;
+                this.initialiseFolder();
+            }
+
+            id = Number(id);
+
+            if (id == this.folder.id) {
+                useResponseStore().updateResponse("You can't move a folder into itself.", "warn");
+                return;
+            }
+
+            const descendants = await this.ds.getDescendants(this.folder.id);
+
+            if (descendants.includes(id)) {
+                useResponseStore().updateResponse("You can't move a folder into a descendant folder.", "warn");
+                return;
+            }
+
+            const result = await this.ds.updateFolder(this.folder.id, this.folder.name, id, this.folder.theme);
+
+            if (!result) {
+                useResponseStore().updateResponse("Failed to move folder", "err");
+                return;
+            }
+
+            useResponseStore().updateResponse("Folder moved successfully", "succ");
+
+            this.showParentMoveFolders = false;
+            this.initialiseFolder();
+            return;
         },
 
         // SELECT CARD OPERATIONS //

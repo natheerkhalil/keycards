@@ -1,9 +1,9 @@
 <template>
     <div style="position: relative; " class="_flex __b _fd-co" :style="marginLeftStyle">
 
-        <div v-if="this.initialised" @click="selectFolder(folder.id, $event)" style="margin-bottom: 10px;" :id="`fmsearch_${folder.id}`"
+        <div v-if="this.initialised" @click="selectFolder($event)" style="margin-bottom: 10px;"
             class="fmsearch __b _flex _fd-ro">
-            <div :style="`position: relative; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${folder.theme}.png')`"
+            <div :id="`fmsearch_${folder.id}`" :style="`position: relative; margin-bottom: 10px; background-position: centre; background-size: cover; background-image: url('/themes/${folder.theme}.png')`"
                 class="folder-content __po __b _flex _fd-ro __bdxs __padsm">
 
                 <div class="__bdxs"
@@ -32,7 +32,7 @@
         </div>
 
         <div v-if="initialised && !collapsed" class="_flex _fd-co">
-            <Folder @select-folder="(id, $event) => selectFolder(id, $event)" v-for="child in children" :key="child.id" :folder="child"
+            <Folder @select-folder="selectFolder($event)" v-for="child in children" :key="child.id" :folder="child"
                 :allFolders="allFolders" :level="level + 1" />
         </div>
     </div>
@@ -110,11 +110,22 @@ export default {
             this.collapsed = !this.collapsed;
         },
 
-        selectFolder(id, event) {
+        selectFolder(e) {
+           // let id = e.target.parentElement.id.replace('fmsearch_', '');
+            //console.log('Selected folder:', id);console.log(e.target.parentElement);
+            let t = e.target;
+            while (!t.id)
+                t = t.parentElement;
+
+            console.log(t);
+            let id = t.id;
+            id = id.replace('fmsearch_', '');
+            console.log(id);
+            
             this.$emit("selectFolder", id);
 
-            event.preventDefault();
-            event.stopPropagation();
+            e.preventDefault();
+            e.stopPropagation();
         },
     },
 

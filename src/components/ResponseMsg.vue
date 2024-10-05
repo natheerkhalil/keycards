@@ -2,7 +2,7 @@
     <!--<div :style="'background-color: var(--' + rtype + '_7); z-index: 999; '" v-if="rmsg" id="respmsg" class="__po _flex _fd-co" @click="clearResponse()">
         <p style="color: black;">{{ rmsg }}</p>
     </div>-->
-    <div class="respmsg-container _flex _fd-co">
+    <div style="z-index: 999999999999999" class="respmsg-container _flex _fd-co">
         <div @click="destroyMsg(msg)" v-for="msg in msgs" class="__po _flex _fd-co">
             <div style="margin-bottom: 15px;"
                 class="_flex _fd-co respmsg-inner" :style="`background-color: var(--${msg.type}_7);`">
