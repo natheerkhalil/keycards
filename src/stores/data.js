@@ -312,14 +312,15 @@ await this.loadStoredData();
             const folder = await getFolderById(folderId);
             if (folder) {
                 folder.order = order;
-                await updateFolder(folder);
+                const result = await this.updateFolder(folder.id, folder.name, folder.parent, folder.theme, folder.order);
+                console.log("Folder order updated:", result);
             }
         },
 
-        async appendFolder([id, name, parent, theme]) {
+        async appendFolder([id, name, parent, theme, order = 0]) {
             id = Number(id);
 
-            const folder = { id, name, parent, theme };
+            const folder = { id, name, parent, theme, order: 0 };
             await saveFolder(folder);
             this.folders.push(folder);
         },
@@ -338,10 +339,10 @@ await this.loadStoredData();
             return result.data.id;
         },
 
-        async updateFolder(folderId, name, parent, theme) {
+        async updateFolder(folderId, name, parent, theme, order = null) {
             folderId = Number(folderId);
 
-            const result = request({ folder: folderId, name: name, parent: parent, theme: theme }, '/folder/update');
+            const result = request({ folder: folderId, name: name, parent: parent, theme: theme, order: order }, '/folder/update');
             if (result.failed) return false;
 
             const folder = await getFolderById(folderId);
