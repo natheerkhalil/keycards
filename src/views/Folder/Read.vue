@@ -315,6 +315,11 @@
 
             <br>
 
+            <div style="max-height: 300px; overflow-y: auto" v-html="cards.map((c, index) => [c.q, c.a]).flat().map((item, index) => index % 2 === 0 ? `${item} <br>+<br>` : ` ${item} @ <br><br>`)" class="__mauto __b _flex __bo-grey-8 __bod __bdxs __padsm">
+            </div>
+
+            <br>
+
             <div style="z-index: 0" class="__b _fw-wr _flex _cc _fd-ro">
                 <!-- CARDS -->
                 <div style="flex-grow: 1;" v-if="searchResults.length == 0" v-for="v in cards.slice(0, cardLimit)"
