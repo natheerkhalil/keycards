@@ -315,7 +315,7 @@
 
             <br>
 
-            <div style="max-height: 300px; overflow-y: auto" v-html="cards.map((c, index) => [c.q, c.a]).flat().map((item, index) => index % 2 === 0 ? `${item} <br>+<br>` : ` ${item} @ <br><br>`)" class="__mauto __b _flex __bo-grey-8 __bod __bdxs __padsm">
+            <div style="max-height: 300px; overflow-y: auto" v-html="cards.map((c, index) => [c.q, c.a]).flat().map((item, index) => index % 2 === 0 ? `${item} <br>]<br>` : ` ${item} = <br><br>`)" class="__mauto __b _flex __bo-grey-8 __bod __bdxs __padsm">
             </div>
 
             <br>
