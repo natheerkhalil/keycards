@@ -159,7 +159,7 @@
                 <div id="container" ref="container"
                     style="transition: 0.25s; height: 300px; max-height: 300px; overflow-y: auto"
                     class="__hv __b __padsm __bo-grey-7 __bo-2 _flex">
-                    <p class="__tmd __b __tal __mauto">{{ transitioning ? '' : !this.show ? q : a }}</p>
+                    <p v-html="transitioning ? '' : !this.show ? q : a " class="__tmd __b __tal __mauto"></p>
                 </div>
             </div>
 

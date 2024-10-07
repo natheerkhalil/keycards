@@ -174,8 +174,8 @@
         </form>
 
         <form v-if="method == 's'" @submit.prevent="create" class="__b _flex __mlauto __mrauto _fd-co">
-            <textarea :placeholder="`Question\n${this.sep_qa}\nAnswer\n${this.sep_cd}`" 
-                v-model="cards2" style="height: 400px; max-height: 500px; overflow-y: auto; resize: none;"
+            <textarea :placeholder="`Question\n${this.sep_qa}\nAnswer\n${this.sep_cd}`" v-model="cards2"
+                style="height: 400px; max-height: 500px; overflow-y: auto; resize: none;"
                 class="outline-focus __padsm __bo-grey-7 __bo-2 __b __bdsm"></textarea>
             <br>
             <div class="__b _flex _jc-be _ai-ce">
@@ -409,7 +409,8 @@ export default {
             try {
 
                 // Trim text
-                let str = text.cleanup(this.cards2);
+                let str = this.cards2.replace(/\n/g, '<br>');
+                str = text.cleanup(str);
 
                 // If text is empty, return
                 if (str.length == 0) {
