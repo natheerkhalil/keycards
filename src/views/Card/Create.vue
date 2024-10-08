@@ -480,11 +480,11 @@ export default {
                 }
 
                 // If any cards are empty or too long, return
-                if (empty_cards) {
+                /*if (empty_cards) {
                     this.processing = false;
                     useResponseStore().updateResponse("Some of the cards are empty.", "warn");
                     return;
-                }
+                }*/
                 if (too_long) {
                     this.processing = false;
                     useResponseStore().updateResponse("Some of the cards exceed the limit of 10,000 characters.", "warn");
