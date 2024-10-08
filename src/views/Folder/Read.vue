@@ -315,7 +315,9 @@
 
             <br>
 
-            <div style="max-height: 300px; overflow-y: auto" v-html="cards.map((c, index) => [c.q, c.a]).flat().map((item, index) => index % 2 === 0 ? `${item} <br>]<br>` : ` ${item} = <br><br>`)" class="__mauto __b _flex __bo-grey-8 __bod __bdxs __padsm">
+            <div style="max-height: 300px; overflow-y: auto"
+                v-html="cards.map((c, index) => [c.q, c.a]).flat().map((item, index) => index % 2 === 0 ? `${item} <br>]<br>` : ` ${item} = <br><br>`)"
+                class="__mauto __b _flex __bo-grey-8 __bod __bdxs __padsm">
             </div>
 
             <br>
@@ -814,11 +816,13 @@ export default {
 
         // REORDER CHILDREN FOLDERS //
         async updateChildrenFolderOrder() {
-            for (let i = 0; i < this.childrenFolders.length; i++) {
-                this.childrenFolders[i].order = i;
+            setTimeout(async () => {
+                for (let i = 0; i < this.childrenFolders.length; i++) {
+                    this.childrenFolders[i].order = i;
 
-                await this.ds.updateFolderOrder(this.childrenFolders[i].id, i);
-            }
+                    await this.ds.updateFolderOrder(this.childrenFolders[i].id, i);
+                }
+            }, 500);
         },
 
 
